@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'g:\Work\Code\grassyy\uisrc\general.ui'
+# Form implementation generated from reading ui file 'g:\Work\Code\grassyy\uisrc\window\general.ui'
 #
 # Created by: PyQt5 UI code generator 5.15.2
 #
@@ -12,9 +12,9 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 
 
 class Ui_GeneralWindow(object):
-    def setupUi(self, GeneralWindow):
+    def setupUi(self, GeneralWindow: QtWidgets.QMainWindow):
         GeneralWindow.setObjectName("GeneralWindow")
-        GeneralWindow.resize(800, 600)
+        GeneralWindow.resize(600, 600)
         GeneralWindow.setMinimumSize(QtCore.QSize(600, 600))
         self.mdi = QtWidgets.QMdiArea(GeneralWindow)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
@@ -22,13 +22,14 @@ class Ui_GeneralWindow(object):
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.mdi.sizePolicy().hasHeightForWidth())
         self.mdi.setSizePolicy(sizePolicy)
+        self.mdi.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAsNeeded)
+        self.mdi.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAsNeeded)
         self.mdi.setActivationOrder(QtWidgets.QMdiArea.ActivationHistoryOrder)
         self.mdi.setViewMode(QtWidgets.QMdiArea.SubWindowView)
         self.mdi.setObjectName("mdi")
         GeneralWindow.setCentralWidget(self.mdi)
-
         self.menubar = QtWidgets.QMenuBar(GeneralWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 800, 26))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 600, 26))
         self.menubar.setObjectName("menubar")
         self.meiPlants = QtWidgets.QMenu(self.menubar)
         self.meiPlants.setObjectName("meiPlants")
@@ -41,7 +42,7 @@ class Ui_GeneralWindow(object):
         self.action = QtWidgets.QAction(GeneralWindow)
         self.action.setObjectName("action")
         self.meiDevices = QtWidgets.QAction(GeneralWindow)
-        self.meiDevices.setObjectName("meiDeviceSettings")
+        self.meiDevices.setObjectName("meiDevices")
         self.meiRules = QtWidgets.QAction(GeneralWindow)
         self.meiRules.setObjectName("meiRules")
         self.meiLog = QtWidgets.QAction(GeneralWindow)

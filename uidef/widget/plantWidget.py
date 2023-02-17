@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'g:\Work\Code\Greenyy\uisrc\plantWidget.ui'
+# Form implementation generated from reading ui file 'g:\Work\Code\grassyy\uisrc\widget\plantWidget.ui'
 #
 # Created by: PyQt5 UI code generator 5.15.2
 #
@@ -15,6 +15,11 @@ class Ui_PlantWidget(object):
     def setupUi(self, PlantWidget):
         PlantWidget.setObjectName("PlantWidget")
         PlantWidget.resize(400, 500)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Minimum)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(PlantWidget.sizePolicy().hasHeightForWidth())
+        PlantWidget.setSizePolicy(sizePolicy)
         PlantWidget.setMinimumSize(QtCore.QSize(400, 500))
         self.gridLayout = QtWidgets.QGridLayout(PlantWidget)
         self.gridLayout.setObjectName("gridLayout")

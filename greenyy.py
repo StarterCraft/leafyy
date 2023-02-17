@@ -18,12 +18,12 @@ def main():
     generalWindow.ui.mdi.addSubWindow(PlantWidget())
     generalWindow.ui.mdi.addSubWindow(PlantWidget())
     generalWindow.ui.mdi.addSubWindow(PlantWidget())
-    generalWindow.ui.mdi.addSubWindow(PlantWidget())
+
     generalWindow.ui.mdi.cascadeSubWindows()
 
-    generalWindow.ui.meiDevices.triggered.connect(settingsWindow.show)
-    generalWindow.ui.meiPlants.triggered.connect(settingsWindow.show)
-
+    generalWindow.ui.meiDevices.triggered.connect(settingsWindow.show0)
+    generalWindow.ui.meiRules.triggered.connect(settingsWindow.show1)
+    generalWindow.ui.meiLog.triggered.connect(logWindow.show)
 
     generalWindow.show()
 

@@ -19,7 +19,26 @@
   <property name="windowTitle">
    <string>Иваров листочек</string>
   </property>
-  
+  <widget class="QMdiArea" name="mdi">
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
+   </property>
+   <property name="verticalScrollBarPolicy">
+    <enum>Qt::ScrollBarAsNeeded</enum>
+   </property>
+   <property name="horizontalScrollBarPolicy">
+    <enum>Qt::ScrollBarAsNeeded</enum>
+   </property>
+   <property name="activationOrder">
+    <enum>QMdiArea::ActivationHistoryOrder</enum>
+   </property>
+   <property name="viewMode">
+    <enum>QMdiArea::SubWindowView</enum>
+   </property>
+  </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
     <rect>
@@ -38,7 +57,7 @@
     <property name="title">
      <string>Настройки</string>
     </property>
-    <addaction name="meiDeviceSettings"/>
+    <addaction name="meiDevices"/>
     <addaction name="meiRules"/>
     <addaction name="meiLog"/>
    </widget>
@@ -51,7 +70,7 @@
     <string>Устройства...</string>
    </property>
   </action>
-  <action name="meiDeviceSettings">
+  <action name="meiDevices">
    <property name="text">
     <string>Устройства...</string>
    </property>
