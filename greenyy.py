@@ -1,31 +1,19 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 from sys import argv, exit
 
-from ui import *
-from ui.window.general import GeneralWindow
-from ui.window.settings import SettingsWindow
-from ui.window.log import LogWindow
+from ui import GreenyyUiManager
 from ui.widget.plantWidget import PlantWidget
+
+from device import GreenyyDeviceManager
 
 
 def main():
     app = QtWidgets.QApplication(argv)
+    ui = GreenyyUiManager()
+    device = GreenyyDeviceManager()
 
-    generalWindow = GeneralWindow()
-    settingsWindow = SettingsWindow()
-    logWindow = LogWindow()
-
-    generalWindow.ui.mdi.addSubWindow(PlantWidget())
-    generalWindow.ui.mdi.addSubWindow(PlantWidget())
-    generalWindow.ui.mdi.addSubWindow(PlantWidget())
-
-    generalWindow.ui.mdi.cascadeSubWindows()
-
-    generalWindow.ui.meiDevices.triggered.connect(settingsWindow.show0)
-    generalWindow.ui.meiRules.triggered.connect(settingsWindow.show1)
-    generalWindow.ui.meiLog.triggered.connect(logWindow.show)
-
-    generalWindow.show()
+    ui.generalWindow.mdi.addSubWindow(PlantWidget())
+    ui.generalWindow.show()
 
     exit(app.exec_())
 

@@ -1,0 +1,11 @@
+[
+{"address": "com0",
+"name": "канал полива для тестирования", 
+"desc": "необходимо для тестирования системы",
+"enabled": true,
+"unifiedTempSensor": null,
+"plants": [
+
+]
+}
+]
