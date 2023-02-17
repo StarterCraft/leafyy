@@ -14,3 +14,6 @@ class GreenyyUiManager():
         self.generalWindow.meiRules.triggered.connect(self.settingsWindow.show1)
         self.generalWindow.meiLog.triggered.connect(self.logWindow.show)
 
+    def deviceIntegration(self, dm):
+        for d in dm.devices:
+            self.generalWindow.meiPlants.addAction(d.address)

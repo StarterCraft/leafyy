@@ -52,5 +52,5 @@ class GreenyyDeviceManager:
             self.threadpool.start(initializer.run)
 
     def registerDevice(self, it: Device):
-        self.devices.append(Device)
+        self.devices.append(it)
         print(Device)

@@ -13,6 +13,8 @@ def main():
     device = GreenyyDeviceManager()
 
     ui.generalWindow.mdi.addSubWindow(PlantWidget())
+    
+    ui.deviceIntegration(device)
     ui.generalWindow.show()
 
     exit(app.exec_())
