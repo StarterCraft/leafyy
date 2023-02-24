@@ -16,8 +16,9 @@ def main():
     device.devices[0].port.readyRead.connect(lambda: ui.logWindow.ui.txtLogDisplay.append(str(device.devices[0].port.readLine())))
     ui.logWindow.ui.btnSend.clicked.connect( lambda: device.devices[0].port.write(bytearray(ui.logWindow.ui.lneMessage.text(), 'UTF-8')) )
 
-    ui.deviceIntegration(device)
+    #ui.deviceIntegration(device)
     ui.generalWindow.show()
+
 
     exit(app.exec_())
 

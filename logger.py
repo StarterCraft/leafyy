@@ -1,3 +1,4 @@
+#coding=utf-8
 import logging
 import os
 import time
@@ -5,7 +6,7 @@ import time
 from colorama import Fore, Style
 
 
-class AqLogger:
+class GreenyyLogger:
     '''
     Класс канала журналирования.
 
@@ -85,7 +86,7 @@ class AqLogger:
         :param 'name': str
             Имя канала журналирования
 
-        :param 'logLevel': AqLogger.LogLevel = DEBUG
+        :param 'logLevel': GreenyyLogger.LogLevel = DEBUG
             Необходимый уровень журналирования.
 
             Возможные уровни журналирования:
@@ -118,9 +119,11 @@ class AqLogger:
         self.formatString = ''
         self.getFilename()
         
+        
         self.Logger.setLevel(self.logLevel._level)
 
         self.handler = logging.FileHandler(rf'{self.filenames[0]}', 'a+', 'utf-8')
+
         self.Logger.addHandler(self.handler)
 
 
@@ -128,7 +131,7 @@ class AqLogger:
         '''
         Установить уровень журналирования.
 
-        :param 'logLevel': AqLogger.LogLevel
+        :param 'logLevel': GreenyyLogger.LogLevel
             Необходимый уровень журналирования.
 
             Возможные уровни журналирования:
@@ -156,7 +159,7 @@ class AqLogger:
 
         :returns: None
         '''
-        self.filenames.append(f'logs/{(time.strftime("""%d.%m.%Y_%H%M%S""", time.localtime()))}_AsQammLog.log')
+        self.filenames.append(f'logs/Greeny_{(time.strftime("""%d.%m.%Y_%H%M%S""", time.localtime()))}.log')
 
 
     def debug(self, message: str):
@@ -180,17 +183,7 @@ class AqLogger:
                                  '%(message)s')
         elif self.useColorama <= 1 and self.logLevel >= self.INFO:
             self.formatString = '{%(asctime)s} [%(name)s:%(levelname)s] %(message)s'
-
-        elif self.useColorama == 2 and self.logLevel == self.DEBUG:
-            self.formatString = (str(Fore.CYAN)   +  '{%(asctime)s} [' + str(Style.RESET_ALL) +
-                                 str(Fore.GREEN)  +   '%(name)s'       + str(Style.RESET_ALL) + ':'   +
-                                 str(Fore.YELLOW) +   '%(levelname)s'  + str(Style.RESET_ALL) + '] [' +
-                                 str(Fore.BLUE)   +   fileName         + str(Style.RESET_ALL) + ' <'  +
-                                 str(Fore.WHITE)  +   lineNo           + str(Style.RESET_ALL) + '>: ' +
-                                 str(Fore.BLUE)   +   moduleName       + str(Style.RESET_ALL) + '.'   +
-                                                      funcName         + ': %(message)s')
-
-        elif self.useColorama == 2 and self.logLevel >= self.INFO:
+            
             self.formatString = (str(Fore.CYAN)   +  '{%(asctime)s} [' + str(Style.RESET_ALL) +
                                  str(Fore.GREEN)  +   '%(name)s'       + str(Style.RESET_ALL) + ':'   +
                                  str(Fore.YELLOW) +   '%(levelname)s'  + str(Style.RESET_ALL) + '] [' +
@@ -225,21 +218,6 @@ class AqLogger:
         elif self.useColorama <= 1 and self.logLevel >= self.INFO:
             self.formatString = '{%(asctime)s} [%(name)s:%(levelname)s] %(message)s'
 
-        elif self.useColorama == 2 and self.logLevel == self.DEBUG:
-            self.formatString = (str(Fore.CYAN)   +  '{%(asctime)s} [' + str(Style.RESET_ALL) +
-                                 str(Fore.GREEN)  +   '%(name)s'       + str(Style.RESET_ALL) + ':'   +
-                                 str(Fore.YELLOW) +   '%(levelname)s'  + str(Style.RESET_ALL) + '] [' +
-                                 str(Fore.BLUE)   +   fileName         + str(Style.RESET_ALL) + ' <'  +
-                                 str(Fore.WHITE)  +   lineNo           + str(Style.RESET_ALL) + '>: ' +
-                                 str(Fore.BLUE)   +   moduleName       + str(Style.RESET_ALL) + '.'   +
-                                                      funcName         + ': %(message)s')
-
-        elif self.useColorama == 2 and self.logLevel >= self.INFO:
-            self.formatString = (str(Fore.CYAN)   +  '{%(asctime)s} [' + str(Style.RESET_ALL) +
-                                 str(Fore.GREEN)  +   '%(name)s'       + str(Style.RESET_ALL) + ':'   +
-                                 str(Fore.YELLOW) +   '%(levelname)s'  + str(Style.RESET_ALL) + '] [' +
-                                 str(Fore.BLUE)   +   moduleName       + str(Style.RESET_ALL) + '.'   + 
-                                                      funcName + ': %(message)s')
         self.handler.setFormatter(logging.Formatter(self.formatString))
 
         self.Logger.info(message)
@@ -269,21 +247,6 @@ class AqLogger:
         elif self.useColorama <= 1 and self.logLevel >= self.INFO:
             self.formatString = '{%(asctime)s} [%(name)s:%(levelname)s] %(message)s'
 
-        elif self.useColorama == 2 and self.logLevel == self.DEBUG:
-            self.formatString = (str(Fore.CYAN)   +  '{%(asctime)s} [' + str(Style.RESET_ALL) +
-                                 str(Fore.GREEN)  +   '%(name)s'       + str(Style.RESET_ALL) + ':'   +
-                                 str(Fore.YELLOW) +   '%(levelname)s'  + str(Style.RESET_ALL) + '] [' +
-                                 str(Fore.BLUE)   +   fileName         + str(Style.RESET_ALL) + ' <'  +
-                                 str(Fore.WHITE)  +   lineNo           + str(Style.RESET_ALL) + '>: ' +
-                                 str(Fore.BLUE)   +   moduleName       + str(Style.RESET_ALL) + '.'   +
-                                                      funcName         + ': %(message)s')
-
-        elif self.useColorama == 2 and self.logLevel >= self.INFO:
-            self.formatString = (str(Fore.CYAN)   +  '{%(asctime)s} [' + str(Style.RESET_ALL) +
-                                 str(Fore.GREEN)  +   '%(name)s'       + str(Style.RESET_ALL) + ':'   +
-                                 str(Fore.YELLOW) +   '%(levelname)s'  + str(Style.RESET_ALL) + '] [' +
-                                 str(Fore.BLUE)   +   moduleName       + str(Style.RESET_ALL) + '.'   + 
-                                                      funcName + ': %(message)s')
         self.handler.setFormatter(logging.Formatter(self.formatString))
 
         self.Logger.warning(message)
@@ -313,22 +276,7 @@ class AqLogger:
         elif self.useColorama <= 1 and self.logLevel >= self.INFO:
             self.formatString = '{%(asctime)s} [%(name)s:%(levelname)s] %(message)s'
 
-        elif self.useColorama == 2 and self.logLevel == self.DEBUG:
-            self.formatString = (str(Fore.CYAN)   +  '{%(asctime)s} [' + str(Style.RESET_ALL) +
-                                 str(Fore.GREEN)  +   '%(name)s'       + str(Style.RESET_ALL) + ':'   +
-                                 str(Fore.YELLOW) +   '%(levelname)s'  + str(Style.RESET_ALL) + '] [' +
-                                 str(Fore.BLUE)   +   fileName         + str(Style.RESET_ALL) + ' <'  +
-                                 str(Fore.WHITE)  +   lineNo           + str(Style.RESET_ALL) + '>: ' +
-                                 str(Fore.BLUE)   +   moduleName       + str(Style.RESET_ALL) + '.'   +
-                                                      funcName         + ': %(message)s')
-
-        elif self.useColorama == 2 and self.logLevel >= self.INFO:
-            self.formatString = (str(Fore.CYAN)   +  '{%(asctime)s} [' + str(Style.RESET_ALL) +
-                                 str(Fore.GREEN)  +   '%(name)s'       + str(Style.RESET_ALL) + ':'   +
-                                 str(Fore.YELLOW) +   '%(levelname)s'  + str(Style.RESET_ALL) + '] [' +
-                                 str(Fore.BLUE)   +   moduleName       + str(Style.RESET_ALL) + '.'   + 
-                                                      funcName + ': %(message)s')
-        self.handler.setFormatter(logging.Formatter(self.formatString))
+        self.handler.setFormatter(self.formatString)
 
         self.Logger.error(message)
         if self.logLevel <= self.ERROR and not self.printDsb:
@@ -356,22 +304,7 @@ class AqLogger:
                                  '%(message)s')
         elif self.useColorama <= 1 and self.logLevel >= self.INFO:
             self.formatString = '{%(asctime)s} [%(name)s:%(levelname)s] %(message)s'
-
-        elif self.useColorama == 2 and self.logLevel == self.DEBUG:
-            self.formatString = (str(Fore.CYAN)   +  '{%(asctime)s} [' + str(Style.RESET_ALL) +
-                                 str(Fore.GREEN)  +   '%(name)s'       + str(Style.RESET_ALL) + ':'   +
-                                 str(Fore.YELLOW) +   '%(levelname)s'  + str(Style.RESET_ALL) + '] [' +
-                                 str(Fore.BLUE)   +   fileName         + str(Style.RESET_ALL) + ' <'  +
-                                 str(Fore.WHITE)  +   lineNo           + str(Style.RESET_ALL) + '>: ' +
-                                 str(Fore.BLUE)   +   moduleName       + str(Style.RESET_ALL) + '.'   +
-                                                      funcName         + ': %(message)s')
-
-        elif self.useColorama == 2 and self.logLevel >= self.INFO:
-            self.formatString = (str(Fore.CYAN)   +  '{%(asctime)s} [' + str(Style.RESET_ALL) +
-                                 str(Fore.GREEN)  +   '%(name)s'       + str(Style.RESET_ALL) + ':'   +
-                                 str(Fore.YELLOW) +   '%(levelname)s'  + str(Style.RESET_ALL) + '] [' +
-                                 str(Fore.BLUE)   +   moduleName       + str(Style.RESET_ALL) + '.'   + 
-                                                      funcName + ': %(message)s')
+            
         self.handler.setFormatter(logging.Formatter(self.formatString))
         
         self.Logger.critical(message)
@@ -388,7 +321,7 @@ class AqLogger:
         :returns: None
         '''
         print(f'[{Fore.GREEN}{self.name}{Style.RESET_ALL}@{Fore.YELLOW}CRITICAL{Style.RESET_ALL}]: '
-              f'Программа аварийно завершила работу из-за исклоючения {type(_exception)}:')
+              f'Программа аварийно завершила работу из-за исключения {type(_exception)}:')
         self.Logger.exception(f'Программа аварийно завершила работу из-за исклоючения {type(_exception)}:',
                                 exc_info = _exception)
 

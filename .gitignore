@@ -53,3 +53,7 @@ compile_commands.json
 
 # pycomp
 *.pyc
+
+# log
+logs/
+.vscode/

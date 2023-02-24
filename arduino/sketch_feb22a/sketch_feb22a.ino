@@ -7,9 +7,9 @@ void loop() {
   // put your main code here, to run repeatedly:
   if (Serial.available() > 0) {
     for (int i = 0; i<9; i++)
-    Serial.write(0xFF);
+    Serial.println(0xFF);
   }
 
   
-  Serial.write(0xA0);
+  Serial.println(0xA0);
 }
