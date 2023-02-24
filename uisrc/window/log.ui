@@ -132,26 +132,14 @@
      <height>26</height>
     </rect>
    </property>
-   <widget class="QMenu" name="menu_2">
+   <widget class="QMenu" name="menu_File">
     <property name="title">
-     <string>Уровень журнала</string>
+     <string>Файл</string>
     </property>
-    <property name="toolTipsVisible">
-     <bool>true</bool>
-    </property>
-    <addaction name="macLogLvl_DEBUG"/>
-    <addaction name="macLogLvl_INFO"/>
-    <addaction name="macLogLvl_WARNING"/>
-    <addaction name="macLogLvl_ERROR"/>
-    <addaction name="macLogLvl_CRITICAL"/>
+    <addaction name="action"/>
+    <addaction name="meiExit_2"/>
    </widget>
-   <widget class="QMenu" name="meiOpenLog">
-    <property name="title">
-     <string>Открыть файл</string>
-    </property>
-   </widget>
-   <addaction name="menu_2"/>
-   <addaction name="meiOpenLog"/>
+   <addaction name="menu_File"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="macLogLvl_DEBUG">
@@ -194,6 +182,21 @@
     <string>Уровень журналирования: Критические ошибки (CRITICAL)</string>
    </property>
   </action>
+  <action name="meiExit">
+   <property name="text">
+    <string>Выход</string>
+   </property>
+  </action>
+  <action name="action">
+   <property name="text">
+    <string>Открыть папку с журналом</string>
+   </property>
+  </action>
+  <action name="meiExit_2">
+   <property name="text">
+    <string>Выход</string>
+   </property>
+  </action>
  </widget>
  <tabstops>
   <tabstop>cbbPort</tabstop>
@@ -215,6 +218,22 @@
     <hint type="destinationlabel">
      <x>558</x>
      <y>360</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>meiExit</sender>
+   <signal>triggered()</signal>
+   <receiver>LogWindow</receiver>
+   <slot>close()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>299</x>
+     <y>199</y>
     </hint>
    </hints>
   </connection>
