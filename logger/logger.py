@@ -1,12 +1,26 @@
 #coding=utf-8
+from PyQt5 import QtCore
 import logging
 import os
 import time
 
 from colorama import Fore, Style
+from logger import QTextEditLogger
+from greenyy import logProxy
 
 
-class GreenyyLogger:
+class Manager(QtCore.QObject):
+    published = QtCore.pyqtSignal(str)
+
+    def __init__(self) -> None:
+        super().__init__()
+
+    @classmethod
+    def e(self, string):
+        self.published.emit(string)
+
+
+class GreenyyLogger(QtCore.QObject):
     '''
     Класс канала журналирования.
 
@@ -77,6 +91,7 @@ class GreenyyLogger:
                                           #сообщения)
 
 
+
     def __init__(self, name: str, logLevel: LogLevel = DEBUG,
                                   disableStdPrint: bool = False,
                                   useColorama = 1):
@@ -112,6 +127,9 @@ class GreenyyLogger:
             2 —— использовать цветной текст для вывода
                  сообщений в консоль и для файла журнала
         '''
+        global logProxy
+
+        super(GreenyyLogger, self).__init__()
         self.name, self.logLevel, self.printDsb, self.useColorama = name, logLevel, disableStdPrint, useColorama
         self.filenames = list()
 
@@ -123,6 +141,7 @@ class GreenyyLogger:
         self.Logger.setLevel(self.logLevel._level)
 
         self.handler = logging.FileHandler(rf'{self.filenames[0]}', 'a+', 'utf-8')
+        self.logWindow = QTextEditLogger(logProxy)
 
         self.Logger.addHandler(self.handler)
 
@@ -195,6 +214,8 @@ class GreenyyLogger:
         if self.logLevel == self.DEBUG and not self.printDsb:
             print(f'[{Fore.GREEN}{self.name}{Style.RESET_ALL}@{Fore.YELLOW}DEBUG{Style.RESET_ALL}]: {message}')
         
+        Manager.e(f'[{Fore.GREEN}{self.name}{Style.RESET_ALL}@{Fore.YELLOW}DEBUG{Style.RESET_ALL}]: {message}')
+
 
     def info(self, message: str):
         '''
@@ -223,6 +244,8 @@ class GreenyyLogger:
         self.Logger.info(message)
         if self.logLevel <= self.INFO and not self.printDsb:
             print(f'[{Fore.GREEN}{self.name}{Style.RESET_ALL}@{Fore.YELLOW}INFO{Style.RESET_ALL}]: {message}')
+
+        self.published.emit(f'[{Fore.GREEN}{self.name}{Style.RESET_ALL}@{Fore.YELLOW}INFO{Style.RESET_ALL}]: {message}')
 
 
     def warning(self, message: str):
@@ -253,6 +276,8 @@ class GreenyyLogger:
         if self.logLevel <= self.WARNING and not self.printDsb:
             print(f'[{Fore.GREEN}{self.name}{Style.RESET_ALL}@{Fore.YELLOW}WARN{Style.RESET_ALL}]: {message}')
 
+        self.published.emit(f'[{Fore.GREEN}{self.name}{Style.RESET_ALL}@{Fore.YELLOW}WARN{Style.RESET_ALL}]: {message}')
+
 
     def error(self, message: str):
         '''
@@ -281,6 +306,8 @@ class GreenyyLogger:
         self.Logger.error(message)
         if self.logLevel <= self.ERROR and not self.printDsb:
             print(f'[{Fore.GREEN}{self.name}{Style.RESET_ALL}@{Fore.YELLOW}ERROR{Style.RESET_ALL}]: {message}')
+
+        self.published.emit(f'[{Fore.GREEN}{self.name}{Style.RESET_ALL}@{Fore.YELLOW}ERROR{Style.RESET_ALL}]: {message}')
 
 
     def critical(self, message: str):
@@ -311,6 +338,9 @@ class GreenyyLogger:
         if self.logLevel <= self.CRITICAL and not self.printDsb:
             print(f'[{Fore.GREEN}{self.name}{Style.RESET_ALL}@{Fore.YELLOW}CRITICAL{Style.RESET_ALL}]: {message}')
 
+        self.published.emit(f'[{Fore.GREEN}{self.name}{Style.RESET_ALL}@{Fore.YELLOW}CRITICAL{Style.RESET_ALL}]: {message}')
+
+
     def exception(self, _exception: Exception):
         '''
         Опубликовать сообщение о возникновении исключения
@@ -324,6 +354,10 @@ class GreenyyLogger:
               f'Программа аварийно завершила работу из-за исключения {type(_exception)}:')
         self.Logger.exception(f'Программа аварийно завершила работу из-за исклоючения {type(_exception)}:',
                                 exc_info = _exception)
+        
+        self.published.emit(f'[{Fore.GREEN}{self.name}{Style.RESET_ALL}@{Fore.YELLOW}CRITICAL{Style.RESET_ALL}]: '
+              f'Программа аварийно завершила работу из-за исключения {type(_exception)}:')
+
 
 
     @staticmethod
