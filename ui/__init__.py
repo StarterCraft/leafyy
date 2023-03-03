@@ -2,14 +2,12 @@ from datetime import datetime
 from .window.general import GeneralWindow
 from .window.log import LogWindow
 from .window.settings import SettingsWindow
-from greenyy import proxy
 
 class GreenyyUiManager():
     def __init__(self) -> None:    
         self.generalWindow = GeneralWindow()
         self.settingsWindow = SettingsWindow()
         self.logWindow = LogWindow()
-        proxy.logProxy = self.logWindow.txtLogDisplay
         self.interconnect()
 
     def interconnect(self):
@@ -26,6 +24,9 @@ class GreenyyUiManager():
     def writeDeviceMessage(self, device):
         self.logWindow.txtLogDisplay.append(
             f'{datetime.now()} [{device.address.capitalize()}] {device.port.readLine()}')
+        c = self.logWindow.txtLogDisplay.textCursor()
+        c.movePosition(c.End)
+        self.logWindow.txtLogDisplay.setTextCursor(c)
 
     def sendDeviceMessage(self, device):
-        device.port.write(bytearray(self.logWindow.lneMessage.text(), 'uft-8'))
+        device.port.write(bytearray(self.logWindow.lneMessage.text(), 'utf-8'))

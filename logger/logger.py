@@ -1,23 +1,10 @@
 #coding=utf-8
-from PyQt5 import QtCore
+from PyQt5 import QtCore, QtWidgets
 import logging
 import os
 import time
 
 from colorama import Fore, Style
-from logger import QTextEditLogger
-from greenyy import logProxy
-
-
-class Manager(QtCore.QObject):
-    published = QtCore.pyqtSignal(str)
-
-    def __init__(self) -> None:
-        super().__init__()
-
-    @classmethod
-    def e(self, string):
-        self.published.emit(string)
 
 
 class GreenyyLogger(QtCore.QObject):
@@ -92,7 +79,7 @@ class GreenyyLogger(QtCore.QObject):
 
 
 
-    def __init__(self, name: str, logLevel: LogLevel = DEBUG,
+    def __init__(self, name: str, w: QtWidgets.QListWidget, logLevel: LogLevel = DEBUG,
                                   disableStdPrint: bool = False,
                                   useColorama = 1):
         '''
@@ -132,6 +119,7 @@ class GreenyyLogger(QtCore.QObject):
         super(GreenyyLogger, self).__init__()
         self.name, self.logLevel, self.printDsb, self.useColorama = name, logLevel, disableStdPrint, useColorama
         self.filenames = list()
+        self.logWindow = w
 
         self.Logger = logging.getLogger(name)
         self.formatString = ''
@@ -141,7 +129,7 @@ class GreenyyLogger(QtCore.QObject):
         self.Logger.setLevel(self.logLevel._level)
 
         self.handler = logging.FileHandler(rf'{self.filenames[0]}', 'a+', 'utf-8')
-        self.logWindow = QTextEditLogger(logProxy)
+        
 
         self.Logger.addHandler(self.handler)
 
@@ -213,8 +201,8 @@ class GreenyyLogger(QtCore.QObject):
         self.Logger.debug(message)
         if self.logLevel == self.DEBUG and not self.printDsb:
             print(f'[{Fore.GREEN}{self.name}{Style.RESET_ALL}@{Fore.YELLOW}DEBUG{Style.RESET_ALL}]: {message}')
-        
-        Manager.e(f'[{Fore.GREEN}{self.name}{Style.RESET_ALL}@{Fore.YELLOW}DEBUG{Style.RESET_ALL}]: {message}')
+
+        self.logWindow.append(f'[{self.name}@DEBUG]: {message}')
 
 
     def info(self, message: str):
