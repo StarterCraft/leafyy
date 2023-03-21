@@ -5,6 +5,7 @@ import os
 import time
 
 from colorama import Fore, Style
+from datetime import datetime
 
 
 class GreenyyLogger(QtCore.QObject):
@@ -79,7 +80,7 @@ class GreenyyLogger(QtCore.QObject):
 
 
 
-    def __init__(self, name: str, w: QtWidgets.QListWidget, logLevel: LogLevel = DEBUG,
+    def __init__(self, name: str, logLevel: LogLevel = DEBUG,
                                   disableStdPrint: bool = False,
                                   useColorama = 1):
         '''
@@ -114,12 +115,9 @@ class GreenyyLogger(QtCore.QObject):
             2 —— использовать цветной текст для вывода
                  сообщений в консоль и для файла журнала
         '''
-        global logProxy
-
         super(GreenyyLogger, self).__init__()
         self.name, self.logLevel, self.printDsb, self.useColorama = name, logLevel, disableStdPrint, useColorama
         self.filenames = list()
-        self.logWindow = w
 
         self.Logger = logging.getLogger(name)
         self.formatString = ''
@@ -169,6 +167,17 @@ class GreenyyLogger(QtCore.QObject):
         self.filenames.append(f'logs/Greeny_{(time.strftime("""%d.%m.%Y_%H%M%S""", time.localtime()))}.log')
 
 
+    def publishToLogWindow(self, message: str):
+        'Отправить сообщение в LogWindow'
+        try:
+            QtWidgets.QApplication.instance().ui.logWindow.txtLogDisplay.append(message)
+            print('run 174')
+        except NameError:
+            print('obj not init')
+        except Exception as e:
+            print(e)
+
+
     def debug(self, message: str):
         '''
         Опубликовать сообщение с уровнем DEBUG (ОТЛАДКА).
@@ -202,7 +211,10 @@ class GreenyyLogger(QtCore.QObject):
         if self.logLevel == self.DEBUG and not self.printDsb:
             print(f'[{Fore.GREEN}{self.name}{Style.RESET_ALL}@{Fore.YELLOW}DEBUG{Style.RESET_ALL}]: {message}')
 
-        self.logWindow.append(f'[{self.name}@DEBUG]: {message}')
+        self.publishToLogWindow(
+            f'<span style="color:gray">{datetime.now()}</span> '
+            f'[<span style="color:green">{self.name}</span>'
+            f'@<span style="color:orange">DEBUG</span>]: {message}')
 
 
     def info(self, message: str):

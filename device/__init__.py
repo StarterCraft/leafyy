@@ -2,16 +2,16 @@
 from PyQt5 import QtCore, QtSerialPort, QtWidgets
 from .device import GreenyyDevice
 from .initializer import GreenyyDeviceInitializer
-from logger.logger import GreenyyLogger
+from logger import GreenyyLogger
 from json import load, dump
 import sys
 import traceback
 
 
 class GreenyyDeviceManager(QtCore.QObject):
-    def __init__(self, w: QtWidgets.QTextEdit):
+    def __init__(self):
         super().__init__()
-        self.logger = GreenyyLogger('DeviceManager', w)
+        self.logger = GreenyyLogger('DeviceManager')
 
         self.ports = QtSerialPort.QSerialPortInfo().availablePorts()
         self.logger.debug('Информация о портах получена')

@@ -29,6 +29,8 @@ class Ui_Log(object):
         self.txtLogDisplay.setReadOnly(True)
         self.txtLogDisplay.setTextInteractionFlags(QtCore.Qt.TextSelectableByKeyboard|QtCore.Qt.TextSelectableByMouse)
         self.txtLogDisplay.setObjectName("txtLogDisplay")
+        self.txtLogDisplay.setAcceptRichText(True)
+        self.txtLogDisplay.setWordWrapMode(QtGui.QTextOption.NoWrap)
         self.verticalLayout.addWidget(self.txtLogDisplay)
         self.horizontalLayout = QtWidgets.QHBoxLayout()
         self.horizontalLayout.setContentsMargins(11, -1, 11, 0)

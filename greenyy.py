@@ -12,10 +12,10 @@ import typing
 class Greenyy(QtWidgets.QApplication):
     def __init__(self, argv: typing.List[str]) -> None:
         super().__init__(argv)
+        assert QtWidgets.QApplication.instance() is self
 
         self.ui = GreenyyUiManager()
-
-        self.device = GreenyyDeviceManager(self.ui.logWindow.txtLogDisplay)
+        self.device = GreenyyDeviceManager()
 
         self.ui.generalWindow.mdi.addSubWindow(PlantWidget())
 
