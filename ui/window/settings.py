@@ -24,6 +24,10 @@ class SettingsWindow(QtWidgets.QMainWindow, Ui_SettingsWindow):
         self.tabs.setCurrentIndex(1)
         self.show()
 
+    def show2(self):
+        self.tabs.setCurrentIndex(2)
+        self.show()
+
     def addItem_debug(self):
         if (self.tabs.currentIndex()):
             self.liwRules.addItem(f'testItem {self.liwRules.currentIndex().row()}')

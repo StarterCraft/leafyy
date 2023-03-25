@@ -41,6 +41,9 @@
         <pointsize>10</pointsize>
        </font>
       </property>
+      <property name="lineWrapMode">
+       <enum>QTextEdit::NoWrap</enum>
+      </property>
       <property name="readOnly">
        <bool>true</bool>
       </property>
@@ -74,11 +77,9 @@
           <pointsize>10</pointsize>
          </font>
         </property>
-        <item>
-         <property name="text">
-          <string>COM1</string>
-         </property>
-        </item>
+        <property name="placeholderText">
+         <string>Порт</string>
+        </property>
        </widget>
       </item>
       <item>
@@ -132,17 +133,30 @@
      <height>26</height>
     </rect>
    </property>
-   <widget class="QMenu" name="menu_File">
+   <widget class="QMenu" name="menuFile">
     <property name="title">
      <string>Файл</string>
     </property>
-    <addaction name="action"/>
-    <addaction name="meiExit_2"/>
+    <addaction name="meiLogFolder"/>
+    <addaction name="separator"/>
    </widget>
-   <addaction name="menu_File"/>
+   <widget class="QMenu" name="menuView">
+    <property name="title">
+     <string>Вид</string>
+    </property>
+    <addaction name="meiScroll"/>
+    <addaction name="separator"/>
+    <addaction name="meiIncreaseFontSize"/>
+    <addaction name="meiReduceFontSize"/>
+    <addaction name="separator"/>
+    <addaction name="meiASCII"/>
+    <addaction name="meiLogSource"/>
+   </widget>
+   <addaction name="menuFile"/>
+   <addaction name="menuView"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
-  <action name="macLogLvl_DEBUG">
+  <action name="meiLogLvlDEBUG">
    <property name="text">
     <string>Отладка (DEBUG)</string>
    </property>
@@ -150,7 +164,7 @@
     <string>Уровень журналирования: Отладка (DEBUG)</string>
    </property>
   </action>
-  <action name="macLogLvl_INFO">
+  <action name="meiLogLvlINFO">
    <property name="text">
     <string>Информирование (INFO)</string>
    </property>
@@ -158,7 +172,7 @@
     <string>Уровень журналирования: Информирование (INFO)</string>
    </property>
   </action>
-  <action name="macLogLvl_WARNING">
+  <action name="meiLogLvlWARNING">
    <property name="text">
     <string>Предупреждение (WARNING)</string>
    </property>
@@ -166,7 +180,7 @@
     <string>Уровень журналирования: Предупреждение (WARNING)</string>
    </property>
   </action>
-  <action name="macLogLvl_ERROR">
+  <action name="meiLogLvlERROR">
    <property name="text">
     <string>Ошибки (ERROR)</string>
    </property>
@@ -174,7 +188,7 @@
     <string>Уровень журналирования: Ошибки (ERROR)</string>
    </property>
   </action>
-  <action name="macLogLvl_CRITICAL">
+  <action name="meiLogLvlCRITICAL">
    <property name="text">
     <string>Критические ошибки (CRITICAL)</string>
    </property>
@@ -187,14 +201,34 @@
     <string>Выход</string>
    </property>
   </action>
-  <action name="action">
+  <action name="meiLogFolder">
    <property name="text">
     <string>Открыть папку с журналом</string>
    </property>
   </action>
-  <action name="meiExit_2">
+  <action name="meiScroll">
    <property name="text">
-    <string>Выход</string>
+    <string>Автопрокрутка</string>
+   </property>
+  </action>
+  <action name="meiIncreaseFontSize">
+   <property name="text">
+    <string>Увеличить кегль</string>
+   </property>
+  </action>
+  <action name="meiReduceFontSize">
+   <property name="text">
+    <string>Уменьшить кегль</string>
+   </property>
+  </action>
+  <action name="meiASCII">
+   <property name="text">
+    <string>Декодирование в ASCII...</string>
+   </property>
+  </action>
+  <action name="meiLogSource">
+   <property name="text">
+    <string>Источники журнала...</string>
    </property>
   </action>
  </widget>

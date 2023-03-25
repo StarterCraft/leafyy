@@ -6,7 +6,7 @@
  "repeated":true,
  "triggers": 
  [
-    {"id":0, "parent": null, "type":0, "condition":1}, 
+    {"id":0, "parent": null, "type": 0, "condition":1}, 
     {"id": 1, "parent": 0, "type": 1, "condition": ["com1.0.humidity.percent", "le", 50]},
     {"id": 2, "parent": 0, "type": 2, "condition": ["time.exact", 12, 0]}],
  "actions": 

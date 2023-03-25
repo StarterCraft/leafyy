@@ -1,10 +1,9 @@
 from PyQt5 import QtWidgets
-from ui import UiManager
 from uidef.dialog.ruleProperties import Ui_RulePropertiesDialog
 
 
-class RulePropertiesDialog(QtWidgets.QDialog):
-    def __init__(self, ui: UiManager):
+class RulePropertiesDialog(QtWidgets.QDialog, Ui_RulePropertiesDialog):
+    def __init__(self):
         super().__init__()
 
-        ui.setupUiComponent(self, Ui_RulePropertiesDialog())
+        self.setupUi(self)

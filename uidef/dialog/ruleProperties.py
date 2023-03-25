@@ -9,10 +9,8 @@
 
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-from ui import UiDefinition
 
-
-class Ui_RulePropertiesDialog(UiDefinition):
+class Ui_RulePropertiesDialog(object):
     def setupUi(self, RulePropertiesDialog):
         RulePropertiesDialog.setObjectName("RulePropertiesDialog")
         RulePropertiesDialog.resize(400, 550)

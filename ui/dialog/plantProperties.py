@@ -1,10 +1,9 @@
 from PyQt5 import QtWidgets
-from ui import UiManager
 from uidef.dialog.plantProperties import Ui_PlantPropertiesDialog
 
 
-class PlantPropertiesDialog(QtWidgets.QDialog):
-    def __init__(self, ui: UiManager):
+class PlantPropertiesDialog(QtWidgets.QDialog, Ui_PlantPropertiesDialog):
+    def __init__(self):
         super().__init__()
 
-        ui.setupUiComponent(self, Ui_PlantPropertiesDialog())
+        self.setupUi(self)

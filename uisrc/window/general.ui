@@ -48,10 +48,12 @@
      <height>26</height>
     </rect>
    </property>
-   <widget class="QMenu" name="meiPlants">
+   <widget class="QMenu" name="meiWindow">
     <property name="title">
-     <string>Грядка</string>
+     <string>Окно</string>
     </property>
+    <addaction name="meiLog"/>
+    <addaction name="separator"/>
    </widget>
    <widget class="QMenu" name="meiSettings">
     <property name="title">
@@ -59,17 +61,12 @@
     </property>
     <addaction name="meiDevices"/>
     <addaction name="meiRules"/>
-    <addaction name="meiLog"/>
+    <addaction name="meiKeys"/>
    </widget>
-   <addaction name="meiPlants"/>
+   <addaction name="meiWindow"/>
    <addaction name="meiSettings"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
-  <action name="action">
-   <property name="text">
-    <string>Устройства...</string>
-   </property>
-  </action>
   <action name="meiDevices">
    <property name="text">
     <string>Устройства...</string>
@@ -82,7 +79,12 @@
   </action>
   <action name="meiLog">
    <property name="text">
-    <string>Журнал...</string>
+    <string>Журнал</string>
+   </property>
+  </action>
+  <action name="meiKeys">
+   <property name="text">
+    <string>Клавиши...</string>
    </property>
   </action>
  </widget>

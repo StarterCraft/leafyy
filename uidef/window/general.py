@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'g:\Work\Code\grassyy\uisrc\window\general.ui'
+# Form implementation generated from reading ui file 'g:\Work\Code\greenyy\uisrc\window\general.ui'
 #
 # Created by: PyQt5 UI code generator 5.15.2
 #
@@ -12,7 +12,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 
 
 class Ui_GeneralWindow(object):
-    def setupUi(self, GeneralWindow: QtWidgets.QMainWindow):
+    def setupUi(self, GeneralWindow):
         GeneralWindow.setObjectName("GeneralWindow")
         GeneralWindow.resize(600, 600)
         GeneralWindow.setMinimumSize(QtCore.QSize(600, 600))
@@ -31,26 +31,28 @@ class Ui_GeneralWindow(object):
         self.menubar = QtWidgets.QMenuBar(GeneralWindow)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 600, 26))
         self.menubar.setObjectName("menubar")
-        self.meiPlants = QtWidgets.QMenu(self.menubar)
-        self.meiPlants.setObjectName("meiPlants")
+        self.meiWindow = QtWidgets.QMenu(self.menubar)
+        self.meiWindow.setObjectName("meiWindow")
         self.meiSettings = QtWidgets.QMenu(self.menubar)
         self.meiSettings.setObjectName("meiSettings")
         GeneralWindow.setMenuBar(self.menubar)
         self.statusbar = QtWidgets.QStatusBar(GeneralWindow)
         self.statusbar.setObjectName("statusbar")
         GeneralWindow.setStatusBar(self.statusbar)
-        self.action = QtWidgets.QAction(GeneralWindow)
-        self.action.setObjectName("action")
         self.meiDevices = QtWidgets.QAction(GeneralWindow)
         self.meiDevices.setObjectName("meiDevices")
         self.meiRules = QtWidgets.QAction(GeneralWindow)
         self.meiRules.setObjectName("meiRules")
         self.meiLog = QtWidgets.QAction(GeneralWindow)
         self.meiLog.setObjectName("meiLog")
+        self.meiKeys = QtWidgets.QAction(GeneralWindow)
+        self.meiKeys.setObjectName("meiKeys")
+        self.meiWindow.addAction(self.meiLog)
+        self.meiWindow.addSeparator()
         self.meiSettings.addAction(self.meiDevices)
         self.meiSettings.addAction(self.meiRules)
-        self.meiSettings.addAction(self.meiLog)
-        self.menubar.addAction(self.meiPlants.menuAction())
+        self.meiSettings.addAction(self.meiKeys)
+        self.menubar.addAction(self.meiWindow.menuAction())
         self.menubar.addAction(self.meiSettings.menuAction())
 
         self.retranslateUi(GeneralWindow)
@@ -59,9 +61,9 @@ class Ui_GeneralWindow(object):
     def retranslateUi(self, GeneralWindow):
         _translate = QtCore.QCoreApplication.translate
         GeneralWindow.setWindowTitle(_translate("GeneralWindow", "Иваров листочек"))
-        self.meiPlants.setTitle(_translate("GeneralWindow", "Грядка"))
+        self.meiWindow.setTitle(_translate("GeneralWindow", "Окно"))
         self.meiSettings.setTitle(_translate("GeneralWindow", "Настройки"))
-        self.action.setText(_translate("GeneralWindow", "Устройства..."))
         self.meiDevices.setText(_translate("GeneralWindow", "Устройства..."))
         self.meiRules.setText(_translate("GeneralWindow", "Правила..."))
-        self.meiLog.setText(_translate("GeneralWindow", "Журнал..."))
+        self.meiLog.setText(_translate("GeneralWindow", "Журнал"))
+        self.meiKeys.setText(_translate("GeneralWindow", "Клавиши..."))

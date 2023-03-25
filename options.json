@@ -1,0 +1,12 @@
+{
+    "logWindowScrollMode": false,
+    "logWindowShowLoggers": ["All"],
+    "logWindowDecodeASCII": ["All"],
+
+    "keys": {
+        "logFolder": "Ctrl+F",
+        "logWindowScrollMode": "Ctrl+M",
+        "logIncreaseFontSize": "Ctrl++",
+        "logReduceFontSize": "Ctrl+-"
+    }
+}

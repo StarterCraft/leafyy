@@ -1,30 +1,37 @@
-from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5 import QtCore, QtWidgets
 from sys import argv, exit
 
+from logger import GreenyyLoggingManager
+from options import GreenyyUserOptions
 from ui import GreenyyUiManager
-from ui.widget.plantWidget import PlantWidget
-
+from logger.logger import GreenyyLogger
 from device import GreenyyDeviceManager
-
-import typing
 
 
 class Greenyy(QtWidgets.QApplication):
-    def __init__(self, argv: typing.List[str]) -> None:
+    def __init__(self, argv) -> None:
         super().__init__(argv)
         assert QtWidgets.QApplication.instance() is self
 
-        self.ui = GreenyyUiManager()
-        self.device = GreenyyDeviceManager()
+        self.logging = GreenyyLoggingManager()
+        self.logger = GreenyyLogger('Root')
 
-        self.ui.generalWindow.mdi.addSubWindow(PlantWidget())
+        self.userOptions = GreenyyUserOptions()
+
+        self.ui = GreenyyUiManager()
+        self.logger.info('Инициализация интерфейса завершена')
+
+        self.device = GreenyyDeviceManager()
+        self.logger.info('Инициализация менеджера устройств завершена')
 
         self.ui.deviceIntegration(self.device)
+        self.logger.info('Интеграция устройств в интерфейс проведена')
 
 
 def main():
     app = Greenyy(argv)
     app.ui.generalWindow.show()
+
     exit(app.exec_())
 
 

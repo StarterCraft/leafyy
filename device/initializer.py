@@ -9,10 +9,8 @@ import traceback
 
 
 class GreenyyDeviceInitializer(QtCore.QThread):
-    begun = QtCore.pyqtSignal(str)
     error = QtCore.pyqtSignal(tuple)
-    initialized = QtCore.pyqtSignal(object)
-    completed = QtCore.pyqtSignal()
+    initialized = QtCore.pyqtSignal(GreenyyDevice)
     #STACKOVERFLOW: https://stackoverflow.com/a/6789205/13677671
     #STACKOVERFLOW: https://ru.stackoverflow.com/a/840447/397716
 
@@ -23,14 +21,10 @@ class GreenyyDeviceInitializer(QtCore.QThread):
 
     def run(self):
         try:
-            print('RUN START')
-            result = GreenyyDevice(**self.data) 
+            result = GreenyyDevice(**self.data)
         except:
             traceback.print_exc()
             exctype, value = sys.exc_info()[:2]
             self.error.emit((exctype, value, traceback.format_exc()))
-        else:
-            print(result.port.isOpen())
-            self.initialized.emit(result)
         finally:
-            self.completed.emit()
+            self.initialized.emit(result)
