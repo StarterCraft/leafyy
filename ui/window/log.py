@@ -1,6 +1,7 @@
 from PyQt5 import QtGui, QtWidgets
 from os import system
 from datetime import datetime
+from logging import getLevelName
 
 from app import logging as manager
 from app import userOptions, device
@@ -53,6 +54,12 @@ class LogWindow(QtWidgets.QMainWindow, Ui_LogWindow):
         self.meiLogSource.setMenu(self.setLoggingSourceActions)
         self.setLoggingSourceActions.triggered.connect(self.setLoggerVisibility)
 
+        allLoggersAction = QtWidgets.QAction('Все внутренние логгеры', self)
+        allLoggersAction.setCheckable(True)
+        allLoggersAction.setChecked(
+            bool(sum([logger.logWindowVisibility for logger in manager().loggers])))
+        self.setLoggingSourceActions.addAction(allLoggersAction)
+        
         for logger in manager().loggers:
             action = QtWidgets.QAction(logger.name, self)
             action.setCheckable(True)
@@ -61,6 +68,11 @@ class LogWindow(QtWidgets.QMainWindow, Ui_LogWindow):
 
         self.setLoggingSourceActions.addSeparator()
 
+        allDevicesAction = QtWidgets.QAction('Все устройства', self)
+        allDevicesAction.setCheckable(True)
+        allDevicesAction.setChecked(
+            bool(sum([d.logWindow for d in device().devices])))
+        self.setLoggingSourceActions.addAction(allDevicesAction)
 
     def interconnect(self):
         self.meiLogFolder.triggered.connect(self.openLogFolder)
@@ -75,7 +87,7 @@ class LogWindow(QtWidgets.QMainWindow, Ui_LogWindow):
         self.meiLogFolder.setShortcut(QtGui.QKeySequence(userOptions().keys.logFolder))
         self.meiExit.setShortcut(QtGui.QKeySequence('Alt+F4'))
 
-        self.meiScroll.setShortcut(QtGui.QKeySequence(userOptions().keys.logWindowScrollMode))
+        self.meiScroll.setShortcut(QtGui.QKeySequence(userOptions().keys.logScrollMode))
         self.meiIncreaseFontSize.setShortcut(QtGui.QKeySequence(userOptions().keys.logIncreaseFontSize))
         self.meiReduceFontSize.setShortcut(QtGui.QKeySequence(userOptions().keys.logReduceFontSize))
 
@@ -83,16 +95,19 @@ class LogWindow(QtWidgets.QMainWindow, Ui_LogWindow):
         for action in self.logLevelActions.actions():
             action.setChecked(manager().globalLevel is action.data())
 
-        self.meiScroll.setChecked(userOptions().logWindowScrollMode)
+        self.meiScroll.setChecked(userOptions().logScrollMode)
 
     def scrollDown(self):
-        if (userOptions().logWindowScrollMode):
+        if (userOptions().logScrollMode):
             c = self.txtLogDisplay.textCursor()
             c.movePosition(c.End)
             self.txtLogDisplay.setTextCursor(c)
 
     def setGlobalLogLevel(self):
         manager().setGlobalLogLevel(self.logLevelActions.checkedAction().data())
+        userOptions().logLevel = getLevelName(self.logLevelActions.checkedAction().data())
+        userOptions().write()
+
         self.logger.publish(manager().globalLogLevel,
             f'Глобальный уровень журнала установлен на {manager().globalLogLevel.name}')
 
@@ -107,9 +122,9 @@ class LogWindow(QtWidgets.QMainWindow, Ui_LogWindow):
         self.scrollDown()
 
     def setScrollingMode(self):
-        userOptions().logWindowScrollMode = self.meiScroll.isChecked()
+        userOptions().logScrollMode = self.meiScroll.isChecked()
         self.logger.debug(
-            f'Автопрокрутка {"включена" if userOptions().logWindowScrollMode else "отключена"}')
+            f'Автопрокрутка {"включена" if userOptions().logScrollMode else "отключена"}')
         self.scrollDown()
 
     def setASCIIMode(self, action: QtWidgets.QAction):
