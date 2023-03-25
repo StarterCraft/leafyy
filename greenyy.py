@@ -17,6 +17,7 @@ class Greenyy(QtWidgets.QApplication):
         self.logger = GreenyyLogger('Root')
 
         self.userOptions = GreenyyUserOptions()
+        self.logging.setGlobalLogLevel(self.userOptions.logLevel)
 
         self.ui = GreenyyUiManager()
         self.logger.info('Инициализация интерфейса завершена')
@@ -24,9 +25,9 @@ class Greenyy(QtWidgets.QApplication):
         self.device = GreenyyDeviceManager()
         self.logger.info('Инициализация менеджера устройств завершена')
 
-        self.ui.deviceIntegration(self.device)
+        self.ui.deviceIntegration()
         self.logger.info('Интеграция устройств в интерфейс проведена')
-
+        
 
 def main():
     app = Greenyy(argv)

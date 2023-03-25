@@ -1,4 +1,7 @@
+from PyQt5 import QtWidgets
+
 from json import load, dump
+from glob import glob
 
 from app import device
 from logger import GreenyyLogger
@@ -7,113 +10,145 @@ from logger import GreenyyLogger
 class GreenyyKeySequences:
     def __init__(self, keys: dict) -> None:
         self.logFolder = keys['logFolder']
-        self.logWindowScrollMode = keys['logWindowScrollMode']
+        self.logScrollMode = keys['logScrollMode']
         self.logIncreaseFontSize = keys['logIncreaseFontSize']
         self.logReduceFontSize = keys['logReduceFontSize']
 
     def toDict(self):
         return {
             'logFolder': self.logFolder,
-            'logWindowScrollMode': self.logWindowScrollMode,
+            'logScrollMode': self.logScrollMode,
             'logIncreaseFontSize': self.logIncreaseFontSize,
             'logReduceFontSize': self.logReduceFontSize
         }
 
+    def setBinding(self, bindingName: str, binding: str):
+        setattr(self, bindingName, binding)
+
 
 class GreenyyUserOptions:
+    defaults = {
+        'logLevel': 'DEBUG',
+        'logScrollMode': False,
+        'logSources': [
+            'All'
+        ],
+        'logDecodeASCII': [
+            'All'
+        ],
+        'keys': {
+            'logFolder': 'Ctrl+N',
+            'logScrollMode': 'Ctrl+M',
+            'logIncreaseFontSize': 'Ctrl+.',
+            'logReduceFontSize': 'Ctrl+,'
+        }
+    }
+
     def __init__(self) -> None:
         self.logger = GreenyyLogger('UserOptions')
-        self.readConfig()
 
-    def readConfig(self):
-        configFile = open('options.json', encoding='utf-8')
-        configData = load(configFile)
-        self.logWindowScrollMode = configData['logWindowScrollMode']
-        self._logWindowSources = configData['logWindowShowLoggers']
-        self._logWindowDecodeASCII = configData['logWindowDecodeASCII']
+        try:
+            load(open('options.json', encoding = 'utf-8'))
+        except Exception:
+            self.writeDefaults()
+
+        self.read()
+
+    def read(self):
+        with open('options.json', encoding = 'utf-8') as configFile:
+            configData = load(configFile)
+
+        self.logLevel = configData['logLevel']
+        self.logScrollMode = configData['logScrollMode']
+        self._logSources = configData['logSources']
+        self._logDecodeASCII = configData['logDecodeASCII']
         self.keys = GreenyyKeySequences(configData['keys'])
-        configFile.close()
         self.logger.debug('Настройки программы загружены')
 
-    def writeConfig(self):
-        configFile = open('options.json', encoding='utf-8')
-        configData = load(configFile)
-        configFile.close()
+    def write(self):
+        with open('options.json', encoding='utf-8') as configFile:
+            configData = load(configFile)
 
         toWrite = {
-            'logWindowScrollMode': self.logWindowScrollMode,
-            'logWindowShowLoggers': self._logWindowSources,
-            'logWindowDecodeASCII': self._logWindowDecodeASCII,
+            'logScrollMode': self.logScrollMode,
+            'logSources': self._logSources,
+            'logDecodeASCII': self._logDecodeASCII,
 
             'keys': self.keys.toDict()
             }
         
-        configData.update(toWrite)
-        configFile = open('options.json', 'w', encoding='utf-8')
-        dump(configData, configFile)
-        configFile.close()
-        self.logger.debug('Настройки программы сохранены')
+        if (configData != toWrite):
+            configData.update(toWrite)
+            with open('options.json', 'w', encoding='utf-8') as configFile:
+                dump(configData, configFile, indent = 4)
+            self.logger.info('Настройки программы сохранены')
+
+    def writeDefaults(self):
+        with open('options.json', 'w', encoding='utf-8') as configFile:
+            dump(self.defaults, configFile, indent = 4)
+        self.logger.critical('Настройки программы по умолчанию восстановлены')
+
 
     def logWindowDecodeASCII(self, deviceAddress: str) -> bool:
-        if (self._logWindowDecodeASCII[0] == 'All'):
+        if (self._logDecodeASCII[0] == 'All'):
             return True
 
-        return (deviceAddress in self._logWindowDecodeASCII)
+        return (deviceAddress in self._logDecodeASCII)
     
     def setLogWindowDecodeASCII(self, deviceAddress: str, value: bool) -> None:
-        if (value and self._logWindowDecodeASCII[0] == 'All'):
+        if (value and self._logDecodeASCII[0] == 'All'):
             return
         
-        if (self._logWindowDecodeASCII == 'All'):
-            self._logWindowDecodeASCII = [d.address for d in device().devices]
-            self._logWindowDecodeASCII.remove(deviceAddress)
+        if (self._logDecodeASCII == 'All'):
+            self._logDecodeASCII = [d.address for d in device().devices]
+            self._logDecodeASCII.remove(deviceAddress)
 
             self.writeConfig()
             return
         
-        if (deviceAddress in self._logWindowDecodeASCII):
+        if (deviceAddress in self._logDecodeASCII):
             if (value): 
                 return
 
-            self._logWindowDecodeASCII.remove(deviceAddress)
+            self._logDecodeASCII.remove(deviceAddress)
 
             self.writeConfig()
             return
         
         if (value):
-            self._logWindowDecodeASCII.append(deviceAddress)
+            self._logDecodeASCII.append(deviceAddress)
 
             self.writeConfig()
             return
         
     def logWindowSources(self, loggerName: str) -> bool:
-        if (self._logWindowSources[0] == 'All'):
+        if (self._logSources[0] == 'All'):
             return True
 
-        return (loggerName in self._logWindowSources)
+        return (loggerName in self._logSources)
     
     def setLogWindowSources(self, loggerName: str, value: bool) -> None:
-        if (value and self._logWindowSources[0] == 'All'):
+        if (value and self._logSources[0] == 'All'):
             return
         
-        if (self._logWindowSources == 'All'):
-            self._logWindowSources = [d.address for d in device().devices]
-            self._logWindowSources.remove(loggerName)
+        if (self._logSources == 'All'):
+            self._logSources = [d.address for d in device().devices]
+            self._logSources.remove(loggerName)
 
             self.writeConfig()
             return
         
-        if (loggerName in self._logWindowSources):
+        if (loggerName in self._logSources):
             if (value): 
                 return
 
-            self._logWindowSources.remove(loggerName)
+            self._logSources.remove(loggerName)
 
             self.writeConfig()
             return
         
         if (value):
-            self._logWindowSources.append(loggerName)
+            self._logSources.append(loggerName)
 
             self.writeConfig()
             return

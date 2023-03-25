@@ -81,21 +81,32 @@ class Ui_SettingsWindow(object):
         self.horizontalLayout_3 = QtWidgets.QHBoxLayout()
         self.horizontalLayout_3.setObjectName("horizontalLayout_3")
         self.label = QtWidgets.QLabel(self.tabKeys)
+        self.label.setMinimumSize(QtCore.QSize(150, 0))
         self.label.setObjectName("label")
         self.horizontalLayout_3.addWidget(self.label)
         self.keySequenceEdit = QtWidgets.QKeySequenceEdit(self.tabKeys)
         self.keySequenceEdit.setObjectName("keySequenceEdit")
         self.horizontalLayout_3.addWidget(self.keySequenceEdit)
+        self.btnKeySequence = QtWidgets.QPushButton(self.tabKeys)
+        self.btnKeySequence.setObjectName("btnKeySequence")
+        self.horizontalLayout_3.addWidget(self.btnKeySequence)
         self.verticalLayout_4.addLayout(self.horizontalLayout_3)
         self.tabs.addTab(self.tabKeys, "")
         self.verticalLayout.addWidget(self.tabs)
         SettingsWindow.setCentralWidget(self.centralwidget)
-        self.statusbar = QtWidgets.QStatusBar(SettingsWindow)
-        self.statusbar.setObjectName("statusbar")
-        SettingsWindow.setStatusBar(self.statusbar)
+        self.statusBar = QtWidgets.QStatusBar(SettingsWindow)
+        self.statusBar.setStyleSheet("QStatusBar {\n"
+"font-size: 8pt;\n"
+"}\n"
+"\n"
+"QStatusBar QLabel {\n"
+"font-size: 8pt;\n"
+"}")
+        self.statusBar.setObjectName("statusBar")
+        SettingsWindow.setStatusBar(self.statusBar)
 
         self.retranslateUi(SettingsWindow)
-        self.tabs.setCurrentIndex(0)
+        self.tabs.setCurrentIndex(2)
         QtCore.QMetaObject.connectSlotsByName(SettingsWindow)
 
     def retranslateUi(self, SettingsWindow):
@@ -114,6 +125,7 @@ class Ui_SettingsWindow(object):
         self.btnConfigureRule.setText(_translate("SettingsWindow", "Настроить..."))
         self.tabs.setTabText(self.tabs.indexOf(self.tabRules), _translate("SettingsWindow", "Правила"))
         self.treeKeys.headerItem().setText(0, _translate("SettingsWindow", "Действие"))
-        self.treeKeys.headerItem().setText(1, _translate("SettingsWindow", "Комбинация клавиш"))
+        self.treeKeys.headerItem().setText(1, _translate("SettingsWindow", "Клавиши"))
         self.label.setText(_translate("SettingsWindow", "Введите комбинацию:"))
+        self.btnKeySequence.setText(_translate("SettingsWindow", "Сохранить"))
         self.tabs.setTabText(self.tabs.indexOf(self.tabKeys), _translate("SettingsWindow", "Клавиши"))

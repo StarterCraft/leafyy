@@ -1,6 +1,7 @@
 from PyQt5 import QtWidgets
 from datetime import datetime
 
+from app import device
 from logger import GreenyyLogger
 
 from .window.general import GeneralWindow
@@ -19,6 +20,7 @@ class GreenyyUiManager():
         self.generalWindow = GeneralWindow()
         self.settingsWindow = SettingsWindow()
         self.logWindow = LogWindow()
+
         self.interconnect()
         self.logger.debug('Инициализация интерфейса завершена')
 
@@ -28,8 +30,13 @@ class GreenyyUiManager():
         self.generalWindow.meiKeys.triggered.connect(self.settingsWindow.show2)
         self.generalWindow.meiLog.triggered.connect(self.logWindow.show)
 
-    def deviceIntegration(self, dm):
-        for d in dm.devices:
+    def bind(self):
+        self.generalWindow.bind()
+        self.settingsWindow.bind()
+        self.logWindow.bind()
+
+    def deviceIntegration(self):
+        for d in device().devices:
             self.generalWindow.meiWindow.addAction(d.address)
 
             self.logWindow.cbbPort.addItem(d.address)

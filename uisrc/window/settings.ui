@@ -36,7 +36,7 @@
     <item>
      <widget class="QTabWidget" name="tabs">
       <property name="currentIndex">
-       <number>0</number>
+       <number>2</number>
       </property>
       <widget class="QWidget" name="tabDevices">
        <attribute name="title">
@@ -192,7 +192,7 @@
           </column>
           <column>
            <property name="text">
-            <string>Комбинация клавиш</string>
+            <string>Клавиши</string>
            </property>
           </column>
          </widget>
@@ -201,6 +201,12 @@
          <layout class="QHBoxLayout" name="horizontalLayout_3">
           <item>
            <widget class="QLabel" name="label">
+            <property name="minimumSize">
+             <size>
+              <width>150</width>
+              <height>0</height>
+             </size>
+            </property>
             <property name="text">
              <string>Введите комбинацию:</string>
             </property>
@@ -208,6 +214,13 @@
           </item>
           <item>
            <widget class="QKeySequenceEdit" name="keySequenceEdit"/>
+          </item>
+          <item>
+           <widget class="QPushButton" name="btnKeySequence">
+            <property name="text">
+             <string>Сохранить</string>
+            </property>
+           </widget>
           </item>
          </layout>
         </item>
@@ -217,7 +230,17 @@
     </item>
    </layout>
   </widget>
-  <widget class="QStatusBar" name="statusbar"/>
+  <widget class="QStatusBar" name="statusBar">
+   <property name="styleSheet">
+    <string notr="true">QStatusBar {
+font-size: 8pt;
+}
+
+QStatusBar QLabel {
+font-size: 8pt;
+}</string>
+   </property>
+  </widget>
  </widget>
  <resources/>
  <connections/>

@@ -6,4 +6,7 @@ class GeneralWindow(QtWidgets.QMainWindow, Ui_GeneralWindow):
     def __init__(self):
         super().__init__()
         self.setupUi(self)
+
+    def bind(self):
+        pass
         

@@ -1,12 +1,16 @@
 {
-    "logWindowScrollMode": false,
-    "logWindowShowLoggers": ["All"],
-    "logWindowDecodeASCII": ["All"],
-
+    "logLevel": "DEBUG",
+    "logScrollMode": false,
+    "logSources": [
+        "All"
+    ],
+    "logDecodeASCII": [
+        "All"
+    ],
     "keys": {
-        "logFolder": "Ctrl+F",
-        "logWindowScrollMode": "Ctrl+M",
-        "logIncreaseFontSize": "Ctrl++",
-        "logReduceFontSize": "Ctrl+-"
+        "logFolder": "Ctrl+N",
+        "logScrollMode": "Ctrl+M",
+        "logIncreaseFontSize": "Ctrl+.",
+        "logReduceFontSize": "Ctrl+,"
     }
 }

@@ -1,5 +1,8 @@
-from PyQt5 import QtWidgets
+from PyQt5 import QtGui, QtWidgets
 from enum import Enum
+
+from app import userOptions, ui
+from logger.logger import GreenyyLogger
 from uidef.window.settings import Ui_SettingsWindow
 
 
@@ -11,11 +14,16 @@ class SettingsWindow(QtWidgets.QMainWindow, Ui_SettingsWindow):
     def __init__(self):
         super().__init__()
 
+        self.logger = GreenyyLogger('SettingsWindow')
         self.setupUi(self)
+        self.interconnect()
+        self.updateUi()
 
-        self.btnAddDevice.clicked.connect(self.addItem_debug)
-        self.btnRemoveDevice.clicked.connect(self.delete_debug)
-        
+    def show(self):
+        self.statusBar.clearMessage()
+        super().show()
+        self.logger.info('Открыто окно настроек')
+
     def show0(self):
         self.tabs.setCurrentIndex(0)
         self.show()
@@ -28,19 +36,63 @@ class SettingsWindow(QtWidgets.QMainWindow, Ui_SettingsWindow):
         self.tabs.setCurrentIndex(2)
         self.show()
 
-    def addItem_debug(self):
-        if (self.tabs.currentIndex()):
-            self.liwRules.addItem(f'testItem {self.liwRules.currentIndex().row()}')
+    def close(self):
+        self.treeDevices.setCurrentItem()
+        self.liwRules.setCurrentItem()
+        self.treeKeys.setCurrentItem()
 
-        else:
-            print(32)
-            self.treeDevices.addTopLevelItem(
-                QtWidgets.QTreeWidgetItem(self.treeDevices, [f'testItem {self.treeDevices.currentIndex().row()}']))
+        self.keySequenceEdit.clear()
+        self.label.setStyleSheet()
+        super().close()
 
-    def delete_debug(self):
-        if (self.tabs.currentIndex()):
-            self.liwRules.removeItemWidget(self.liwRules.currentItem())
+    def interconnect(self):
+        self.treeKeys.currentItemChanged.connect(self.keyBindingSelected)
+        self.keySequenceEdit.keySequenceChanged.connect(self.keyBindingEditInitiated)
+        #self.keySequenceEdit.k
 
-        else:
-            print(42)
-            self.treeDevices.removeItemWidget(self.treeDevices.currentItem(), 1)
+    def bind(self):
+        pass
+
+    def updateUi(self):
+        items = {
+            'Окно журнала': {
+                'logFolder': ['Открыть папку с журналом', userOptions().keys.logFolder],
+                'logScrollMode': ['Автопрокрутка', userOptions().keys.logScrollMode],
+                'logIncreaseFontSize': ['Увеличить шрифт', userOptions().keys.logIncreaseFontSize],
+                'logReduceFontSize': ['Уменьшить шрифт', userOptions().keys.logReduceFontSize]
+            }
+        }
+
+        for key, subdict in items.items():
+            topLevelItem = QtWidgets.QTreeWidgetItem(self.treeKeys, [key])
+            for bindingName, binding in subdict.items():
+                bindingItem = QtWidgets.QTreeWidgetItem(topLevelItem, binding)
+                bindingItem.setData(1, 0x100, bindingName)
+
+            self.treeKeys.addTopLevelItem(topLevelItem)
+
+        self.treeKeys.header().setSectionResizeMode(QtWidgets.QHeaderView.ResizeToContents)
+        self.treeKeys.header().setStretchLastSection(False)
+
+    def keyBindingSelected(self, *args):
+        currentItem = args[0]
+        self.keySequenceEdit.setKeySequence(QtGui.QKeySequence(currentItem.text(1)))
+
+    def keyBindingEditInitiated(self):
+        if (self.treeKeys.currentItem() and self.treeKeys.currentItem().text(1)):
+            self.statusBar.showMessage(f'Установка комбинации для: {self.treeKeys.currentItem().text(0)}')
+            self.btnKeySequence.clicked.connect(self.keyBindingEdit)
+            return
+
+        self.statusBar.showMessage('Сначала выберите действие!', 5000)
+
+    def keyBindingEdit(self):
+        currentItem = self.treeKeys.currentItem()
+        keys = self.keySequenceEdit.keySequence().toString()
+
+        currentItem.setText(1, keys)
+        userOptions().keys.setBinding(currentItem.data(1, 0x100), keys)
+        userOptions().write()
+        ui().bind()
+
+        self.statusBar.showMessage(f'Установлена клавиша для {currentItem.text(0)}: {keys}', 5000)
