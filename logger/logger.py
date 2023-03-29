@@ -148,7 +148,7 @@ class GreenyyLogger(QtCore.QObject):
     @logWindowVisibility.setter
     def logWindowVisibility(self, value: bool):
         self.logWindow = value
-        userOptions().setLogWindowShowLogger(self.name, value)
+        userOptions().setLogWindowSources(self.name, value)
 
     def setLogLevel(self, logLevel: LogLevel):
         '''

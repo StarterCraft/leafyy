@@ -1,4 +1,4 @@
-from PyQt5 import QtGui, QtWidgets
+from PyQt5 import QtCore, QtGui, QtWidgets
 from os import system
 from datetime import datetime
 from logging import getLevelName
@@ -16,6 +16,7 @@ class LogWindow(QtWidgets.QMainWindow, Ui_LogWindow):
 
         self.setupUi(self)
         self.setupMenu()
+        self.setupUserInput()
         self.interconnect()
         self.bind()
         self.updateUi()
@@ -23,6 +24,7 @@ class LogWindow(QtWidgets.QMainWindow, Ui_LogWindow):
         self.logger.info('Окно журнала инициализировано')
 
     def show(self):
+        self.updateUi()
         super().show()
         self.logger.info('Открыто окно журнала')
 
@@ -68,11 +70,8 @@ class LogWindow(QtWidgets.QMainWindow, Ui_LogWindow):
 
         self.setLoggingSourceActions.addSeparator()
 
-        allDevicesAction = QtWidgets.QAction('Все устройства', self)
-        allDevicesAction.setCheckable(True)
-        allDevicesAction.setChecked(
-            bool(sum([d.logWindow for d in device().devices])))
-        self.setLoggingSourceActions.addAction(allDevicesAction)
+    def setupUserInput(self):
+        return
 
     def interconnect(self):
         self.meiLogFolder.triggered.connect(self.openLogFolder)
@@ -82,6 +81,8 @@ class LogWindow(QtWidgets.QMainWindow, Ui_LogWindow):
         self.meiScroll.triggered.connect(self.setScrollingMode)
         self.meiIncreaseFontSize.triggered.connect(self.increaseFontSize)
         self.meiReduceFontSize.triggered.connect(self.reduceFontSize)
+
+        self.btnSend.clicked.connect(self.sendDeviceMessage)
 
     def bind(self):
         self.meiLogFolder.setShortcut(QtGui.QKeySequence(userOptions().keys.logFolder))
@@ -128,9 +129,30 @@ class LogWindow(QtWidgets.QMainWindow, Ui_LogWindow):
         self.scrollDown()
 
     def setASCIIMode(self, action: QtWidgets.QAction):
+        if (action.text().startswith('Все')):
+            for ga in self.setASCIIModeActions.actions():
+                if (ga.text().startswith('Все')):
+                    continue
+                ga.setChecked(action.isChecked())
+                device()[ga.text()].decodeASCII = action.isChecked()
+                userOptions().setLogDecodeASCII('All', action.isChecked())
+
+            return
+
         device()[action.text()].decodeASCII = action.isChecked()
 
     def setLoggerVisibility(self, action: QtWidgets.QAction):
+        print(type(action))
+        if (action.text().startswith('Все')):
+            for ga in self.setLoggingSourceActions.actions():
+                if (ga.text().startswith('Все')):
+                    continue
+                ga.setChecked(action.isChecked())
+                manager()[ga.text()].decodeASCII = action.isChecked()
+                userOptions().setLogDecodeASCII('All', action.isChecked())
+
+            return
+
         manager()[action.text()].logWindowVisibility = action.isChecked()
 
     def openLogFolder(self):
@@ -138,16 +160,42 @@ class LogWindow(QtWidgets.QMainWindow, Ui_LogWindow):
         self.logger.debug('Открыта папка с журналами')
 
     def writeDeviceMessage(self, device):
+        content = device.port.readLine()
+        toPrint = (str(content) if (device.decodeASCII) else str(content.toHex(' ')))
+
         self.txtLogDisplay.append(
             f'<span style="color:gray">{datetime.now()}</span> '
-            f'[<span style="color:green">{device.address.capitalize()}</span>]: '
-            f'{device.port.readLine()}')
+            f'[<span style="color:lime">{device.address.capitalize()}</span>]: {toPrint}')
+        
+    def validateDeviceMessage(self):
+        text = self.lneMessage.text()
+
+        if (not text):
+            self.lneMessage.setStyleSheet('border: 1px solid red;')
+            self.statusbar.showMessage('Введите данные для отправки!', 2000)
+            return
 
     def sendDeviceMessage(self):
-        device()[self.cbbPort.currentText].port.write(
-            bytearray(self.lneMessage.text(), 'utf-8'))
-        self.txtLogDisplay.append(
-            f'<span style="color:gray">{datetime.now()}</span> '
-            f'[Вы к <span style="color:green">{self.cbbPort.currentText().capitalize()}</span>]: '
-            f'{self.lneMessage.text()}')
+        text = self.lneMessage.text()
+        port = self.cbbPort.currentText().upper()
+
+        if (not port):
+            self.cbbPort.setStyleSheet('border: 1px solid red;')
+            self.statusbar.showMessage('Сначала выберите порт!', 2000)
+        else:
+            self.cbbPort.setStyleSheet('')
+
+        self.logger.debug(f'Пытаюсь отправить сообщение на порт {port}')
+
+        if (device()[port].port.write(bytearray(text, 'ascii')) != -1):
+            self.txtLogDisplay.append(
+                f'<span style="color:gray">{datetime.now()}</span> '
+                f'[Вы к <span style="color:lime">{port}</span>]: {text}')
+        else:
+            self.txtLogDisplay.append(
+                f'<span style="color:gray">{datetime.now()}</span> '
+                f'[Вы к <span style="color:lime">{self.cbbPort.currentText().capitalize()}</span>]: '
+                f'<span style="color:red">[Не отправлено!]</span> {self.lneMessage.text()}')
+            
+
         self.lneMessage.clear()

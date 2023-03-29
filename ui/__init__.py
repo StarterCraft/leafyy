@@ -36,6 +36,12 @@ class GreenyyUiManager():
         self.logWindow.bind()
 
     def deviceIntegration(self):
+        allDevicesAction = QtWidgets.QAction('Все устройства', self.logWindow)
+        allDevicesAction.setCheckable(True)
+        allDevicesAction.setChecked(
+            bool(sum([d.logWindow for d in device().devices])))
+        self.logWindow.setLoggingSourceActions.addAction(allDevicesAction)
+
         for d in device().devices:
             self.generalWindow.meiWindow.addAction(d.address)
 

@@ -4,9 +4,7 @@
     "logSources": [
         "All"
     ],
-    "logDecodeASCII": [
-        "All"
-    ],
+    "logDecodeASCII": [],
     "keys": {
         "logFolder": "Ctrl+N",
         "logScrollMode": "Ctrl+M",

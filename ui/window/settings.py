@@ -48,7 +48,7 @@ class SettingsWindow(QtWidgets.QMainWindow, Ui_SettingsWindow):
     def interconnect(self):
         self.treeKeys.currentItemChanged.connect(self.keyBindingSelected)
         self.keySequenceEdit.keySequenceChanged.connect(self.keyBindingEditInitiated)
-        #self.keySequenceEdit.k
+        self.keySequenceEdit.editingFinished.connect(self.keyBindingEdit)
 
     def bind(self):
         pass

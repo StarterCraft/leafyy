@@ -63,11 +63,11 @@ class GreenyyDevice():
 
     @property
     def decodeASCII(self):
-        return userOptions().logWindowDecodeASCII(self.address)
+        return userOptions().logDecodeASCII(self.address)
     
     @decodeASCII.setter
     def decodeASCII(self, value: bool):
-        userOptions().setLogWindowDecodeASCII(self.address, value)
+        userOptions().setLogDecodeASCII(self.address, value)
 
     def start(self):
         self.logger.debug(f'Пытаюсь открыть порт {self.address}')

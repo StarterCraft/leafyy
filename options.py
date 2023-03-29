@@ -3,7 +3,7 @@ from PyQt5 import QtWidgets
 from json import load, dump
 from glob import glob
 
-from app import device
+from app import device, logging
 from logger import GreenyyLogger
 
 
@@ -88,39 +88,53 @@ class GreenyyUserOptions:
             dump(self.defaults, configFile, indent = 4)
         self.logger.critical('Настройки программы по умолчанию восстановлены')
 
-
-    def logWindowDecodeASCII(self, deviceAddress: str) -> bool:
-        if (self._logDecodeASCII[0] == 'All'):
+    def logDecodeASCII(self, deviceAddress: str) -> bool:
+        if (self._logDecodeASCII[0]):
             return True
 
         return (deviceAddress in self._logDecodeASCII)
     
-    def setLogWindowDecodeASCII(self, deviceAddress: str, value: bool) -> None:
-        if (value and self._logDecodeASCII[0] == 'All'):
+    def setLogDecodeASCII(self, deviceAddress: str, value: bool) -> None:
+        if (self._logDecodeASCII[0] == 'All'):
+            if (value):
+                return
+            
+            if (deviceAddress == 'All'):
+                self._logDecodeASCII.clear()
+            else:
+                self._logDecodeASCII = [d.address for d in device().devices if (
+                    d.address != deviceAddress)]
+            
+            self.write()
             return
         
-        if (self._logDecodeASCII == 'All'):
-            self._logDecodeASCII = [d.address for d in device().devices]
-            self._logDecodeASCII.remove(deviceAddress)
-
-            self.writeConfig()
+        if (not self._logDecodeASCII):
+            if (not value):
+                return
+            
+            if (deviceAddress == 'All'):
+                self._logDecodeASCII.clear()
+            else:
+                self._logDecodeASCII.append(deviceAddress)
+            
+            self.write()
             return
         
         if (deviceAddress in self._logDecodeASCII):
-            if (value): 
+            if (value):
                 return
-
+            
             self._logDecodeASCII.remove(deviceAddress)
-
-            self.writeConfig()
+            
+            self.write()
             return
         
         if (value):
             self._logDecodeASCII.append(deviceAddress)
-
-            self.writeConfig()
-            return
         
+            self.write()
+            return
+
     def logWindowSources(self, loggerName: str) -> bool:
         if (self._logSources[0] == 'All'):
             return True
@@ -128,27 +142,42 @@ class GreenyyUserOptions:
         return (loggerName in self._logSources)
     
     def setLogWindowSources(self, loggerName: str, value: bool) -> None:
-        if (value and self._logSources[0] == 'All'):
+        if (self._logSources[0] == 'All'):
+            if (value):
+                return
+            
+            if (loggerName == 'All'):
+                self._logSources.clear()
+            else:
+                self._logSources = [logger.name for logger in logging().loggers]
+            
+            self.write()
             return
         
-        if (self._logSources == 'All'):
-            self._logSources = [d.address for d in device().devices]
-            self._logSources.remove(loggerName)
-
-            self.writeConfig()
+        if (not self._logSources):
+            if (not value):
+                return
+            
+            if (loggerName == 'All'):
+                self._logSources.clear()
+            else:
+                self._logSources.append(loggerName)
+            
+            self.write()
             return
         
         if (loggerName in self._logSources):
-            if (value): 
+            if (value):
                 return
-
+            
             self._logSources.remove(loggerName)
-
-            self.writeConfig()
+            
+            self.write()
             return
         
         if (value):
             self._logSources.append(loggerName)
-
-            self.writeConfig()
+        
+            self.write()
             return
+        

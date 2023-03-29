@@ -1,4 +1,3 @@
-#coding=utf-8
 from PyQt5 import QtCore, QtWidgets
 
 from app import userOptions
@@ -15,7 +14,7 @@ class GreenyyLoggingManager(QtCore.QObject):
         try:
             return [l for l in self.loggers if (l.name == name)][0]
         except IndexError:
-            raise KeyError(f'Канала журналирования {name} не найдено')
+            raise KeyError(f'Канала журналирования {name} не найдено', name)
 
     def registerLogger(self, logger: GreenyyLogger):
         self.loggers.append(logger)

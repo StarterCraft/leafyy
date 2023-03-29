@@ -215,13 +215,6 @@
           <item>
            <widget class="QKeySequenceEdit" name="keySequenceEdit"/>
           </item>
-          <item>
-           <widget class="QPushButton" name="btnKeySequence">
-            <property name="text">
-             <string>Сохранить</string>
-            </property>
-           </widget>
-          </item>
          </layout>
         </item>
        </layout>

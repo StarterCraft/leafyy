@@ -155,7 +155,11 @@
    <addaction name="menuFile"/>
    <addaction name="menuView"/>
   </widget>
-  <widget class="QStatusBar" name="statusbar"/>
+  <widget class="QStatusBar" name="statusbar">
+   <property name="styleSheet">
+    <string notr="true">font-size: 8pt;</string>
+   </property>
+  </widget>
   <action name="meiLogLvlDEBUG">
    <property name="text">
     <string>Отладка (DEBUG)</string>

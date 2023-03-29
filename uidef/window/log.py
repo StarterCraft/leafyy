@@ -74,6 +74,7 @@ class Ui_LogWindow(object):
         LogWindow.setMenuBar(self.menubar)
         self.statusbar = QtWidgets.QStatusBar(LogWindow)
         self.statusbar.setObjectName("statusbar")
+        self.statusbar.setStyleSheet("font-size: 8pt;")
         LogWindow.setStatusBar(self.statusbar)
         self.meiLogLvlDEBUG = QtWidgets.QAction(LogWindow)
         self.meiLogLvlDEBUG.setObjectName("meiLogLvlDEBUG")
