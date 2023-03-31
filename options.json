@@ -2,7 +2,8 @@
     "logLevel": "DEBUG",
     "logScrollMode": false,
     "logSources": [
-        "All"
+        "AllLoggers",
+        "AllDevices"
     ],
     "logDecodeASCII": [],
     "keys": {

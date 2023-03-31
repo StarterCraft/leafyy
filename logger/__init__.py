@@ -1,14 +1,14 @@
 from PyQt5 import QtCore, QtWidgets
 
 from app import userOptions
-from logger.logger import LogLevel, GreenyyLogger
+from logger.logger import GreenyyLogLevel, GreenyyLogger
 
 class GreenyyLoggingManager(QtCore.QObject):
     def __init__(self) -> None:
         super().__init__()
 
         self.loggers = []
-        self.globalLevel = LogLevel.DEBUG
+        self.globalLevel = GreenyyLogLevel.DEBUG
         
     def __getitem__(self, name: str) -> GreenyyLogger:
         try:
@@ -20,13 +20,13 @@ class GreenyyLoggingManager(QtCore.QObject):
         self.loggers.append(logger)
 
     def setGlobalLogLevel(self, level):
-        lvl = LogLevel.DEBUG
+        lvl = GreenyyLogLevel.DEBUG
 
         if (isinstance(level, str)):
-            lvl = LogLevel[level]
+            lvl = GreenyyLogLevel[level]
 
-        if (isinstance(level, LogLevel) or isinstance(level, int)):
-            lvl = LogLevel(level)
+        if (isinstance(level, GreenyyLogLevel) or isinstance(level, int)):
+            lvl = GreenyyLogLevel(level)
 
         self.globalLevel = lvl
         for logger in self.loggers:

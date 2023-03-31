@@ -4,22 +4,22 @@ from datetime import datetime
 from app import device
 from logger import GreenyyLogger
 
-from .window.general import GeneralWindow
-from .window.log import LogWindow
-from .window.settings import SettingsWindow
+from .window.general import GreenyyGeneralWindow
+from .window.log import GreenyyLogWindow
+from .window.settings import GreenyySettingsWindow
 
-from .dialog.deviceProperties import DevicePropertiesDialog
-from .dialog.plantProperties import PlantPropertiesDialog
-from .dialog.ruleItem import RuleItemDialog
-from .dialog.ruleProperties import RulePropertiesDialog
+from .dialog.deviceProperties import GreenyyDeviceDialog
+from .dialog.plantProperties import GreenyyPlantDialog
+from .dialog.ruleItem import GreenyyRuleItemDialog
+from .dialog.ruleProperties import GreenyyRuleDialog
 
 
 class GreenyyUiManager():
     def __init__(self) -> None:
         self.logger = GreenyyLogger('UIManager')
-        self.generalWindow = GeneralWindow()
-        self.settingsWindow = SettingsWindow()
-        self.logWindow = LogWindow()
+        self.generalWindow = GreenyyGeneralWindow()
+        self.settingsWindow = GreenyySettingsWindow()
+        self.logWindow = GreenyyLogWindow()
 
         self.interconnect()
         self.logger.debug('Инициализация интерфейса завершена')
@@ -40,6 +40,7 @@ class GreenyyUiManager():
         allDevicesAction.setCheckable(True)
         allDevicesAction.setChecked(
             bool(sum([d.logWindow for d in device().devices])))
+        allDevicesAction.setData('device')
         self.logWindow.setLoggingSourceActions.addAction(allDevicesAction)
 
         for d in device().devices:
@@ -56,6 +57,7 @@ class GreenyyUiManager():
             setLoggerVisibilityAction = QtWidgets.QAction(d.address.upper(), self.logWindow)
             setLoggerVisibilityAction.setCheckable(True)
             setLoggerVisibilityAction.setChecked(d.logWindow)
+            setLoggerVisibilityAction.setData('device')
             self.logWindow.setLoggingSourceActions.addAction(setLoggerVisibilityAction)
 
             self.settingsWindow.treeDevices.addTopLevelItem(d.liwDevicesItem)

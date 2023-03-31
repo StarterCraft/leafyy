@@ -17,7 +17,8 @@ class GreenyyDevice():
         self.tempSensorDef = kwargs['unifiedTempSensor']
         self.plantsDef = kwargs['plants']
 
-        self.logWindow = userOptions().logWindowSources(self.address)
+        self.logWindowVisibility = userOptions().logWindowSources(self.address, 1)
+        self.decodeASCIIMode = userOptions().logDecodeASCII(self.address)
 
         self.status = GreenyyStatus.Disabled
         self.logger = GreenyyLogger(f'Device[{self.address}]')
@@ -59,14 +60,15 @@ class GreenyyDevice():
     @logWindowVisibility.setter
     def logWindowVisibility(self, value: bool):
         self.logWindow = value
-        userOptions().setLogWindowSources(self.name, value)
+        userOptions().setLogWindowSources(self.name, value, 1)
 
     @property
     def decodeASCII(self):
-        return userOptions().logDecodeASCII(self.address)
+        return self.decodeASCIIMode
     
     @decodeASCII.setter
     def decodeASCII(self, value: bool):
+        self.decodeASCIIMode = value
         userOptions().setLogDecodeASCII(self.address, value)
 
     def start(self):

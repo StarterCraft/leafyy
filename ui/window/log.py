@@ -2,14 +2,20 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from os import system
 from datetime import datetime
 from logging import getLevelName
+from enum import Enum
 
 from app import logging as manager
 from app import userOptions, device
-from logger import GreenyyLogger, LogLevel
+from logger import GreenyyLogger, GreenyyLogLevel
 from uidef.window.log import Ui_LogWindow
 
 
-class LogWindow(QtWidgets.QMainWindow, Ui_LogWindow):
+class GreenyyLogWindowSource(Enum):
+    Logger = 0
+    Device = 1
+
+
+class GreenyyLogWindow(QtWidgets.QMainWindow, Ui_LogWindow):
     def __init__(self):
         super().__init__()
         self.logger = GreenyyLogger('LogWindow')
@@ -32,7 +38,7 @@ class LogWindow(QtWidgets.QMainWindow, Ui_LogWindow):
         self.logLevelActions = QtWidgets.QActionGroup(self)
         self.logLevelActions.setExclusive(True)
 
-        for level, action in zip(LogLevel, [
+        for level, action in zip(GreenyyLogLevel, [
             self.meiLogLvlDEBUG, self.meiLogLvlINFO,
             self.meiLogLvlWARNING, self.meiLogLvlERROR,
             self.meiLogLvlCRITICAL
@@ -60,12 +66,15 @@ class LogWindow(QtWidgets.QMainWindow, Ui_LogWindow):
         allLoggersAction.setCheckable(True)
         allLoggersAction.setChecked(
             bool(sum([logger.logWindowVisibility for logger in manager().loggers])))
+        allLoggersAction.setData('logger')
+        
         self.setLoggingSourceActions.addAction(allLoggersAction)
         
         for logger in manager().loggers:
             action = QtWidgets.QAction(logger.name, self)
             action.setCheckable(True)
             action.setChecked(logger.logWindowVisibility)
+            action.setData('logger')
             self.setLoggingSourceActions.addAction(action)
 
         self.setLoggingSourceActions.addSeparator()
@@ -128,44 +137,49 @@ class LogWindow(QtWidgets.QMainWindow, Ui_LogWindow):
             f'Автопрокрутка {"включена" if userOptions().logScrollMode else "отключена"}')
         self.scrollDown()
 
-    def setASCIIMode(self, action: QtWidgets.QAction):
-        if (action.text().startswith('Все')):
-            for ga in self.setASCIIModeActions.actions():
-                if (ga.text().startswith('Все')):
-                    continue
-                ga.setChecked(action.isChecked())
-                device()[ga.text()].decodeASCII = action.isChecked()
-                userOptions().setLogDecodeASCII('All', action.isChecked())
+    def setASCIIMode(self, triggered: QtWidgets.QAction):
+        text = triggered.text()
+        isChecked = triggered.isChecked()
 
+        if (text.startswith('Все')):
+            for a in [ac for ac in self.setLoggingSourceActions.actions() if (
+                not ac.text().startswith('Все'))]:
+                a.setChecked(isChecked)
+                device()[a.text()].logDecodeASCIIMode = isChecked
+
+            userOptions().setLogDecodeASCII('All', isChecked)
             return
 
-        device()[action.text()].decodeASCII = action.isChecked()
+        device()[text].decodeASCII = isChecked
 
-    def setLoggerVisibility(self, action: QtWidgets.QAction):
-        print(type(action))
-        if (action.text().startswith('Все')):
-            for ga in self.setLoggingSourceActions.actions():
-                if (ga.text().startswith('Все')):
-                    continue
-                ga.setChecked(action.isChecked())
-                manager()[ga.text()].decodeASCII = action.isChecked()
-                userOptions().setLogDecodeASCII('All', action.isChecked())
+    def setLoggerVisibility(self, triggered: QtWidgets.QAction):
+        text = triggered.text()
+        data = triggered.data()
+        isChecked = triggered.isChecked()
 
-            return
+        if (text.startswith('Все')):
+            for a in [ac for ac in self.setLoggingSourceActions.actions() if (
+                ac.data() == data and not ac.text().startswith('Все'))]:
+                a.setChecked(isChecked)
+                
+                if (a.data() == 'logger'):
+                    manager()[a.text()].logWindow = isChecked
 
-        manager()[action.text()].logWindowVisibility = action.isChecked()
 
     def openLogFolder(self):
         system('explorer logs')
         self.logger.debug('Открыта папка с журналами')
 
     def writeDeviceMessage(self, device):
-        content = device.port.readLine()
-        toPrint = (str(content) if (device.decodeASCII) else str(content.toHex(' ')))
+        if (device.logWindowVisibility):
+            content = device.port.readLine()
+            toPrint = (str(content) if (device.decodeASCII) else str(content.toHex(' ')))
 
-        self.txtLogDisplay.append(
-            f'<span style="color:gray">{datetime.now()}</span> '
-            f'[<span style="color:lime">{device.address.capitalize()}</span>]: {toPrint}')
+            self.txtLogDisplay.append(
+                f'<span style="color:gray">{datetime.now()}</span> '
+                f'[<span style="color:lime">{device.address.upper()}</span>]: {toPrint}')
+            
+            self.scrollDown()
         
     def validateDeviceMessage(self):
         text = self.lneMessage.text()

@@ -6,7 +6,7 @@ from logger.logger import GreenyyLogger
 from uidef.window.settings import Ui_SettingsWindow
 
 
-class SettingsWindow(QtWidgets.QMainWindow, Ui_SettingsWindow):
+class GreenyySettingsWindow(QtWidgets.QMainWindow, Ui_SettingsWindow):
     class SettingsTab(Enum):
         Devices = 0
         Rules = 1

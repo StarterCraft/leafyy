@@ -89,13 +89,13 @@ class GreenyyUserOptions:
         self.logger.critical('Настройки программы по умолчанию восстановлены')
 
     def logDecodeASCII(self, deviceAddress: str) -> bool:
-        if (self._logDecodeASCII[0]):
+        if (self._logDecodeASCII == ['All']):
             return True
 
         return (deviceAddress in self._logDecodeASCII)
     
     def setLogDecodeASCII(self, deviceAddress: str, value: bool) -> None:
-        if (self._logDecodeASCII[0] == 'All'):
+        if (self._logDecodeASCII == ['All']):
             if (value):
                 return
             
@@ -136,13 +136,13 @@ class GreenyyUserOptions:
             return
 
     def logWindowSources(self, loggerName: str) -> bool:
-        if (self._logSources[0] == 'All'):
+        if (self._logSources == ['All']):
             return True
 
         return (loggerName in self._logSources)
     
     def setLogWindowSources(self, loggerName: str, value: bool) -> None:
-        if (self._logSources[0] == 'All'):
+        if (self._logSources == ['All']):
             if (value):
                 return
             

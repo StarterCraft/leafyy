@@ -11,7 +11,7 @@ from colorama import Fore, Style
 from datetime import datetime
 
 
-class LogLevel(Enum):
+class GreenyyLogLevel(Enum):
     'Объект для представления уровня журналирования'
 
     #Возможные уровни журналирования:
@@ -26,42 +26,42 @@ class LogLevel(Enum):
 
     #Спасибо ChatGPT
     def __lt__(self, other):
-        if isinstance(other, LogLevel):
+        if isinstance(other, GreenyyLogLevel):
             return self.value < other.value
         elif isinstance(other, int):
             return self.value < other
         return NotImplemented
     
     def __le__(self, other):
-        if isinstance(other, LogLevel):
+        if isinstance(other, GreenyyLogLevel):
             return self.value <= other.value
         elif isinstance(other, int):
             return self.value <= other
         return NotImplemented
     
     def __eq__(self, other):
-        if isinstance(other, LogLevel):
+        if isinstance(other, GreenyyLogLevel):
             return self.value == other.value
         elif isinstance(other, int):
             return self.value == other
         return NotImplemented
     
     def __ne__(self, other):
-        if isinstance(other, LogLevel):
+        if isinstance(other, GreenyyLogLevel):
             return self.value != other.value
         elif isinstance(other, int):
             return self.value != other
         return NotImplemented
     
     def __gt__(self, other):
-        if isinstance(other, LogLevel):
+        if isinstance(other, GreenyyLogLevel):
             return self.value > other.value
         elif isinstance(other, int):
             return self.value > other
         return NotImplemented
     
     def __ge__(self, other):
-        if isinstance(other, LogLevel):
+        if isinstance(other, GreenyyLogLevel):
             return self.value >= other.value
         elif isinstance(other, int):
             return self.value >= other
@@ -87,7 +87,7 @@ class GreenyyLogger(QtCore.QObject):
     '''
 
 
-    def __init__(self, name: str, logLevel: LogLevel = LogLevel.DEBUG,
+    def __init__(self, name: str, logLevel: GreenyyLogLevel = GreenyyLogLevel.DEBUG,
                                   disableStdPrint: bool = False,
                                   disableLogWindow: bool = False,
                                   useColorama = 1):
@@ -150,7 +150,7 @@ class GreenyyLogger(QtCore.QObject):
         self.logWindow = value
         userOptions().setLogWindowSources(self.name, value)
 
-    def setLogLevel(self, logLevel: LogLevel):
+    def setLogLevel(self, logLevel: GreenyyLogLevel):
         '''
         Установить уровень журналирования.
 
@@ -191,10 +191,10 @@ class GreenyyLogger(QtCore.QObject):
             except:
                 return
             
-    def publish(self, value: LogLevel, message: str):
+    def publish(self, value: GreenyyLogLevel, message: str):
         'Опубликовать сообщение с заданным уровнем.'
-        methods = dict.fromkeys(LogLevel)
-        for level in LogLevel:
+        methods = dict.fromkeys(GreenyyLogLevel)
+        for level in GreenyyLogLevel:
             methods[level] = getattr(self, level.name)
 
         methods[value](message)
@@ -214,11 +214,11 @@ class GreenyyLogger(QtCore.QObject):
         moduleName = ('UNKNOWN' if callerInfo[0] == '(unknown file)' else callerInfo[0][:callerInfo[0].index('.')])
         funcName = callerInfo[2]
 
-        if self.useColorama <= 1 and self.logLevel == LogLevel.DEBUG:
+        if self.useColorama <= 1 and self.logLevel == GreenyyLogLevel.DEBUG:
             self.formatString = ('{%(asctime)s} [%(name)s:%(levelname)s] '
                                  f'[{fileName} <{lineNo}>: {moduleName}.{funcName}]: '
                                  '%(message)s')
-        elif self.useColorama <= 1 and self.logLevel >= LogLevel.INFO:
+        elif self.useColorama <= 1 and self.logLevel >= GreenyyLogLevel.INFO:
             self.formatString = '{%(asctime)s} [%(name)s:%(levelname)s] %(message)s'
             
             self.formatString = (str(Fore.CYAN)   +  '{%(asctime)s} [' + str(Style.RESET_ALL) +
@@ -229,7 +229,7 @@ class GreenyyLogger(QtCore.QObject):
         self.handler.setFormatter(logging.Formatter(self.formatString))
 
         self.Logger.debug(message)
-        if self.logLevel == LogLevel.DEBUG and not self.printDsb:
+        if self.logLevel == GreenyyLogLevel.DEBUG and not self.printDsb:
             print(f'[{Fore.GREEN}{self.name}{Style.RESET_ALL}@{Fore.YELLOW}DEBUG{Style.RESET_ALL}]: {message}')
 
         self.publishToLogWindow(
@@ -252,17 +252,17 @@ class GreenyyLogger(QtCore.QObject):
         moduleName = ('UNKNOWN' if callerInfo[0] == '(unknown file)' else callerInfo[0][:callerInfo[0].index('.')])
         funcName = callerInfo[2]
 
-        if self.useColorama <= 1 and self.logLevel == LogLevel.DEBUG:
+        if self.useColorama <= 1 and self.logLevel == GreenyyLogLevel.DEBUG:
             self.formatString = ('{%(asctime)s} [%(name)s:%(levelname)s] '
                                  f'[{fileName} <{lineNo}>: {moduleName}.{funcName}]: '
                                  '%(message)s')
-        elif self.useColorama <= 1 and self.logLevel >= LogLevel.INFO:
+        elif self.useColorama <= 1 and self.logLevel >= GreenyyLogLevel.INFO:
             self.formatString = '{%(asctime)s} [%(name)s:%(levelname)s] %(message)s'
 
         self.handler.setFormatter(logging.Formatter(self.formatString))
 
         self.Logger.info(message)
-        if self.logLevel <= LogLevel.INFO and not self.printDsb:
+        if self.logLevel <= GreenyyLogLevel.INFO and not self.printDsb:
             print(f'[{Fore.GREEN}{self.name}{Style.RESET_ALL}@{Fore.YELLOW}INFO{Style.RESET_ALL}]: {message}')
 
         self.publishToLogWindow(
@@ -285,17 +285,17 @@ class GreenyyLogger(QtCore.QObject):
         moduleName = ('UNKNOWN' if callerInfo[0] == '(unknown file)' else callerInfo[0][:callerInfo[0].index('.')])
         funcName = callerInfo[2]
 
-        if self.useColorama <= 1 and self.logLevel == LogLevel.DEBUG:
+        if self.useColorama <= 1 and self.logLevel == GreenyyLogLevel.DEBUG:
             self.formatString = ('{%(asctime)s} [%(name)s:%(levelname)s] '
                                  f'[{fileName} <{lineNo}>: {moduleName}.{funcName}]: '
                                  '%(message)s')
-        elif self.useColorama <= 1 and self.logLevel >= LogLevel.INFO:
+        elif self.useColorama <= 1 and self.logLevel >= GreenyyLogLevel.INFO:
             self.formatString = '{%(asctime)s} [%(name)s:%(levelname)s] %(message)s'
 
         self.handler.setFormatter(logging.Formatter(self.formatString))
 
         self.Logger.warning(message)
-        if self.logLevel <= LogLevel.WARNING and not self.printDsb:
+        if self.logLevel <= GreenyyLogLevel.WARNING and not self.printDsb:
             print(f'[{Fore.GREEN}{self.name}{Style.RESET_ALL}@{Fore.YELLOW}WARN{Style.RESET_ALL}]: {message}')
 
         self.publishToLogWindow(
@@ -318,17 +318,17 @@ class GreenyyLogger(QtCore.QObject):
         moduleName = ('UNKNOWN' if callerInfo[0] == '(unknown file)' else callerInfo[0][:callerInfo[0].index('.')])
         funcName = callerInfo[2]
 
-        if self.useColorama <= 1 and self.logLevel == LogLevel.DEBUG:
+        if self.useColorama <= 1 and self.logLevel == GreenyyLogLevel.DEBUG:
             self.formatString = ('{%(asctime)s} [%(name)s:%(levelname)s] '
                                  f'[{fileName} <{lineNo}>: {moduleName}.{funcName}]: '
                                  '%(message)s')
-        elif self.useColorama <= 1 and self.logLevel >= LogLevel.INFO:
+        elif self.useColorama <= 1 and self.logLevel >= GreenyyLogLevel.INFO:
             self.formatString = '{%(asctime)s} [%(name)s:%(levelname)s] %(message)s'
 
         self.handler.setFormatter(self.formatString)
 
         self.Logger.error(message)
-        if self.logLevel <= LogLevel.ERROR and not self.printDsb:
+        if self.logLevel <= GreenyyLogLevel.ERROR and not self.printDsb:
             print(f'[{Fore.GREEN}{self.name}{Style.RESET_ALL}@{Fore.YELLOW}ERROR{Style.RESET_ALL}]: {message}')
 
         self.publishToLogWindow(
@@ -351,17 +351,17 @@ class GreenyyLogger(QtCore.QObject):
         moduleName = ('UNKNOWN' if callerInfo[0] == '(unknown file)' else callerInfo[0][:callerInfo[0].index('.')])
         funcName = callerInfo[2]
 
-        if self.useColorama <= 1 and self.logLevel == LogLevel.DEBUG:
+        if self.useColorama <= 1 and self.logLevel == GreenyyLogLevel.DEBUG:
             self.formatString = ('{%(asctime)s} [%(name)s:%(levelname)s] '
                                  f'[{fileName} <{lineNo}>: {moduleName}.{funcName}]: '
                                  '%(message)s')
-        elif self.useColorama <= 1 and self.logLevel >= LogLevel.INFO:
+        elif self.useColorama <= 1 and self.logLevel >= GreenyyLogLevel.INFO:
             self.formatString = '{%(asctime)s} [%(name)s:%(levelname)s] %(message)s'
             
         self.handler.setFormatter(logging.Formatter(self.formatString))
         
         self.Logger.critical(message)
-        if self.logLevel <= LogLevel.CRITICAL and not self.printDsb:
+        if self.logLevel <= GreenyyLogLevel.CRITICAL and not self.printDsb:
             print(f'[{Fore.GREEN}{self.name}{Style.RESET_ALL}@{Fore.YELLOW}CRITICAL{Style.RESET_ALL}]: {message}')
 
         self.publishToLogWindow(
