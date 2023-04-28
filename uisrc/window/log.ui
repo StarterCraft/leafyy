@@ -19,6 +19,11 @@
   <property name="windowTitle">
    <string>Журнал и последовательный порт</string>
   </property>
+  <property name="styleSheet">
+   <string notr="true">QTextEdit, QLineEdit, QComboBox, QPushButton {
+	font: 10pt &quot;Cascadia Code&quot;;
+}</string>
+  </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout">
     <property name="leftMargin">
@@ -39,6 +44,9 @@
        <font>
         <family>Cascadia Code</family>
         <pointsize>10</pointsize>
+        <weight>50</weight>
+        <italic>false</italic>
+        <bold>false</bold>
        </font>
       </property>
       <property name="lineWrapMode">
@@ -53,74 +61,68 @@
      </widget>
     </item>
     <item>
-     <layout class="QHBoxLayout" name="horizontalLayout">
-      <property name="leftMargin">
-       <number>11</number>
-      </property>
-      <property name="rightMargin">
-       <number>11</number>
-      </property>
-      <property name="bottomMargin">
-       <number>0</number>
-      </property>
-      <item>
-       <widget class="QComboBox" name="cbbPort">
-        <property name="maximumSize">
-         <size>
-          <width>75</width>
-          <height>16777215</height>
-         </size>
-        </property>
-        <property name="font">
-         <font>
-          <family>Cascadia Code</family>
-          <pointsize>10</pointsize>
-         </font>
-        </property>
-        <property name="placeholderText">
-         <string>Порт</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QLineEdit" name="lneMessage">
-        <property name="font">
-         <font>
-          <family>Cascadia Code</family>
-          <pointsize>10</pointsize>
-         </font>
-        </property>
-        <property name="placeholderText">
-         <string>Отправить сообщение на COM-порт...</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="btnSend">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>50</width>
-          <height>16777215</height>
-         </size>
-        </property>
-        <property name="font">
-         <font>
-          <family>Cascadia Code</family>
-          <pointsize>10</pointsize>
-         </font>
-        </property>
-        <property name="text">
-         <string>=&gt;</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
+     <widget class="QFrame" name="frmSend">
+      <layout class="QHBoxLayout" name="sendPanel">
+       <property name="leftMargin">
+        <number>11</number>
+       </property>
+       <property name="rightMargin">
+        <number>11</number>
+       </property>
+       <property name="bottomMargin">
+        <number>1</number>
+       </property>
+       <item>
+        <widget class="QComboBox" name="cbbPort">
+         <property name="maximumSize">
+          <size>
+           <width>100</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <property name="placeholderText">
+          <string>Порт</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="lneMessage">
+         <property name="placeholderText">
+          <string>Отправить сообщение на COM-порт...</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QComboBox" name="cbbSendMode">
+         <property name="maximumSize">
+          <size>
+           <width>75</width>
+           <height>16777215</height>
+          </size>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="btnSend">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>50</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>=&gt;</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
     </item>
    </layout>
   </widget>
@@ -140,6 +142,24 @@
     <addaction name="meiLogFolder"/>
     <addaction name="separator"/>
    </widget>
+   <widget class="QMenu" name="menuWindow">
+    <property name="title">
+     <string>Окно</string>
+    </property>
+    <widget class="QMenu" name="meiSettings">
+     <property name="title">
+      <string>Настройки</string>
+     </property>
+     <addaction name="meiDevices"/>
+     <addaction name="meiRules"/>
+     <addaction name="meiKeys"/>
+     <addaction name="meiEnvironment"/>
+    </widget>
+    <addaction name="meiGeneral"/>
+    <addaction name="meiLog"/>
+    <addaction name="meiSettings"/>
+    <addaction name="separator"/>
+   </widget>
    <widget class="QMenu" name="menuView">
     <property name="title">
      <string>Вид</string>
@@ -153,6 +173,7 @@
     <addaction name="meiLogSource"/>
    </widget>
    <addaction name="menuFile"/>
+   <addaction name="menuWindow"/>
    <addaction name="menuView"/>
   </widget>
   <widget class="QStatusBar" name="statusbar">
@@ -235,6 +256,42 @@
     <string>Источники журнала...</string>
    </property>
   </action>
+  <action name="meiDevices">
+   <property name="text">
+    <string>Устройства...</string>
+   </property>
+  </action>
+  <action name="meiRules">
+   <property name="text">
+    <string>Правила...</string>
+   </property>
+  </action>
+  <action name="meiKeys">
+   <property name="text">
+    <string>Клавиши...</string>
+   </property>
+  </action>
+  <action name="meiLog">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Журнал</string>
+   </property>
+  </action>
+  <action name="meiGeneral">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Основное окно</string>
+   </property>
+  </action>
+  <action name="meiEnvironment">
+   <property name="text">
+    <string>Среда...</string>
+   </property>
+  </action>
  </widget>
  <tabstops>
   <tabstop>cbbPort</tabstop>
@@ -243,22 +300,6 @@
  </tabstops>
  <resources/>
  <connections>
-  <connection>
-   <sender>lneMessage</sender>
-   <signal>returnPressed()</signal>
-   <receiver>btnSend</receiver>
-   <slot>click()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>321</x>
-     <y>359</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>558</x>
-     <y>360</y>
-    </hint>
-   </hints>
-  </connection>
   <connection>
    <sender>meiExit</sender>
    <signal>triggered()</signal>

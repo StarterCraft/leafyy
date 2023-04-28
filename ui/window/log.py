@@ -1,12 +1,14 @@
-from PyQt5 import QtCore, QtGui, QtWidgets
-from os import system
+from PyQt5    import QtCore, QtGui, QtWidgets
+from os       import system
 from datetime import datetime
-from logging import getLevelName
-from enum import Enum
+from logging  import getLevelName
+from enum     import Enum
 
-from app import logging as manager
-from app import userOptions, device
-from logger import GreenyyLogger, GreenyyLogLevel
+from app      import log
+from app      import ui, options, hardware
+from logger   import GreenyyLogger, GreenyyLogLevel
+
+from ui       import GreenyyComponent
 from uidef.window.log import Ui_LogWindow
 
 
@@ -15,24 +17,26 @@ class GreenyyLogWindowSource(Enum):
     Device = 1
 
 
-class GreenyyLogWindow(QtWidgets.QMainWindow, Ui_LogWindow):
+class GreenyyLogWindow(
+    GreenyyComponent, 
+    QtWidgets.QMainWindow,
+    Ui_LogWindow):
     def __init__(self):
-        super().__init__()
-        self.logger = GreenyyLogger('LogWindow')
+        super().__init__('logWindow')
 
         self.setupUi(self)
+        self.defaultSize = (
+            QtCore.QSize(*options().defaultWindowSize[self.name])
+            if (self.name in options().defaultWindowSize.keys()) else
+            self.minimumSize()
+        )
+
         self.setupMenu()
         self.setupUserInput()
         self.interconnect()
         self.bind()
-        self.updateUi()
 
         self.logger.info('Окно журнала инициализировано')
-
-    def show(self):
-        self.updateUi()
-        super().show()
-        self.logger.info('Открыто окно журнала')
 
     def setupMenu(self):
         self.logLevelActions = QtWidgets.QActionGroup(self)
@@ -57,20 +61,20 @@ class GreenyyLogWindow(QtWidgets.QMainWindow, Ui_LogWindow):
         self.setASCIIModeActions = QtWidgets.QMenu(self)
         self.meiASCII.setMenu(self.setASCIIModeActions)
         self.setASCIIModeActions.triggered.connect(self.setASCIIMode)
+        self.allASCIIAction = None
 
         self.setLoggingSourceActions = QtWidgets.QMenu(self)
         self.meiLogSource.setMenu(self.setLoggingSourceActions)
         self.setLoggingSourceActions.triggered.connect(self.setLoggerVisibility)
 
-        allLoggersAction = QtWidgets.QAction('Все внутренние логгеры', self)
-        allLoggersAction.setCheckable(True)
-        allLoggersAction.setChecked(
-            bool(sum([logger.logWindowVisibility for logger in manager().loggers])))
-        allLoggersAction.setData('logger')
+        self.allLoggersAction = QtWidgets.QAction('Все внутренние логгеры', self)
+        self.allLoggersAction.setCheckable(True)
+        self.allLoggersAction.setChecked(all(l.logWindow for l in log()))
+        self.allLoggersAction.setData('logger')
         
-        self.setLoggingSourceActions.addAction(allLoggersAction)
+        self.setLoggingSourceActions.addAction(self.allLoggersAction)
         
-        for logger in manager().loggers:
+        for logger in log().loggers:
             action = QtWidgets.QAction(logger.name, self)
             action.setCheckable(True)
             action.setChecked(logger.logWindowVisibility)
@@ -78,6 +82,8 @@ class GreenyyLogWindow(QtWidgets.QMainWindow, Ui_LogWindow):
             self.setLoggingSourceActions.addAction(action)
 
         self.setLoggingSourceActions.addSeparator()
+
+        self.allDevicesAction = None
 
     def setupUserInput(self):
         return
@@ -94,32 +100,90 @@ class GreenyyLogWindow(QtWidgets.QMainWindow, Ui_LogWindow):
         self.btnSend.clicked.connect(self.sendDeviceMessage)
 
     def bind(self):
-        self.meiLogFolder.setShortcut(QtGui.QKeySequence(userOptions().keys.logFolder))
+        self.meiGeneral.setShortcut(QtGui.QKeySequence(options().keys.generalWindow))
+        self.meiLog.setShortcut(options().keys.logWindow)
+        self.meiDevices.setShortcut(options().keys.settingsWindow)
+
+        self.meiLogFolder.setShortcut(QtGui.QKeySequence(options().keys.logFolder))
         self.meiExit.setShortcut(QtGui.QKeySequence('Alt+F4'))
 
-        self.meiScroll.setShortcut(QtGui.QKeySequence(userOptions().keys.logScrollMode))
-        self.meiIncreaseFontSize.setShortcut(QtGui.QKeySequence(userOptions().keys.logIncreaseFontSize))
-        self.meiReduceFontSize.setShortcut(QtGui.QKeySequence(userOptions().keys.logReduceFontSize))
+        self.meiScroll.setShortcut(QtGui.QKeySequence(options().keys.logScrollMode))
+        self.meiIncreaseFontSize.setShortcut(QtGui.QKeySequence(options().keys.logIncreaseFontSize))
+        self.meiReduceFontSize.setShortcut(QtGui.QKeySequence(options().keys.logReduceFontSize))
+
+    def cleanUi(self):
+        self.statusbar.clearMessage()
+        self.lneMessage.clear()
 
     def updateUi(self):
         for action in self.logLevelActions.actions():
-            action.setChecked(manager().globalLevel is action.data())
+            action.setChecked(log().globalLevel is action.data())
 
-        self.meiScroll.setChecked(userOptions().logScrollMode)
+        self.meiGeneral.setChecked(ui().generalWindow.isVisible())
+        self.meiLog.setChecked(self.isVisible())
+
+        self.meiScroll.setChecked(options().logScrollMode)
+
+    def updateShowLoggersMenu(self):
+        for action in self.setLoggingSourceActions.actions():
+            text = action.text()
+            data = action.data()
+
+            if (not data == 'logger'):
+                continue
+
+            if (text.startswith('Все')):
+                action.setChecked(all(l.logWindow for l in log()))
+
+                continue
+                
+            action.setChecked(log()[text].logWindow)
+
+    def updateShowDevicesMenu(self):
+        for action in self.setLoggingSourceActions.actions():
+            text = action.text()
+            data = action.data()
+
+            if (not data == 'device'):
+                continue
+
+            if (text.startswith('Все')):
+                action.setChecked(all(d.logWindow for d in hardware()))
+                continue
+                
+            action.setChecked(hardware()[text].logWindow)
+
+    def show(self, force: bool = False):
+        if (force or not self.isVisible()):
+            self.cleanUi()
+            self.updateShowLoggersMenu()
+            self.updateShowDevicesMenu()
+
+            super().show()
+            self.updateUi()
+
+            self.logger.info('Открыто окно журнала')
+
+        else:
+            self.close()
+
+    def close(self):
+        super().close()
+        ui().updateUi()
 
     def scrollDown(self):
-        if (userOptions().logScrollMode):
+        if (options().logScrollMode):
             c = self.txtLogDisplay.textCursor()
             c.movePosition(c.End)
             self.txtLogDisplay.setTextCursor(c)
 
     def setGlobalLogLevel(self):
-        manager().setGlobalLogLevel(self.logLevelActions.checkedAction().data())
-        userOptions().logLevel = getLevelName(self.logLevelActions.checkedAction().data())
-        userOptions().write()
+        log().setGlobalLogLevel(self.logLevelActions.checkedAction().data())
+        options().logLevel = getLevelName(self.logLevelActions.checkedAction().data())
+        options().write()
 
-        self.logger.publish(manager().globalLogLevel,
-            f'Глобальный уровень журнала установлен на {manager().globalLogLevel.name}')
+        self.logger.publish(log().globalLogLevel,
+            f'Глобальный уровень журнала установлен на {log().globalLogLevel.name}')
 
     def increaseFontSize(self):
         self.txtLogDisplay.zoomIn()
@@ -132,39 +196,60 @@ class GreenyyLogWindow(QtWidgets.QMainWindow, Ui_LogWindow):
         self.scrollDown()
 
     def setScrollingMode(self):
-        userOptions().logScrollMode = self.meiScroll.isChecked()
-        self.logger.debug(
-            f'Автопрокрутка {"включена" if userOptions().logScrollMode else "отключена"}')
+        value = self.meiScroll.isChecked()
+
+        options().logScrollMode = value
+        self.logger.debug(f'Автопрокрутка {"включена" if value else "отключена"}')
         self.scrollDown()
+        options().write()
 
     def setASCIIMode(self, triggered: QtWidgets.QAction):
         text = triggered.text()
         isChecked = triggered.isChecked()
 
-        if (text.startswith('Все')):
-            for a in [ac for ac in self.setLoggingSourceActions.actions() if (
-                not ac.text().startswith('Все'))]:
+        if (triggered == self.allASCIIAction):
+            for a in [ac for ac in self.setLoggingSourceActions.actions()
+                      if (ac != self.allASCIIAction)]:
                 a.setChecked(isChecked)
-                device()[a.text()].logDecodeASCIIMode = isChecked
+                hardware()[a.text()].logDecodeASCIIMode = isChecked
 
-            userOptions().setLogDecodeASCII('All', isChecked)
+            options().setLogDecodeASCII('All', isChecked)
             return
 
-        device()[text].decodeASCII = isChecked
+        self.allASCIIAction.setChecked(all(d.decodeASCIIMode for d in hardware()))
+        hardware()[text].decodeASCII = isChecked
 
     def setLoggerVisibility(self, triggered: QtWidgets.QAction):
         text = triggered.text()
         data = triggered.data()
         isChecked = triggered.isChecked()
 
-        if (text.startswith('Все')):
-            for a in [ac for ac in self.setLoggingSourceActions.actions() if (
-                ac.data() == data and not ac.text().startswith('Все'))]:
-                a.setChecked(isChecked)
-                
-                if (a.data() == 'logger'):
-                    manager()[a.text()].logWindow = isChecked
+        vendor = (log() 
+                  if (data == 'logger') 
+                  else hardware())
+        
+        config = (options().setLogWindowLoggers  
+                  if (data == 'logger') else 
+                  options().setLogWindowDevices)
+        
+        common = (self.allLoggersAction
+                  if (data == 'logger') else
+                  self.allDevicesAction)
 
+        if (text.startswith('Все')):
+            for a in [ac for ac in self.setLoggingSourceActions.actions()
+                      if (ac.data() == data and ac != self.allASCIIAction)]:
+                a.setChecked(isChecked)    
+                vendor[a.text()].logWindow = isChecked
+            
+            config('All', isChecked)
+            return
+        
+        common.setChecked(all(obj.logWindow for obj in vendor))
+        vendor[text].logWindow = isChecked
+        config(text, isChecked)
+
+        self.updateUi()
 
     def openLogFolder(self):
         system('explorer logs')
@@ -196,20 +281,22 @@ class GreenyyLogWindow(QtWidgets.QMainWindow, Ui_LogWindow):
         if (not port):
             self.cbbPort.setStyleSheet('border: 1px solid red;')
             self.statusbar.showMessage('Сначала выберите порт!', 2000)
+            return
+
         else:
             self.cbbPort.setStyleSheet('')
 
         self.logger.debug(f'Пытаюсь отправить сообщение на порт {port}')
 
-        if (device()[port].port.write(bytearray(text, 'ascii')) != -1):
+        if (hardware()[port].send(text) != -1):
             self.txtLogDisplay.append(
                 f'<span style="color:gray">{datetime.now()}</span> '
                 f'[Вы к <span style="color:lime">{port}</span>]: {text}')
+            
         else:
             self.txtLogDisplay.append(
                 f'<span style="color:gray">{datetime.now()}</span> '
                 f'[Вы к <span style="color:lime">{self.cbbPort.currentText().capitalize()}</span>]: '
                 f'<span style="color:red">[Не отправлено!]</span> {self.lneMessage.text()}')
             
-
         self.lneMessage.clear()

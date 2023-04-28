@@ -4,8 +4,8 @@ import logging
 import os
 import time
 
-from app import logging as manager
-from app import ui, userOptions
+from app import log
+from app import ui, options
 from enum import Enum
 from colorama import Fore, Style
 from datetime import datetime
@@ -139,7 +139,7 @@ class GreenyyLogger(QtCore.QObject):
         
         self.Logger.addHandler(self.handler)
 
-        manager().registerLogger(self)
+        log().add(self)
 
     @property
     def logWindowVisibility(self):
@@ -148,7 +148,7 @@ class GreenyyLogger(QtCore.QObject):
     @logWindowVisibility.setter
     def logWindowVisibility(self, value: bool):
         self.logWindow = value
-        userOptions().setLogWindowSources(self.name, value)
+        options().setlogWindowLoggers(self.name, value)
 
     def setLogLevel(self, logLevel: GreenyyLogLevel):
         '''

@@ -52,19 +52,27 @@
     <property name="title">
      <string>Окно</string>
     </property>
+    <widget class="QMenu" name="meiSettings">
+     <property name="title">
+      <string>Настройки</string>
+     </property>
+     <addaction name="meiDevices"/>
+     <addaction name="meiRules"/>
+     <addaction name="meiKeys"/>
+     <addaction name="meiEnvironment"/>
+    </widget>
+    <addaction name="meiGeneral"/>
     <addaction name="meiLog"/>
+    <addaction name="meiSettings"/>
     <addaction name="separator"/>
    </widget>
-   <widget class="QMenu" name="meiSettings">
+   <widget class="QMenu" name="menuView">
     <property name="title">
-     <string>Настройки</string>
+     <string>Вид</string>
     </property>
-    <addaction name="meiDevices"/>
-    <addaction name="meiRules"/>
-    <addaction name="meiKeys"/>
    </widget>
    <addaction name="meiWindow"/>
-   <addaction name="meiSettings"/>
+   <addaction name="menuView"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="meiDevices">
@@ -77,14 +85,30 @@
     <string>Правила...</string>
    </property>
   </action>
+  <action name="meiKeys">
+   <property name="text">
+    <string>Клавиши...</string>
+   </property>
+  </action>
   <action name="meiLog">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="text">
     <string>Журнал</string>
    </property>
   </action>
-  <action name="meiKeys">
+  <action name="meiGeneral">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="text">
-    <string>Клавиши...</string>
+    <string>Основное окно</string>
+   </property>
+  </action>
+  <action name="meiEnvironment">
+   <property name="text">
+    <string>Среда...</string>
    </property>
   </action>
  </widget>

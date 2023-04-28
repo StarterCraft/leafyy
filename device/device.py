@@ -1,8 +1,9 @@
 #coding=utf-8
 from PyQt5 import QtCore, QtWidgets, QtSerialPort
 from collections import deque
+from typing import Union
 
-from app import ui, userOptions
+from app import ui, options
 from logger import GreenyyLogger
 from device import GreenyyStatus
 from .message import GreenyyDeviceMessage
@@ -17,8 +18,8 @@ class GreenyyDevice():
         self.tempSensorDef = kwargs['unifiedTempSensor']
         self.plantsDef = kwargs['plants']
 
-        self.logWindowVisibility = userOptions().logWindowSources(self.address, 1)
-        self.decodeASCIIMode = userOptions().logDecodeASCII(self.address)
+        self.logWindow = options().logWindowDevices(self.address)
+        self.decodeASCIIMode = options().logDecodeASCII(self.address)
 
         self.status = GreenyyStatus.Disabled
         self.logger = GreenyyLogger(f'Device[{self.address}]')
@@ -60,7 +61,7 @@ class GreenyyDevice():
     @logWindowVisibility.setter
     def logWindowVisibility(self, value: bool):
         self.logWindow = value
-        userOptions().setLogWindowSources(self.name, value, 1)
+        options().setLogWindowSources(self.name, value, 1)
 
     @property
     def decodeASCII(self):
@@ -69,7 +70,7 @@ class GreenyyDevice():
     @decodeASCII.setter
     def decodeASCII(self, value: bool):
         self.decodeASCIIMode = value
-        userOptions().setLogDecodeASCII(self.address, value)
+        options().setLogDecodeASCII(self.address, value)
 
     def start(self):
         self.logger.debug(f'Пытаюсь открыть порт {self.address}')
@@ -85,6 +86,12 @@ class GreenyyDevice():
             self.logger.warning(f'Порт {self.address} открыть не удалось')
             self.status = GreenyyStatus.Failed
             self.liwDevicesItem.setText(1, self.status.name)
+
+    def send(self, data: Union[str, bytearray]) -> int:
+        if (isinstance(data, str)):
+            return self.port.write(bytearray(data, 'ascii'))
+        
+        return self.port.write(data)
 
     def receive(self):
         msg = GreenyyDeviceMessage(self.address, self.port.readLine())

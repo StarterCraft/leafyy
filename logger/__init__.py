@@ -1,6 +1,7 @@
 from PyQt5 import QtCore, QtWidgets
+from typing import Iterator, Union
 
-from app import userOptions
+from app import options
 from logger.logger import GreenyyLogLevel, GreenyyLogger
 
 class GreenyyLoggingManager(QtCore.QObject):
@@ -15,11 +16,14 @@ class GreenyyLoggingManager(QtCore.QObject):
             return [l for l in self.loggers if (l.name == name)][0]
         except IndexError:
             raise KeyError(f'Канала журналирования {name} не найдено', name)
+        
+    def __iter__(self) -> Iterator:
+        return iter(self.loggers)
 
-    def registerLogger(self, logger: GreenyyLogger):
+    def add(self, logger: GreenyyLogger):
         self.loggers.append(logger)
 
-    def setGlobalLogLevel(self, level):
+    def setGlobalLogLevel(self, level: Union[GreenyyLogLevel, str, int]):
         lvl = GreenyyLogLevel.DEBUG
 
         if (isinstance(level, str)):

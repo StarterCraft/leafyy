@@ -1,12 +1,25 @@
 {
-    "logLevel": "DEBUG",
-    "logScrollMode": false,
-    "logSources": [
-        "AllLoggers",
-        "AllDevices"
+    "launchWith": [
+        "logWindow"
     ],
-    "logDecodeASCII": [],
+    "defaultWindowSize":
+    {
+        "logWindow": [600, 600]
+    },
+    "logLevel": "DEBUG",
+    "logScrollMode": true,
+    "logLoggers": [
+        "All"
+    ],
+    "logDevices": [],
+    "logDecodeASCII": [
+        "COM3"
+    ],
     "keys": {
+        "generalWindow": "Ctrl+1",
+        "logWindow": "Ctrl+2",
+        "settingsWindow": "Ctrl+3",
+
         "logFolder": "Ctrl+N",
         "logScrollMode": "Ctrl+M",
         "logIncreaseFontSize": "Ctrl+.",

@@ -1,0 +1,5 @@
+/* theme: default */
+
+QStatusBar {
+    font-size: 8pt;
+}

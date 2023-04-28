@@ -2,8 +2,9 @@
 from PyQt5 import QtCore, QtSerialPort, QtWidgets
 from json import load, dump
 from enum import Enum
+from typing import Iterator
 
-from app import userOptions
+from app import options
 from logger import GreenyyLogger
 
 
@@ -11,8 +12,8 @@ class GreenyyStatus(Enum):
     Failed = -1
     Disabled = 0
     Enabled = 1
-
-
+    
+    
 class GreenyyByteOperations:
     '''
     Большое спасибо ChatGPT 2.0 за код для этого класса.
@@ -38,8 +39,8 @@ class GreenyyByteOperations:
         Преобразует QByteArray в бинарный формат.
         Например, QByteArray(b'\\X10\\XBA\\XBF') -> '0b00010000 0b10111010 0b10111111'
         '''
-        binary = userOptions().byteSeparator.join([bin(byte)[2:].zfill(8) for byte in arr])
-        return userOptions().binaryPrefix + binary
+        binary = options().byteSeparator.join([bin(byte)[2:].zfill(8) for byte in arr])
+        return options().binaryPrefix + binary
 
     @staticmethod
     def toOctal(arr: QtCore.QByteArray) -> str:
@@ -47,8 +48,8 @@ class GreenyyByteOperations:
         Преобразует QByteArray в восьмеричный формат.
         Например, QByteArray(b'\\X10\\XBA\\XBF') -> '020 272 277'
         '''
-        octal = userOptions().byteSeparator.join([oct(byte)[2:].zfill(3) for byte in arr])
-        return userOptions().octalPrefix + octal
+        octal = options().byteSeparator.join([oct(byte)[2:].zfill(3) for byte in arr])
+        return options().octalPrefix + octal
 
     @staticmethod
     def toDecimal(arr: QtCore.QByteArray) -> str:
@@ -56,7 +57,7 @@ class GreenyyByteOperations:
         Преобразует QByteArray в десятичный формат.
         Например, QByteArray(b'\\X10\\XBA\\XBF') -> '16 186 191'
         '''
-        decimal = userOptions().byteSeparator.join([str(byte) for byte in arr])
+        decimal = options().byteSeparator.join([str(byte) for byte in arr])
         return decimal
 
     @staticmethod
@@ -65,8 +66,8 @@ class GreenyyByteOperations:
         Преобразует QByteArray в шестнадцатеричный формат.
         Например, QByteArray(b'\\X10\\XBA\\XBF') -> '0X10 0XBA 0XBF'
         '''
-        hexadecimal = userOptions().byteSeparator.join([hex(byte)[2:].zfill(2) for byte in arr])
-        return userOptions().hexadecimalPrefix + hexadecimal
+        hexadecimal = options().byteSeparator.join([hex(byte)[2:].zfill(2) for byte in arr])
+        return options().hexadecimalPrefix + hexadecimal
     
     #Конверсия строк в QByteArray для разных систем счисления.
 
@@ -140,16 +141,16 @@ from .initializer import GreenyyDeviceInitializer
 from .worker import GreenyyDeviceIniitializationWorker
 
 
-class GreenyyDeviceManager(QtCore.QObject):
+class GreenyyHardwareManager(QtCore.QObject):
     def __init__(self):
         super().__init__()
-        self.logger = GreenyyLogger('DeviceManager')
+        self.logger = GreenyyLogger('HardwareManager')
         self.ports = QtSerialPort.QSerialPortInfo().availablePorts()
         self.logger.debug('Информация о портах получена')
 
-        configFile = open('device.json', encoding='utf-8')
-        self.config = load(configFile)
-        configFile.close()
+        with open('device.json', encoding='utf-8') as configFile:
+            self.config = load(configFile)
+
         self.logger.info('Загружены настройки устройств')
 
         self.devices = []
@@ -166,6 +167,9 @@ class GreenyyDeviceManager(QtCore.QObject):
             return [d for d in self.devices if (d.address == address)][0]
         except IndexError:
             raise KeyError(f'Устройства по адресу {address} не найдено')
+        
+    def __iter__(self) -> Iterator:
+        return iter(self.devices)
 
     def startDevicesSingleThread(self):
         for deviceData in self.config:
@@ -183,7 +187,7 @@ class GreenyyDeviceManager(QtCore.QObject):
 
         self.logger.debug('Выход из метода многопоточной инициализации устройств')
 
-    def startDevice(self, deviceData):
+    def startDevice(self, deviceData: dict):
         self.logger.debug(f'Создание инициализатора устройства: {deviceData["address"]}')
         ini = GreenyyDeviceIniitializationWorker(deviceData)
         ini.signals.result.connect(lambda d: self.devices.append(d))

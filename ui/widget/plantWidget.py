@@ -1,12 +1,17 @@
 from PyQt5 import QtGui, QtWidgets
+
+from ui    import GreenyyComponent
 from uidef.widget.plantWidget import Ui_PlantWidget
 
 
-class PlantWidget(QtWidgets.QWidget):
+class GreenyyPlantWidget(
+    GreenyyComponent, 
+    QtWidgets.QMainWindow,
+    Ui_PlantWidget):
     def __init__(self):
         super().__init__()
-
-        self.ui = Ui_PlantWidget()
-        self.ui.setupUi(self)
+        
+        self.setupUi(self)
         self.setWindowIcon(QtGui.QIcon())
+
         self.resize(self.minimumSize())

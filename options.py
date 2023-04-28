@@ -1,42 +1,54 @@
 from PyQt5 import QtWidgets
 
+from typing import List, Dict, Any
 from json import load, dump
-from glob import glob
 
-from app import device, logging
+from app import hardware
 from logger import GreenyyLogger
 
 
-class GreenyyKeySequences:
-    def __init__(self, keys: dict) -> None:
-        self.logFolder = keys['logFolder']
-        self.logScrollMode = keys['logScrollMode']
-        self.logIncreaseFontSize = keys['logIncreaseFontSize']
-        self.logReduceFontSize = keys['logReduceFontSize']
+class GreenyyDirectDict:
+    def __init__(self, data: Dict[str, Any] = {}, **kd: Dict[str, Any]) -> None:
+        self.__dict__.update(data)
+        self.__dict__.update(kd)
+
+    def __getitem__(self, key: str) -> Any:
+        return self.__dict__[key]
+    
+    def keys(self) -> List[str]:
+        return [k for k in self.__dict__.keys() if (
+            '__' not in k and k not in ['toDict', 'keys']
+        )]
 
     def toDict(self):
-        return {
-            'logFolder': self.logFolder,
-            'logScrollMode': self.logScrollMode,
-            'logIncreaseFontSize': self.logIncreaseFontSize,
-            'logReduceFontSize': self.logReduceFontSize
-        }
-
-    def setBinding(self, bindingName: str, binding: str):
-        setattr(self, bindingName, binding)
+        return {k: v for k, v in self.__dict__.items() if (
+            '__' not in k and k not in ['toDict', 'keys']
+        )}
 
 
-class GreenyyUserOptions:
+class GreenyyOptions:
     defaults = {
+        'launchWith': [
+            'general'
+        ],
+
+        'defaultWindowSize': {
+        },
+
         'logLevel': 'DEBUG',
         'logScrollMode': False,
-        'logSources': [
+        'logLoggers': [
             'All'
         ],
         'logDecodeASCII': [
             'All'
         ],
+
         'keys': {
+            'generalWindow': 'Ctrl+1',
+            'logWindow': 'Ctrl+2',
+            'settingsWindow': 'Ctrl+3',
+
             'logFolder': 'Ctrl+N',
             'logScrollMode': 'Ctrl+M',
             'logIncreaseFontSize': 'Ctrl+.',
@@ -45,11 +57,12 @@ class GreenyyUserOptions:
     }
 
     def __init__(self) -> None:
-        self.logger = GreenyyLogger('UserOptions')
+        self.logger = GreenyyLogger('Options')
 
         try:
             load(open('options.json', encoding = 'utf-8'))
-        except Exception:
+        except:
+            self.logger.error(f'failed to load')
             self.writeDefaults()
 
         self.read()
@@ -58,12 +71,21 @@ class GreenyyUserOptions:
         with open('options.json', encoding = 'utf-8') as configFile:
             configData = load(configFile)
 
-        self.logLevel = configData['logLevel']
-        self.logScrollMode = configData['logScrollMode']
-        self._logSources = configData['logSources']
+        _keys = [
+            'launchWith',
+            'defaultWindowSize',
+            'logLevel',
+            'logScrollMode',
+            'logLoggers',
+            'logDevices'
+        ]
+
+        for key in _keys:
+            setattr(self, key, configData[key])
+
         self._logDecodeASCII = configData['logDecodeASCII']
-        self.keys = GreenyyKeySequences(configData['keys'])
-        self.logger.debug('Настройки программы загружены')
+        self.keys = GreenyyDirectDict(**configData['keys'])
+        self.logger.info('Настройки программы загружены')
 
     def write(self):
         with open('options.json', encoding='utf-8') as configFile:
@@ -71,7 +93,8 @@ class GreenyyUserOptions:
 
         toWrite = {
             'logScrollMode': self.logScrollMode,
-            'logSources': self._logSources,
+            'logLoggers': self.logLoggers,
+            'logDevices': self.logDevices,
             'logDecodeASCII': self._logDecodeASCII,
 
             'keys': self.keys.toDict()
@@ -102,7 +125,7 @@ class GreenyyUserOptions:
             if (deviceAddress == 'All'):
                 self._logDecodeASCII.clear()
             else:
-                self._logDecodeASCII = [d.address for d in device().devices if (
+                self._logDecodeASCII = [d.address for d in hardware() if (
                     d.address != deviceAddress)]
             
             self.write()
@@ -135,48 +158,82 @@ class GreenyyUserOptions:
             self.write()
             return
 
-    def logWindowSources(self, loggerName: str) -> bool:
-        if (self._logSources == ['All']):
+    def logWindowLoggers(self, loggerName: str) -> bool:
+        if (self.logLoggers == ['All']):
             return True
 
-        return (loggerName in self._logSources)
+        return (loggerName in self.logLoggers)
     
-    def setLogWindowSources(self, loggerName: str, value: bool) -> None:
-        if (self._logSources == ['All']):
+    def setLogWindowLoggers(self, loggerName: str, value: bool) -> None:
+        if (loggerName == 'All'):
             if (value):
-                return
-            
-            if (loggerName == 'All'):
-                self._logSources.clear()
+                self.logLoggers = ['All']
             else:
-                self._logSources = [logger.name for logger in logging().loggers]
+                self.logLoggers = []
             
             self.write()
             return
         
-        if (not self._logSources):
+        if (not self.logLoggers):
             if (not value):
                 return
             
-            if (loggerName == 'All'):
-                self._logSources.clear()
-            else:
-                self._logSources.append(loggerName)
+            self.logLoggers.append(loggerName)
             
             self.write()
             return
         
-        if (loggerName in self._logSources):
+        if (loggerName in self.logLoggers):
             if (value):
                 return
             
-            self._logSources.remove(loggerName)
+            self.logLoggers.remove(loggerName)
             
             self.write()
             return
         
         if (value):
-            self._logSources.append(loggerName)
+            self.logLoggers.append(loggerName)
+        
+            self.write()
+            return
+        
+    def logWindowDevices(self, deviceAddress: str) -> bool:
+        if (self.logDevices == ['All']):
+            return True
+
+        return (deviceAddress in self.logDevices)
+    
+    def setLogWindowDevices(self, deviceAddress: str, value: bool) -> None:
+        if (deviceAddress == 'All'):
+            if (value):
+                self.logDevices = ['All']
+            else:
+                self.logDevices = []
+            
+            self.write()
+            return
+        
+        if (not self.logDevices):
+            if (not value):
+                return
+            
+            self.logDevices.append(deviceAddress)
+            
+            self.write()
+            return
+        
+        if (deviceAddress in self.logDevices):
+            if (value):
+                return
+            
+            self.logDevices.remove(deviceAddress)
+            
+            self.write()
+            return
+        
+        if (value):
+            self.logDevices.append(deviceAddress)
         
             self.write()
             return
