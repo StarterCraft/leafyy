@@ -3,7 +3,7 @@ from PyQt5 import QtCore, QtWidgets, QtSerialPort
 from collections import deque
 from typing import Union
 
-from app import ui, options
+from greenyy import ui, options
 from logger import GreenyyLogger
 from device import GreenyyStatus
 from .message import GreenyyDeviceMessage

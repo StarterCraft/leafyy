@@ -1,28 +1,34 @@
-from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5   import QtCore, QtGui, QtWidgets
 
-from app   import GreenyyComponent
-from app   import ui, options
+from greenyy import ui, options
 
+from ui      import GreenyyUiComponent, GreenyyUiComponentType
 from uidef.window.general import Ui_GeneralWindow
 
 
 class GreenyyGeneralWindow(
-    GreenyyComponent, 
-    QtWidgets.QMainWindow,
-    Ui_GeneralWindow):
+    GreenyyUiComponent, 
+    Ui_GeneralWindow,
+    QtWidgets.QMainWindow):
     def __init__(self):
-        super().__init__('generalWindow')
-
-        self.setupUi(self)
-        self.defaultSize = (
-            QtCore.QSize(**options().defaultWindowSize[self.name])
-            if (self.name in options().defaultWindowSize.keys()) else
-            self.minimumSize()
+        super().__init__(
+            'generalWindow',
+            GreenyyUiComponentType.Widget,
+            displayName = 'Основное окно'
         )
         
+        self.setWindowTitle(self.displayName)
         self.setCentralWidget(self.mdi)
 
-        self.bind()
+        self.logger.debug('Основное окно инициализировано')
+
+    def interconnect(self):
+        self.meiGeneral.triggered.connect(self.show)
+        self.meiLog.triggered.connect(ui().logWindow.show)
+        self.meiDevices.triggered.connect(ui().settingsWindow.show0)
+        self.meiRules.triggered.connect(ui().settingsWindow.show1)
+        self.meiKeys.triggered.connect(ui().settingsWindow.show2)
+        self.meiEnvironment.triggered.connect(ui().settingsWindow.show3)
 
     def bind(self):
         self.meiGeneral.setShortcut(QtGui.QKeySequence(options().keys.generalWindow))

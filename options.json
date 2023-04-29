@@ -1,10 +1,12 @@
 {
-    "launchWith": [
-        "logWindow"
-    ],
-    "defaultWindowSize":
-    {
-        "logWindow": [600, 600]
+    "ui": {
+        "logWindow": {
+            "size": [
+                1000,
+                500
+            ],
+            "onLaunch": true
+        }
     },
     "logLevel": "DEBUG",
     "logScrollMode": true,
@@ -19,7 +21,6 @@
         "generalWindow": "Ctrl+1",
         "logWindow": "Ctrl+2",
         "settingsWindow": "Ctrl+3",
-
         "logFolder": "Ctrl+N",
         "logScrollMode": "Ctrl+M",
         "logIncreaseFontSize": "Ctrl+.",

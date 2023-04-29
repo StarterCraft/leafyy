@@ -1,38 +1,19 @@
-from PyQt5 import QtWidgets
+#coding=utf-8
+from PyQt5  import QtWidgets
 
-from typing import List, Dict, Any
-from json import load, dump
+from json   import load, dump
 
-from app import hardware
+from greenyy    import GreenyyDirectDict
+from greenyy    import hardware
 from logger import GreenyyLogger
-
-
-class GreenyyDirectDict:
-    def __init__(self, data: Dict[str, Any] = {}, **kd: Dict[str, Any]) -> None:
-        self.__dict__.update(data)
-        self.__dict__.update(kd)
-
-    def __getitem__(self, key: str) -> Any:
-        return self.__dict__[key]
-    
-    def keys(self) -> List[str]:
-        return [k for k in self.__dict__.keys() if (
-            '__' not in k and k not in ['toDict', 'keys']
-        )]
-
-    def toDict(self):
-        return {k: v for k, v in self.__dict__.items() if (
-            '__' not in k and k not in ['toDict', 'keys']
-        )}
 
 
 class GreenyyOptions:
     defaults = {
-        'launchWith': [
-            'general'
-        ],
-
-        'defaultWindowSize': {
+        'ui': {
+            'generalWindow': {
+                'onLaunch': True,
+            }
         },
 
         'logLevel': 'DEBUG',
@@ -61,19 +42,30 @@ class GreenyyOptions:
 
         try:
             load(open('options.json', encoding = 'utf-8'))
-        except:
-            self.logger.error(f'failed to load')
+        except Exception as e:
+            self.logger.warning(f'failed to load due to {e}')
             self.writeDefaults()
 
         self.read()
+
+    def toDict(self):
+        return {
+            k: (v.toDict() if (isinstance(v, GreenyyDirectDict)) else v)
+            for k, v in self.__dict__.items() if (
+            '_' not in k and any([
+            isinstance(v, str),
+            isinstance(v, int),
+            isinstance(v, list),
+            isinstance(v, dict),
+            isinstance(v, GreenyyDirectDict)])
+        )}
 
     def read(self):
         with open('options.json', encoding = 'utf-8') as configFile:
             configData = load(configFile)
 
         _keys = [
-            'launchWith',
-            'defaultWindowSize',
+            'ui',
             'logLevel',
             'logScrollMode',
             'logLoggers',
@@ -91,14 +83,7 @@ class GreenyyOptions:
         with open('options.json', encoding='utf-8') as configFile:
             configData = load(configFile)
 
-        toWrite = {
-            'logScrollMode': self.logScrollMode,
-            'logLoggers': self.logLoggers,
-            'logDevices': self.logDevices,
-            'logDecodeASCII': self._logDecodeASCII,
-
-            'keys': self.keys.toDict()
-            }
+        toWrite = self.toDict()
         
         if (configData != toWrite):
             configData.update(toWrite)

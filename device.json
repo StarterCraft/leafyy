@@ -3,7 +3,7 @@
         "address": "COM3",
         "name": "канал полива для тестирования",
         "desc": "необходимо для тестирования системы",
-        "enabled": true,
+        "enabled": false,
         "unifiedTempSensor": null,
         "plants": []
     }

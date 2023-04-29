@@ -1,10 +1,11 @@
 from PyQt5         import QtCore, QtGui, QtWidgets
 from enum          import Enum
 
-from app           import options, ui
+from greenyy       import deepget
+from greenyy       import options, ui
 from logger.logger import GreenyyLogger
 
-from ui            import GreenyyComponent
+from ui            import GreenyyUiComponent, GreenyyUiComponentType
 from uidef.window.settings import Ui_SettingsWindow
 
 
@@ -16,63 +17,16 @@ class GreenyySettingsWindowTab(Enum):
 
 
 class GreenyySettingsWindow(
-    GreenyyComponent, 
+    GreenyyUiComponent, 
     QtWidgets.QMainWindow,
     Ui_SettingsWindow):
     def __init__(self):
-        super().__init__('settingsWindow')
-        
-        self.setupUi(self)
-        self.defaultSize = (
-            QtCore.QSize(*options().defaultWindowSize[self.name])
-            if (self.name in options().defaultWindowSize.keys()) else
-            self.minimumSize()
+        super().__init__(
+            'settingsWindow',
+            GreenyyUiComponentType.Window
         )
-
-        self.interconnect()
-        self.updateUi()
-        self.bind()
-
-    def show(self, force: bool = False):
-        if (force or not self.isVisible()):
-            super().show()
-            self.updateUi()
-            self.updateTreeUi()
-            self.logger.info('Открыто окно настроек')
-
-        else:
-            self.close()
-
-    def show0(self):
-        self.tabs.setCurrentIndex(
-            GreenyySettingsWindowTab.Devices.value)
-        self.show()
-
-    def show1(self):
-        self.tabs.setCurrentIndex(
-            GreenyySettingsWindowTab.Rules.value)
-        self.show()
-
-    def show2(self):
-        self.tabs.setCurrentIndex(
-            GreenyySettingsWindowTab.Keys.value)
-        self.show()
-
-    def show3(self):
-        self.tabs.setCurrentIndex(
-            GreenyySettingsWindowTab.Environment.value)
-        self.show()
-
-    def close(self):
-        self.treeDevices.setCurrentItem()
-        self.liwRules.setCurrentItem()
-        self.treeKeys.setCurrentItem()
-
-        self.keySequenceEdit.clear()
-        self.label.setStyleSheet()
-
-        super().close()
-        ui().updateUi()
+        
+        self.logger.debug('Окно настроек инициализировано')
 
     def interconnect(self):
         self.treeKeys.currentItemChanged.connect(self.keyBindingSelected)
@@ -116,23 +70,23 @@ class GreenyySettingsWindow(
         self.treeKeys.expandAll()
         self.treeKeys.header().setSectionResizeMode(QtWidgets.QHeaderView.Interactive)
         
-    def updateTreeUi(self):
+    def updateUiTree(self):
         windowSettingsItemDef = {
-            'Окна': {
-                'generalWindow': 'Основное окно',
-                'logWindow': 'Журнал',
-                'settingsWindow': 'Настройки'
-            }
+            n: dn for n, dn in
+            zip(GreenyyUiComponentType._member_names_, ['Окна', 'Диалоги', 'Виджеты'])
         }
 
-        for gn, subdict in windowSettingsItemDef.items():
-            root = QtWidgets.QTreeWidgetItem(self.treeUi, [gn])
-            for key, displayName in subdict.items():
+        for n, dn in windowSettingsItemDef.items():
+            root = QtWidgets.QTreeWidgetItem(self.treeUi, [dn])
+            components = [c for c in ui() if (c.cmType == GreenyyUiComponentType[n])]
+
+            for component in components:
                 item = QtWidgets.QTreeWidgetItem(
                     root, [
-                        displayName, 
-                        f'{ui()[key].defaultSize.width()} ✕ '
-                        f'{ui()[key].defaultSize.height()}'
+                        component.displayName, 
+                        f'{ui()[component.name].defaultSize.width()} ✕ '
+                        f'{ui()[component.name].defaultSize.height()}',
+                        ui()[component.name].theme
                         ])
                 
                 item.setFlags(
@@ -140,13 +94,54 @@ class GreenyySettingsWindow(
                     QtCore.Qt.ItemIsUserCheckable | 
                     QtCore.Qt.ItemIsEnabled)
                 
-                item.setData(0, 0x100, key)
+                item.setData(0, 0x100, component.name)
                 
                 item.setCheckState(0, (
-                    QtCore.Qt.Checked if (key in options().launchWith) else QtCore.Qt.Unchecked))
+                    2 if (deepget(options().ui, f'{component.name}.onLaunch', default = False)) else 0))
                 
         self.treeUi.addTopLevelItem(root)
         root.setExpanded(True)
+
+    def show(self, force: bool = False):
+        if (force or not self.isVisible()):
+            super().show()
+            self.updateUi()
+            self.updateUiTree()
+            self.logger.info('Открыто окно настроек')
+
+        else:
+            self.close()
+
+    def show0(self):
+        self.tabs.setCurrentIndex(
+            GreenyySettingsWindowTab.Devices.value)
+        self.show()
+
+    def show1(self):
+        self.tabs.setCurrentIndex(
+            GreenyySettingsWindowTab.Rules.value)
+        self.show()
+
+    def show2(self):
+        self.tabs.setCurrentIndex(
+            GreenyySettingsWindowTab.Keys.value)
+        self.show()
+
+    def show3(self):
+        self.tabs.setCurrentIndex(
+            GreenyySettingsWindowTab.Environment.value)
+        self.show()
+
+    def close(self):
+        self.treeDevices.setCurrentItem()
+        self.liwRules.setCurrentItem()
+        self.treeKeys.setCurrentItem()
+
+        self.keySequenceEdit.clear()
+        self.label.setStyleSheet()
+
+        super().close()
+        ui().updateUi()
 
     def keyBindingSelected(self, *args):
         currentItem = args[0]
@@ -190,10 +185,7 @@ class GreenyySettingsWindow(
         value = (item.checkState(0) == 2)
 
         if (not data):
-            return
-        
-        
-            
+            return           
 
     def uiComponentToggled(self, item: QtWidgets.QTreeWidgetItem):
         '''
@@ -206,8 +198,11 @@ class GreenyySettingsWindow(
         if (not data):
             return
         
-        if (value != data in options().launchWith):
-            if (value):
-                options().launchWith.append(data)
+        if (value != getattr(options().ui, f'{data}.onLaunch'), False):
+            if (options().ui.get(data, False)):
+                options().ui[data]['onLaunch'] = value
+            
             else:
-                options().launchWith.remove(data)
+                options().ui[data] = {
+                    'onLaunch': value
+                }

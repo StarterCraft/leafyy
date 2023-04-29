@@ -4,11 +4,11 @@ from datetime import datetime
 from logging  import getLevelName
 from enum     import Enum
 
-from app      import log
-from app      import ui, options, hardware
+from greenyy  import log
+from greenyy  import ui, options, hardware
 from logger   import GreenyyLogger, GreenyyLogLevel
 
-from ui       import GreenyyComponent
+from ui       import GreenyyUiComponent, GreenyyUiComponentType
 from uidef.window.log import Ui_LogWindow
 
 
@@ -18,23 +18,17 @@ class GreenyyLogWindowSource(Enum):
 
 
 class GreenyyLogWindow(
-    GreenyyComponent, 
+    GreenyyUiComponent, 
     QtWidgets.QMainWindow,
     Ui_LogWindow):
     def __init__(self):
-        super().__init__('logWindow')
-
-        self.setupUi(self)
-        self.defaultSize = (
-            QtCore.QSize(*options().defaultWindowSize[self.name])
-            if (self.name in options().defaultWindowSize.keys()) else
-            self.minimumSize()
+        super().__init__(
+            'logWindow',
+            GreenyyUiComponentType.Window
         )
 
         self.setupMenu()
         self.setupUserInput()
-        self.interconnect()
-        self.bind()
 
         self.logger.info('Окно журнала инициализировано')
 
@@ -89,6 +83,13 @@ class GreenyyLogWindow(
         return
 
     def interconnect(self):
+        self.meiGeneral.triggered.connect(ui().generalWindow.show)
+        self.meiLog.triggered.connect(self.show)
+        self.meiDevices.triggered.connect(ui().settingsWindow.show0)
+        self.meiRules.triggered.connect(ui().settingsWindow.show1)
+        self.meiKeys.triggered.connect(ui().settingsWindow.show2)
+        self.meiEnvironment.triggered.connect(ui().settingsWindow.show3)
+
         self.meiLogFolder.triggered.connect(self.openLogFolder)
 
         self.meiExit.triggered.connect(self.close)
@@ -261,7 +262,7 @@ class GreenyyLogWindow(
             toPrint = (str(content) if (device.decodeASCII) else str(content.toHex(' ')))
 
             self.txtLogDisplay.append(
-                f'<span style="color:gray">{datetime.now()}</span> '
+                f'<span style="color:gray">{datetime.now().strftime(f"%m.%d %H:%M:%S.%f")}</span> '
                 f'[<span style="color:lime">{device.address.upper()}</span>]: {toPrint}')
             
             self.scrollDown()

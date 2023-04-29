@@ -4,7 +4,7 @@ from json import load, dump
 from enum import Enum
 from typing import Iterator
 
-from app import options
+from greenyy import options
 from logger import GreenyyLogger
 
 
@@ -141,7 +141,7 @@ from .initializer import GreenyyDeviceInitializer
 from .worker import GreenyyDeviceIniitializationWorker
 
 
-class GreenyyHardwareManager(QtCore.QObject):
+class GreenyyHardware(QtCore.QObject):
     def __init__(self):
         super().__init__()
         self.logger = GreenyyLogger('HardwareManager')

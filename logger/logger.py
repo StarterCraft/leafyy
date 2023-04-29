@@ -1,12 +1,10 @@
 #coding=utf-8
-from PyQt5 import QtCore, QtWidgets
 import logging
 import os
 import time
 
-from app import log
-from app import ui, options
-from enum import Enum
+from greenyy      import ui, log, options
+from enum     import Enum
 from colorama import Fore, Style
 from datetime import datetime
 
@@ -68,7 +66,7 @@ class GreenyyLogLevel(Enum):
         return NotImplemented
 
 
-class GreenyyLogger(QtCore.QObject):
+class GreenyyLogger:
     '''
     Класс канала журналирования.
 
@@ -188,6 +186,7 @@ class GreenyyLogger(QtCore.QObject):
         if (self.logWindow):
             try:
                 ui().logWindow.txtLogDisplay.append(message)
+                ui().logWindow.scrollDown()
             except:
                 return
             
@@ -233,7 +232,7 @@ class GreenyyLogger(QtCore.QObject):
             print(f'[{Fore.GREEN}{self.name}{Style.RESET_ALL}@{Fore.YELLOW}DEBUG{Style.RESET_ALL}]: {message}')
 
         self.publishToLogWindow(
-            f'<span style="color:gray">{datetime.now()}</span> '
+            f'<span style="color:gray">{datetime.now().strftime(f"%m.%d %H:%M:%S.%f")}</span> '
             f'[<span style="color:green">{self.name}</span>'
             f'@<span style="color:darkgray">DEBUG</span>]: {message}')
 
@@ -266,7 +265,7 @@ class GreenyyLogger(QtCore.QObject):
             print(f'[{Fore.GREEN}{self.name}{Style.RESET_ALL}@{Fore.YELLOW}INFO{Style.RESET_ALL}]: {message}')
 
         self.publishToLogWindow(
-            f'<span style="color:gray">{datetime.now()}</span> '
+            f'<span style="color:gray">{datetime.now().strftime(f"%m.%d %H:%M:%S.%f")}</span> '
             f'[<span style="color:green">{self.name}</span>'
             f'@<span style="color:blue">INFO</span>]: {message}')
         
@@ -299,7 +298,7 @@ class GreenyyLogger(QtCore.QObject):
             print(f'[{Fore.GREEN}{self.name}{Style.RESET_ALL}@{Fore.YELLOW}WARN{Style.RESET_ALL}]: {message}')
 
         self.publishToLogWindow(
-            f'<span style="color:gray">{datetime.now()}</span> '
+            f'<span style="color:gray">{datetime.now().strftime(f"%m.%d %H:%M:%S.%f")}</span> '
             f'[<span style="color:green">{self.name}</span>'
             f'@<span style="color:orange">WARN</span>]: {message}')
         
@@ -332,7 +331,7 @@ class GreenyyLogger(QtCore.QObject):
             print(f'[{Fore.GREEN}{self.name}{Style.RESET_ALL}@{Fore.YELLOW}ERROR{Style.RESET_ALL}]: {message}')
 
         self.publishToLogWindow(
-            f'<span style="color:gray">{datetime.now()}</span> '
+            f'<span style="color:gray">{datetime.now().strftime(f"%m.%d %H:%M:%S.%f")}</span> '
             f'[<span style="color:green">{self.name}</span>'
             f'@<span style="color:red">ERROR</span>]: {message}')
         
@@ -365,7 +364,7 @@ class GreenyyLogger(QtCore.QObject):
             print(f'[{Fore.GREEN}{self.name}{Style.RESET_ALL}@{Fore.YELLOW}CRITICAL{Style.RESET_ALL}]: {message}')
 
         self.publishToLogWindow(
-            f'<span style="color:gray">{datetime.now()}</span> '
+            f'<span style="color:gray">{datetime.now().strftime(f"%m.%d %H:%M:%S.%f")}</span> '
             f'[<span style="color:green">{self.name}</span>'
             f'@<span style="color:magenta">CRITICAL</span>]: {message}')
         
@@ -384,7 +383,7 @@ class GreenyyLogger(QtCore.QObject):
                                 exc_info = _exception)
         
         self.publishToLogWindow(
-            f'<span style="color:gray">{datetime.now()}</span> '
+            f'<span style="color:gray">{datetime.now().strftime(f"%m.%d %H:%M:%S.%f")}</span> '
             f'[<span style="color:green">{self.name}</span>'
             f'@<span style="color:brown">EXCEPTION</span>]: '
             f'Программа аварийно завершила работу из-за исключения {type(_exception)}:')

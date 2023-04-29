@@ -8,7 +8,7 @@
             "name": "Greenyy",
             "type": "python",
             "request": "launch",
-            "program": "greenyy.py",
+            "program": "main.py",
             "console": "integratedTerminal",
             "justMyCode": true
         }

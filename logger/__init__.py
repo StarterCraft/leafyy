@@ -1,14 +1,15 @@
 from PyQt5 import QtCore, QtWidgets
-from typing import Iterator, Union
+from typing import Union, Iterator, List
 
-from app import options
+from greenyy import options
 from logger.logger import GreenyyLogLevel, GreenyyLogger
 
-class GreenyyLoggingManager(QtCore.QObject):
+
+class GreenyyLogging(QtCore.QObject):
     def __init__(self) -> None:
         super().__init__()
 
-        self.loggers = []
+        self.loggers: List[GreenyyLogger] = []
         self.globalLevel = GreenyyLogLevel.DEBUG
         
     def __getitem__(self, name: str) -> GreenyyLogger:
@@ -17,11 +18,19 @@ class GreenyyLoggingManager(QtCore.QObject):
         except IndexError:
             raise KeyError(f'Канала журналирования {name} не найдено', name)
         
-    def __iter__(self) -> Iterator:
+    def __iter__(self) -> Iterator[GreenyyLogger]:
         return iter(self.loggers)
 
     def add(self, logger: GreenyyLogger):
         self.loggers.append(logger)
+
+    def remove(self, logger: Union[GreenyyLogger, str]):
+        if (isinstance(logger, GreenyyLogger)):
+            self.loggers.remove(logger)
+
+        if (isinstance(logger, str)):
+            self.loggers.remove(
+                [l for l in self if (l.name == logger)][0])
 
     def setGlobalLogLevel(self, level: Union[GreenyyLogLevel, str, int]):
         lvl = GreenyyLogLevel.DEBUG
@@ -33,5 +42,6 @@ class GreenyyLoggingManager(QtCore.QObject):
             lvl = GreenyyLogLevel(level)
 
         self.globalLevel = lvl
-        for logger in self.loggers:
+
+        for logger in self:
             logger.setLogLevel(lvl)

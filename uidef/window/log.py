@@ -17,7 +17,7 @@ class Ui_LogWindow(object):
         LogWindow.resize(600, 400)
         LogWindow.setMinimumSize(QtCore.QSize(600, 400))
         LogWindow.setStyleSheet("QTextEdit, QLineEdit, QComboBox, QPushButton {\n"
-"    font: 10pt \"Cascadia Code\";\n"
+"    font-family: \"Cascadia Code\";\n"
 "}")
         self.centralwidget = QtWidgets.QWidget(LogWindow)
         self.centralwidget.setObjectName("centralwidget")
@@ -40,7 +40,7 @@ class Ui_LogWindow(object):
         self.frmSend = QtWidgets.QFrame(self.centralwidget)
         self.frmSend.setObjectName("frmSend")
         self.sendPanel = QtWidgets.QHBoxLayout(self.frmSend)
-        self.sendPanel.setContentsMargins(11, -1, 11, 1)
+        self.sendPanel.setContentsMargins(7, 0, 7, 0)
         self.sendPanel.setObjectName("sendPanel")
         self.cbbPort = QtWidgets.QComboBox(self.frmSend)
         self.cbbPort.setMaximumSize(QtCore.QSize(100, 16777215))
