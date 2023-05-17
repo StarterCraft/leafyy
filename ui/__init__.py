@@ -107,7 +107,6 @@ class GreenyyUiComponent(GreenyyComponent):
         return super().isVisible()
 
 
-from .window.general          import GreenyyGeneralWindow
 from .window.log              import GreenyyLogWindow
 from .window.settings         import GreenyySettingsWindow
 
@@ -135,7 +134,6 @@ class GreenyyUi(GreenyyComponent):
         return iter(self.components)
 
     def setupUi(self):
-        GreenyyGeneralWindow()
         GreenyySettingsWindow()
         GreenyyLogWindow()
 
@@ -219,8 +217,6 @@ class GreenyyUi(GreenyyComponent):
         self.logWindow.setASCIIModeActions.addAction(self.logWindow.allASCIIAction)
 
         for d in hardware():
-            self.generalWindow.meiWindow.addAction(d.address)
-
             self.logWindow.cbbPort.addItem(d.address)
             self.logWindow.cbbPort.setCurrentText(d.address)
 

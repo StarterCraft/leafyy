@@ -158,7 +158,6 @@
      <addaction name="meiKeys"/>
      <addaction name="meiEnvironment"/>
     </widget>
-    <addaction name="meiGeneral"/>
     <addaction name="meiLog"/>
     <addaction name="meiSettings"/>
     <addaction name="separator"/>

@@ -29,7 +29,7 @@ class GreenyySettingsWindow(
         self.logger.debug('Окно настроек инициализировано')
 
     def interconnect(self):
-        self.treeKeys.currentItemChanged.connect(self.keyBindingSelected)
+        self.treeKeys.itemClicked.connect(self.keyBindingSelected)
         self.keySequenceEdit.keySequenceChanged.connect(self.keyBindingEditInitiated)
         self.keySequenceEdit.editingFinished.connect(self.keyBindingEdit)
 
@@ -42,7 +42,6 @@ class GreenyySettingsWindow(
     def updateUi(self):
         keyBindingItemDefs = {
             'Среда': {
-                'generalWindow': 'Открыть основное окно',
                 'logWindow': 'Открыть окно журнала',
                 'settingsWindow': 'Открыть окно настроек'
             },
@@ -60,7 +59,7 @@ class GreenyySettingsWindow(
             for bindingId, bindingDesc in subdict.items():
                 bindingItem = QtWidgets.QTreeWidgetItem(topLevelItem, 
                     [bindingDesc, options().keys[bindingId]])
-                bindingItem.setData(1, 0x100, options().keys[bindingId])
+                bindingItem.setData(1, 0x100, bindingId)
 
             self.treeKeys.addTopLevelItem(topLevelItem)
 
@@ -94,7 +93,9 @@ class GreenyySettingsWindow(
                     QtCore.Qt.ItemIsUserCheckable | 
                     QtCore.Qt.ItemIsEnabled)
                 
+                print(f'setting data to {component.name}')
                 item.setData(0, 0x100, component.name)
+                print(f'98 {item.data(0, 0x100)} {item.data(1, 0x100)}')
                 
                 item.setCheckState(0, (
                     2 if (deepget(options().ui, f'{component.name}.onLaunch', default = False)) else 0))
@@ -148,16 +149,18 @@ class GreenyySettingsWindow(
         self.keySequenceEdit.setKeySequence(QtGui.QKeySequence(currentItem.text(1)))
 
     def keyBindingEditInitiated(self):
+        print(f'started edit')
         currentItem = self.treeKeys.currentItem()
 
         if (currentItem and currentItem.text(1)):
-            self.keySequenceEdit.setKeySequence(currentItem.text(1))
+            self.keySequenceEdit.setKeySequence('')
             self.statusBar.showMessage(f'Установка комбинации для: {currentItem.text(0)}')
             return
 
         self.statusBar.showMessage('Сначала выберите действие!', 5000)
 
     def keyBindingEdit(self):
+        print('ended edit')
         currentItem = self.treeKeys.currentItem()
 
         if (not (currentItem and currentItem.text(1))):
@@ -168,10 +171,12 @@ class GreenyySettingsWindow(
 
         keys = self.keySequenceEdit.keySequence().toString()
 
+        print(currentItem.data(1, 0x100))
+
         currentItem.setText(1, keys)
         options().keys[currentItem.data(1, 0x100)] = keys
         options().write()
-        ui().bind()
+        ui().bind() 
 
         self.statusBar.showMessage(f'Установлена клавиша для {currentItem.text(0)}: {keys}', 5000)
 

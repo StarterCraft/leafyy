@@ -83,7 +83,6 @@ class GreenyyLogWindow(
         return
 
     def interconnect(self):
-        self.meiGeneral.triggered.connect(ui().generalWindow.show)
         self.meiLog.triggered.connect(self.show)
         self.meiDevices.triggered.connect(ui().settingsWindow.show0)
         self.meiRules.triggered.connect(ui().settingsWindow.show1)
@@ -101,7 +100,6 @@ class GreenyyLogWindow(
         self.btnSend.clicked.connect(self.sendDeviceMessage)
 
     def bind(self):
-        self.meiGeneral.setShortcut(QtGui.QKeySequence(options().keys.generalWindow))
         self.meiLog.setShortcut(options().keys.logWindow)
         self.meiDevices.setShortcut(options().keys.settingsWindow)
 
@@ -120,7 +118,6 @@ class GreenyyLogWindow(
         for action in self.logLevelActions.actions():
             action.setChecked(log().globalLevel is action.data())
 
-        self.meiGeneral.setChecked(ui().generalWindow.isVisible())
         self.meiLog.setChecked(self.isVisible())
 
         self.meiScroll.setChecked(options().logScrollMode)

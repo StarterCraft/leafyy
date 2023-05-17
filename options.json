@@ -18,12 +18,11 @@
         "COM3"
     ],
     "keys": {
-        "generalWindow": "Ctrl+1",
         "logWindow": "Ctrl+2",
         "settingsWindow": "Ctrl+3",
         "logFolder": "Ctrl+N",
         "logScrollMode": "Ctrl+M",
         "logIncreaseFontSize": "Ctrl+.",
-        "logReduceFontSize": "Ctrl+,"
+        "logReduceFontSize": ""
     }
 }
