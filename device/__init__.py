@@ -2,8 +2,9 @@
 from PyQt5 import QtCore, QtSerialPort, QtWidgets
 from json import load, dump
 from enum import Enum
-from typing import Iterator
+from typing import Union, Iterator, List
 
+from greenyy import GreenyyComponent
 from greenyy import options
 from logger import GreenyyLogger
 
@@ -141,10 +142,10 @@ from .initializer import GreenyyDeviceInitializer
 from .worker import GreenyyDeviceIniitializationWorker
 
 
-class GreenyyHardware(QtCore.QObject):
+class GreenyyHardware(GreenyyComponent):
     def __init__(self):
-        super().__init__()
-        self.logger = GreenyyLogger('HardwareManager')
+        super().__init__('hardware')
+
         self.ports = QtSerialPort.QSerialPortInfo().availablePorts()
         self.logger.debug('Информация о портах получена')
 
@@ -153,14 +154,13 @@ class GreenyyHardware(QtCore.QObject):
 
         self.logger.info('Загружены настройки устройств')
 
-        self.devices = []
+        self.devices: List[GreenyyDevice] = []
         self.threads = []
         self.pool = QtCore.QThreadPool()
 
         #self.threads = []
         #self.startDevices()
         #INITIALIZER не работает. Пока без многопотокового решения
-        self.startDevicesSingleThread() #временное решение. Или постоянное...
 
     def __getitem__(self, address: str) -> GreenyyDevice:
         try:
@@ -170,10 +170,28 @@ class GreenyyHardware(QtCore.QObject):
         
     def __iter__(self) -> Iterator:
         return iter(self.devices)
+    
+    def add(self, device: GreenyyDevice):
+        self.devices.append(device)
+
+        self.logger.debug(
+            f'Устройство по адресу {device.address} зарегистрировано'
+        )
+
+    def remove(self, component: Union[GreenyyDevice, str]):
+        if (isinstance(component, GreenyyDevice)):
+            self.devices.remove(component)
+
+        if (isinstance(component, str)):
+            self.devices.remove(self[component.name])
+
+        self.logger.debug(
+            f'Компонент {component.name} недоступен'
+        )
 
     def startDevicesSingleThread(self):
         for deviceData in self.config:
-            self.devices.append(GreenyyDevice(**deviceData))
+            GreenyyDevice(**deviceData)
         
     def startDevices(self):
         self.logger.info('Начата инициализация устройств (многопоточная)')

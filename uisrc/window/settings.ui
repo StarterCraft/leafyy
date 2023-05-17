@@ -219,9 +219,9 @@
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="tabEnvironment">
+      <widget class="QWidget" name="tabView">
        <attribute name="title">
-        <string>Среда</string>
+        <string>Внешний вид</string>
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout_5">
         <property name="leftMargin">
@@ -269,12 +269,6 @@
           </item>
           <item>
            <widget class="QSpinBox" name="spbHorizontal">
-            <property name="suffix">
-             <string> точек</string>
-            </property>
-            <property name="prefix">
-             <string/>
-            </property>
             <property name="minimum">
              <number>400</number>
             </property>
@@ -285,12 +279,6 @@
           </item>
           <item>
            <widget class="QSpinBox" name="spbVertical">
-            <property name="suffix">
-             <string> точек</string>
-            </property>
-            <property name="prefix">
-             <string/>
-            </property>
             <property name="minimum">
              <number>400</number>
             </property>
@@ -302,51 +290,36 @@
          </layout>
         </item>
         <item>
-         <widget class="QToolButton" name="btnGlobalStyle">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="text">
-           <string>Глобальный стиль (задано: По умолчанию)...</string>
-          </property>
-          <property name="autoExclusive">
-           <bool>true</bool>
-          </property>
-          <property name="toolButtonStyle">
-           <enum>Qt::ToolButtonTextBesideIcon</enum>
-          </property>
-          <property name="autoRaise">
-           <bool>false</bool>
-          </property>
-          <property name="arrowType">
-           <enum>Qt::DownArrow</enum>
-          </property>
-         </widget>
+         <layout class="QHBoxLayout" name="horizontalLayout_5">
+          <item>
+           <widget class="QLabel" name="label_3">
+            <property name="text">
+             <string>Глобальный стиль:</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QComboBox" name="cbbGlobalTheme"/>
+          </item>
+         </layout>
         </item>
         <item>
-         <widget class="QToolButton" name="btnComponentStyle">
-          <property name="enabled">
-           <bool>false</bool>
-          </property>
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="text">
-           <string>Стиль для выбранного окна...</string>
-          </property>
-          <property name="toolButtonStyle">
-           <enum>Qt::ToolButtonTextBesideIcon</enum>
-          </property>
-          <property name="arrowType">
-           <enum>Qt::DownArrow</enum>
-          </property>
-         </widget>
+         <layout class="QHBoxLayout" name="horizontalLayout_6">
+          <item>
+           <widget class="QLabel" name="label_2">
+            <property name="text">
+             <string>Стиль для</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QComboBox" name="cbbComponentTheme">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+           </widget>
+          </item>
+         </layout>
         </item>
        </layout>
       </widget>
@@ -354,8 +327,7 @@
     </item>
    </layout>
   </widget>
-  <widget class="QStatusBar" name="statusBar">
-  </widget>
+  <widget class="QStatusBar" name="statusBar"/>
  </widget>
  <resources/>
  <connections/>

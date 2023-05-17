@@ -125,15 +125,13 @@ class GreenyyLogger:
         self.printDsb = disableStdPrint
         self.logWindow = not disableLogWindow
         self.useColorama = useColorama
-        self.filenames = list()
 
         self.Logger = logging.getLogger(name)
         self.formatString = ''
-        self.getFilename()
                 
         self.Logger.setLevel(self.logLevel.value)
 
-        self.handler = logging.FileHandler(rf'{self.filenames[0]}', 'a+', 'utf-8')
+        self.handler = logging.FileHandler(rf'{log().fileName}', 'a+', 'utf-8')
         
         self.Logger.addHandler(self.handler)
 
@@ -169,18 +167,6 @@ class GreenyyLogger:
         self.logLevel = logLevel
         self.Logger.setLevel(logLevel.value)
 
-    def getFilename(self):
-        '''
-        Сгенерировать имя файла для сохранения лога и сохранить его в список
-        'self.filenames'. Метод вызывается при инициализации канала журнали-
-        рования, но при этом для сохранения логов всегда используется файл с
-        именем, которое было получено при инициализации ПЕРВОГО по счёту
-        канала.
-
-        :returns: None
-        '''
-        self.filenames.append(f'logs/Greenyy_{time.strftime("""%d.%m.%Y_%H%M%S""", time.localtime())}.log')
-
     def publishToLogWindow(self, message: str):
         'Отправить сообщение в LogWindow'
         if (self.logWindow):
@@ -208,17 +194,26 @@ class GreenyyLogger:
         :returns: None
         '''
         callerInfo = self.Logger.findCaller()
-        fileName = callerInfo[0]
+        fileName = (
+            callerInfo[0][callerInfo[0].index('greenyy'):]
+            if ('greenyy' in callerInfo[0])
+            else callerInfo[0]
+            )
         lineNo = str(callerInfo[1])
-        moduleName = ('UNKNOWN' if callerInfo[0] == '(unknown file)' else callerInfo[0][:callerInfo[0].index('.')])
+        moduleName = (
+            'UNKNOWN'
+            if (callerInfo[0] == '(unknown file)')
+            else (callerInfo[0][callerInfo[0].index('greenyy') + 8:callerInfo[0].index('.')].replace('\\', '.')
+            if ('greenyy' in callerInfo[0])
+            else (callerInfo[0][:callerInfo[0].index('.')])))
         funcName = callerInfo[2]
 
         if self.useColorama <= 1 and self.logLevel == GreenyyLogLevel.DEBUG:
-            self.formatString = ('{%(asctime)s} [%(name)s:%(levelname)s] '
+            self.formatString = ('{%(asctime)s} [%(name)s@%(levelname)s] '
                                  f'[{fileName} <{lineNo}>: {moduleName}.{funcName}]: '
                                  '%(message)s')
         elif self.useColorama <= 1 and self.logLevel >= GreenyyLogLevel.INFO:
-            self.formatString = '{%(asctime)s} [%(name)s:%(levelname)s] %(message)s'
+            self.formatString = '{%(asctime)s} [%(name)s@%(levelname)s] %(message)s'
             
             self.formatString = (str(Fore.CYAN)   +  '{%(asctime)s} [' + str(Style.RESET_ALL) +
                                  str(Fore.GREEN)  +   '%(name)s'       + str(Style.RESET_ALL) + ':'   +
@@ -246,17 +241,26 @@ class GreenyyLogger:
         :returns: None
         '''
         callerInfo = self.Logger.findCaller()
-        fileName = callerInfo[0]
+        fileName = (
+            callerInfo[0][callerInfo[0].index('greenyy'):]
+            if ('greenyy' in callerInfo[0])
+            else callerInfo[0]
+            )
         lineNo = str(callerInfo[1])
-        moduleName = ('UNKNOWN' if callerInfo[0] == '(unknown file)' else callerInfo[0][:callerInfo[0].index('.')])
+        moduleName = (
+            'UNKNOWN'
+            if (callerInfo[0] == '(unknown file)')
+            else (callerInfo[0][callerInfo[0].index('greenyy') + 8:callerInfo[0].index('.')].replace('\\', '.')
+            if ('greenyy' in callerInfo[0])
+            else (callerInfo[0][:callerInfo[0].index('.')])))
         funcName = callerInfo[2]
 
         if self.useColorama <= 1 and self.logLevel == GreenyyLogLevel.DEBUG:
-            self.formatString = ('{%(asctime)s} [%(name)s:%(levelname)s] '
+            self.formatString = ('{%(asctime)s} [%(name)s@%(levelname)s] '
                                  f'[{fileName} <{lineNo}>: {moduleName}.{funcName}]: '
                                  '%(message)s')
         elif self.useColorama <= 1 and self.logLevel >= GreenyyLogLevel.INFO:
-            self.formatString = '{%(asctime)s} [%(name)s:%(levelname)s] %(message)s'
+            self.formatString = '{%(asctime)s} [%(name)s@%(levelname)s] %(message)s'
 
         self.handler.setFormatter(logging.Formatter(self.formatString))
 
@@ -279,17 +283,26 @@ class GreenyyLogger:
         :returns: None
         '''
         callerInfo = self.Logger.findCaller()
-        fileName = callerInfo[0]
+        fileName = (
+            callerInfo[0][callerInfo[0].index('greenyy'):]
+            if ('greenyy' in callerInfo[0])
+            else callerInfo[0]
+            )
         lineNo = str(callerInfo[1])
-        moduleName = ('UNKNOWN' if callerInfo[0] == '(unknown file)' else callerInfo[0][:callerInfo[0].index('.')])
+        moduleName = (
+            'UNKNOWN'
+            if (callerInfo[0] == '(unknown file)')
+            else (callerInfo[0][callerInfo[0].index('greenyy') + 8:callerInfo[0].index('.')].replace('\\', '.')
+            if ('greenyy' in callerInfo[0])
+            else (callerInfo[0][:callerInfo[0].index('.')])))
         funcName = callerInfo[2]
 
         if self.useColorama <= 1 and self.logLevel == GreenyyLogLevel.DEBUG:
-            self.formatString = ('{%(asctime)s} [%(name)s:%(levelname)s] '
+            self.formatString = ('{%(asctime)s} [%(name)s@%(levelname)s] '
                                  f'[{fileName} <{lineNo}>: {moduleName}.{funcName}]: '
                                  '%(message)s')
         elif self.useColorama <= 1 and self.logLevel >= GreenyyLogLevel.INFO:
-            self.formatString = '{%(asctime)s} [%(name)s:%(levelname)s] %(message)s'
+            self.formatString = '{%(asctime)s} [%(name)s@%(levelname)s] %(message)s'
 
         self.handler.setFormatter(logging.Formatter(self.formatString))
 
@@ -312,17 +325,26 @@ class GreenyyLogger:
         :returns: None
         '''
         callerInfo = self.Logger.findCaller()
-        fileName = callerInfo[0]
+        fileName = (
+            callerInfo[0][callerInfo[0].index('greenyy'):]
+            if ('greenyy' in callerInfo[0])
+            else callerInfo[0]
+            )
         lineNo = str(callerInfo[1])
-        moduleName = ('UNKNOWN' if callerInfo[0] == '(unknown file)' else callerInfo[0][:callerInfo[0].index('.')])
+        moduleName = (
+            'UNKNOWN'
+            if (callerInfo[0] == '(unknown file)')
+            else (callerInfo[0][callerInfo[0].index('greenyy') + 8:callerInfo[0].index('.')].replace('\\', '.')
+            if ('greenyy' in callerInfo[0])
+            else (callerInfo[0][:callerInfo[0].index('.')])))
         funcName = callerInfo[2]
 
         if self.useColorama <= 1 and self.logLevel == GreenyyLogLevel.DEBUG:
-            self.formatString = ('{%(asctime)s} [%(name)s:%(levelname)s] '
+            self.formatString = ('{%(asctime)s} [%(name)s@%(levelname)s] '
                                  f'[{fileName} <{lineNo}>: {moduleName}.{funcName}]: '
                                  '%(message)s')
         elif self.useColorama <= 1 and self.logLevel >= GreenyyLogLevel.INFO:
-            self.formatString = '{%(asctime)s} [%(name)s:%(levelname)s] %(message)s'
+            self.formatString = '{%(asctime)s} [%(name)s@%(levelname)s] %(message)s'
 
         self.handler.setFormatter(self.formatString)
 
@@ -345,17 +367,26 @@ class GreenyyLogger:
         :returns: None
         '''
         callerInfo = self.Logger.findCaller()
-        fileName = callerInfo[0]
+        fileName = (
+            callerInfo[0][callerInfo[0].index('greenyy'):]
+            if ('greenyy' in callerInfo[0])
+            else callerInfo[0]
+            )
         lineNo = str(callerInfo[1])
-        moduleName = ('UNKNOWN' if callerInfo[0] == '(unknown file)' else callerInfo[0][:callerInfo[0].index('.')])
+        moduleName = (
+            'UNKNOWN'
+            if (callerInfo[0] == '(unknown file)')
+            else (callerInfo[0][callerInfo[0].index('greenyy') + 8:callerInfo[0].index('.')].replace('\\', '.')
+            if ('greenyy' in callerInfo[0])
+            else (callerInfo[0][:callerInfo[0].index('.')])))
         funcName = callerInfo[2]
 
         if self.useColorama <= 1 and self.logLevel == GreenyyLogLevel.DEBUG:
-            self.formatString = ('{%(asctime)s} [%(name)s:%(levelname)s] '
+            self.formatString = ('{%(asctime)s} [%(name)s@%(levelname)s] '
                                  f'[{fileName} <{lineNo}>: {moduleName}.{funcName}]: '
                                  '%(message)s')
         elif self.useColorama <= 1 and self.logLevel >= GreenyyLogLevel.INFO:
-            self.formatString = '{%(asctime)s} [%(name)s:%(levelname)s] %(message)s'
+            self.formatString = '{%(asctime)s} [%(name)s@%(levelname)s] %(message)s'
             
         self.handler.setFormatter(logging.Formatter(self.formatString))
         

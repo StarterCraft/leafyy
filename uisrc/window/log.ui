@@ -99,10 +99,30 @@
         <widget class="QComboBox" name="cbbSendMode">
          <property name="maximumSize">
           <size>
-           <width>75</width>
+           <width>90</width>
            <height>16777215</height>
           </size>
          </property>
+         <item>
+          <property name="text">
+           <string>ASCII</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>BIN</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>OCT</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>HEX</string>
+          </property>
+         </item>
         </widget>
        </item>
        <item>
@@ -156,7 +176,7 @@
      <addaction name="meiDevices"/>
      <addaction name="meiRules"/>
      <addaction name="meiKeys"/>
-     <addaction name="meiEnvironment"/>
+     <addaction name="meiViewSettings"/>
     </widget>
     <addaction name="meiGeneral"/>
     <addaction name="meiLog"/>
@@ -290,9 +310,9 @@
     <string>Основное окно</string>
    </property>
   </action>
-  <action name="meiEnvironment">
+  <action name="meiViewSettings">
    <property name="text">
-    <string>Среда...</string>
+    <string>Внешний вид...</string>
    </property>
   </action>
  </widget>

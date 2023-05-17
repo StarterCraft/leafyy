@@ -7,13 +7,13 @@ from uidef.window.general import Ui_GeneralWindow
 
 
 class GreenyyGeneralWindow(
-    GreenyyUiComponent, 
-    Ui_GeneralWindow,
-    QtWidgets.QMainWindow):
+    GreenyyUiComponent,
+    QtWidgets.QMainWindow, 
+    Ui_GeneralWindow):
     def __init__(self):
         super().__init__(
             'generalWindow',
-            GreenyyUiComponentType.Widget,
+            GreenyyUiComponentType.Window,
             displayName = 'Основное окно'
         )
         
@@ -28,7 +28,7 @@ class GreenyyGeneralWindow(
         self.meiDevices.triggered.connect(ui().settingsWindow.show0)
         self.meiRules.triggered.connect(ui().settingsWindow.show1)
         self.meiKeys.triggered.connect(ui().settingsWindow.show2)
-        self.meiEnvironment.triggered.connect(ui().settingsWindow.show3)
+        self.meiViewSettings.triggered.connect(ui().settingsWindow.show3)
 
     def bind(self):
         self.meiGeneral.setShortcut(QtGui.QKeySequence(options().keys.generalWindow))

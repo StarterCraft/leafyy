@@ -24,7 +24,8 @@ class GreenyyLogWindow(
     def __init__(self):
         super().__init__(
             'logWindow',
-            GreenyyUiComponentType.Window
+            GreenyyUiComponentType.Window,
+            displayName = 'Журнал'
         )
 
         self.setupMenu()
@@ -88,7 +89,7 @@ class GreenyyLogWindow(
         self.meiDevices.triggered.connect(ui().settingsWindow.show0)
         self.meiRules.triggered.connect(ui().settingsWindow.show1)
         self.meiKeys.triggered.connect(ui().settingsWindow.show2)
-        self.meiEnvironment.triggered.connect(ui().settingsWindow.show3)
+        self.meiViewSettings.triggered.connect(ui().settingsWindow.show3)
 
         self.meiLogFolder.triggered.connect(self.openLogFolder)
 

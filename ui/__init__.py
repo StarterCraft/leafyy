@@ -7,7 +7,7 @@ from glob     import glob
 
 from greenyy      import GreenyyComponent, GreenyyDirectDict
 from greenyy      import deepget
-from greenyy      import a, ui, options, hardware
+from greenyy      import app, ui, options, hardware
 
 
 class GreenyyUiTheme(GreenyyDirectDict):
@@ -45,9 +45,9 @@ class GreenyyUiTheme(GreenyyDirectDict):
 
 
 class GreenyyUiComponentType(Enum):
-    Window = 0
+    Window = 2
     Dialog = 1
-    Widget = 2
+    Widget = 0
 
 
 class GreenyyUiComponent(GreenyyComponent):
@@ -83,7 +83,7 @@ class GreenyyUiComponent(GreenyyComponent):
         )
         self.resize(self.defaultSize)
 
-        self.theme = deepget(options().ui, f'{self.name}.theme', default = 'default')
+        self.theme: str = deepget(options().ui, f'{self.name}.theme', default = 'default')
 
     def setupUi(self, *args):
         super().setupUi(*args)
@@ -97,10 +97,14 @@ class GreenyyUiComponent(GreenyyComponent):
     def updateUi(self):
         super().updateUi()
 
+    def cleanUi(self):
+        super().cleanUi()
+
     def show(self, **kwargs):
         super().show(**kwargs)
 
     def close(self):
+        self.cleanUi()
         super().close()
 
     def isVisible(self) -> bool:
@@ -169,6 +173,14 @@ class GreenyyUi(GreenyyComponent):
 
         self.logger.debug(
             'Интерфейс полностью обновлён'
+        )
+
+    def cleanUi(self):
+        for component in self:
+            component.cleanUi()
+
+        self.logger.debug(
+            'Интерфейс полностью очищен'
         )
 
     def show(self):
@@ -255,40 +267,49 @@ class GreenyyUi(GreenyyComponent):
     def getTheme(self, name: str) -> GreenyyUiTheme:
         return [t for t in self.themes if (t.name == name)][0]
 
-    def themize(self):
+    def themize(self, theme: str = ''):
+        self.themizeApp(theme)
+
+        for component in self:
+            self.themizeComponent(component)
+
+    def themizeApp(self, theme: str = None):
         appTheme = self.getTheme(
-            deepget(options().ui, 'app.theme', 'default')
+            theme if theme else deepget(options().ui, 'app.theme', 'default')
         )
         
-        a().setStyle(appTheme.style)
-        a().setStyleSheet(appTheme.app)
+        app().setStyle(appTheme.style)
 
-        self.logger.debug(f'Тема {appTheme.name}: установлен глобальный QSS длиной {len(appTheme.app)}')
+        appQss = appTheme.get('app', '')
+        app().setStyleSheet(appQss)
+
+        self.logger.debug(f'Тема {appTheme.name}: установлен глобальный QSS длиной {len(appQss)}')
         self.logger.debug(f'Тема {appTheme.name}: установлен глобальный QStyle {appTheme.style}')
 
-        for c in self:
-            theme = self.getTheme(
-                deepget(options().ui, f'{c.name}.theme', 'default')
-            )
+    def themizeComponent(self, c: GreenyyUiComponent, theme: str = ''):
+        theme = self.getTheme(
+            theme if theme else deepget(options().ui, f'{c.name}.theme', 'default')
+        )
 
-            self.logger.debug(f'Тема {theme.name} обнаружена для компонента {c.name}')
+        c.theme = theme.name
 
-            cQss = theme.get(c.name, '')
+        self.logger.debug(f'Тема {theme.name} установлена для компонента {c.name}')
+
+        cQss = theme.get(c.name, self.getTheme('default').get(c.name, ''))
+        if (cQss):
             c.setStyleSheet(cQss)
-            if (cQss):
-                self.logger.debug(f'Тема {theme.name}: установлен QSS для {c.name} длиной {len(cQss)}')
+            self.logger.debug(f'Тема {theme.name}: установлен QSS для {c.name} длиной {len(cQss)}')
 
-            for target, styleSheet in theme:
-                subName = '.'.join(target.split('.')[1:])
+        for target, styleSheet in theme:
+            subName = '.'.join(target.split('.')[1:])
 
-                if (len(target.split('.')) > 1 and 
-                    hasattr(c, subName)):
-                    getattr(c, subName).setStyleSheet(styleSheet)
+            if (len(target.split('.')) > 1 and 
+                hasattr(c, subName)):
+                getattr(c, subName).setStyleSheet(styleSheet)
 
-                    self.logger.debug(f'Тема {theme.name}: '
-                        f'установлен QSS для {target} длиной {len(theme[target])}'
-                    )
-
+                self.logger.debug(f'Тема {theme.name}: '
+                    f'установлен QSS для {target} длиной {len(theme[target])}'
+                )
 
     def isVisible(self) -> bool:
         return any(c.isVisible() for c in self.components)

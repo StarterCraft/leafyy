@@ -1,14 +1,20 @@
 #coding=utf-8
-from PyQt5  import QtWidgets
-
+from typing import List, Dict, Any
 from json   import load, dump
 
-from greenyy    import GreenyyDirectDict
-from greenyy    import hardware
-from logger import GreenyyLogger
+from greenyy import GreenyyComponent, GreenyyDirectDict
+from greenyy import hardware
 
 
-class GreenyyOptions:
+class GreenyyOptions(GreenyyComponent):
+    __reserved__ = [
+        'name',
+        'displayName',
+        'ui',
+        'keys',
+        'logDecodeASCII'
+    ]
+
     defaults = {
         'ui': {
             'generalWindow': {
@@ -38,12 +44,12 @@ class GreenyyOptions:
     }
 
     def __init__(self) -> None:
-        self.logger = GreenyyLogger('Options')
+        super().__init__('options')
 
         try:
             load(open('options.json', encoding = 'utf-8'))
         except Exception as e:
-            self.logger.warning(f'failed to load due to {e}')
+            self.logger.warning(f'Загрузка настроек провалена: {e}')
             self.writeDefaults()
 
         self.read()
@@ -62,21 +68,16 @@ class GreenyyOptions:
 
     def read(self):
         with open('options.json', encoding = 'utf-8') as configFile:
-            configData = load(configFile)
+            configData: Dict[str, Any] = load(configFile)
+            
+        for key in configData.keys():
+            if ('_' not in key and
+                key not in self.__reserved__):
+                setattr(self, key, configData[key])
 
-        _keys = [
-            'ui',
-            'logLevel',
-            'logScrollMode',
-            'logLoggers',
-            'logDevices'
-        ]
-
-        for key in _keys:
-            setattr(self, key, configData[key])
-
-        self._logDecodeASCII = configData['logDecodeASCII']
-        self.keys = GreenyyDirectDict(**configData['keys'])
+        self._logDecodeASCII: List[str] = configData['logDecodeASCII']
+        self.ui = GreenyyDirectDict(configData['ui'])
+        self.keys = GreenyyDirectDict(configData['keys'])
         self.logger.info('Настройки программы загружены')
 
     def write(self):

@@ -1,13 +1,16 @@
 from PyQt5 import QtCore, QtWidgets
 from typing import Union, Iterator, List
+from time import strftime, localtime
 
 from greenyy import options
 from logger.logger import GreenyyLogLevel, GreenyyLogger
 
 
-class GreenyyLogging(QtCore.QObject):
+class GreenyyLogging:
     def __init__(self) -> None:
         super().__init__()
+
+        self.fileName = f'logs/Greenyy_{strftime("""%d.%m.%Y_%H%M%S""", localtime())}.log'
 
         self.loggers: List[GreenyyLogger] = []
         self.globalLevel = GreenyyLogLevel.DEBUG

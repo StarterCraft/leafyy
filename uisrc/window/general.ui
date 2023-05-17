@@ -59,7 +59,7 @@
      <addaction name="meiDevices"/>
      <addaction name="meiRules"/>
      <addaction name="meiKeys"/>
-     <addaction name="meiEnvironment"/>
+     <addaction name="meiViewSettings"/>
     </widget>
     <addaction name="meiGeneral"/>
     <addaction name="meiLog"/>
@@ -106,9 +106,9 @@
     <string>Основное окно</string>
    </property>
   </action>
-  <action name="meiEnvironment">
+  <action name="meiViewSettings">
    <property name="text">
-    <string>Среда...</string>
+    <string>Внешний вид...</string>
    </property>
   </action>
  </widget>

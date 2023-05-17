@@ -15,25 +15,27 @@ def deepget(self: dict, key: str, default: Any = None, sep: str = '.'):
     
     return fetched
 
+def deepupdate(self: dict, key: str, value: Any, sep: str = '.'):
+    pass
 
 #Доступ к компонентам
-def a() -> QtWidgets.QApplication:
+def app() -> QtWidgets.QApplication:
     return QtWidgets.QApplication.instance()
 
 def tr(*args, **kwargs) -> str:
-    return a().translate(*args, **kwargs)
+    return app().translate(*args, **kwargs)
 
 def log():
-    return a().log
+    return app().log
 
 def options():
-    return a().options
+    return app().options
 
 def ui():
-    return a().ui
+    return app().ui
 
 def hardware():
-    return a().hardware
+    return app().hardware
 
 
 from logger.logger import GreenyyLogger
@@ -43,7 +45,7 @@ class GreenyyDirectDict:
     __reserved__ = [
         'keys',
         'get',
-        'update',
+        'update'
         'toDict'
     ]
 
