@@ -3,15 +3,25 @@ from PyQt5 import QtCore, QtWidgets, QtSerialPort
 from collections import deque
 from typing import Union
 
-from greenyy import ui, options
-from logger import GreenyyLogger
-from device import GreenyyStatus
+from greenyy  import GreenyyComponent
+from greenyy  import ui, options, hardware
+from logger   import GreenyyLogger
+from device   import GreenyyStatus
 from .message import GreenyyDeviceMessage
 
 
-class GreenyyDevice():
+class GreenyyDevice(GreenyyComponent):
     def __init__(self, **kwargs):
-        self.name = kwargs['name']
+        super().__init__(
+            kwargs['name'],
+            loggerName = f'Device#{kwargs["address"]}',
+            displayName = (
+                kwargs['displayName'] if 
+                ('displayName' in kwargs.keys()) else
+                'Устройство без названия'
+            )
+        )
+        
         self.desc = kwargs['desc']
         self.isEnabled = kwargs['enabled']
         self.address = kwargs['address']
@@ -22,7 +32,6 @@ class GreenyyDevice():
         self.decodeASCIIMode = options().logDecodeASCII(self.address)
 
         self.status = GreenyyStatus.Disabled
-        self.logger = GreenyyLogger(f'Device[{self.address}]')
         self.logger.info(f'Инициализация устройства по адресу {self.address}')
 
         self.port = QtSerialPort.QSerialPort(self.address)
@@ -40,6 +49,8 @@ class GreenyyDevice():
         if (self.isEnabled):
             self.logger.debug('Пытаюсь запустить устройство в системе')
             self.start()
+
+        hardware().add(self)
 
     def __getitem__(self, _id):
         if (isinstance(_id, int)):

@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>GeneralWindow</class>
+ <widget class="QMainWindow" name="GeneralWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>600</width>
+    <height>600</height>
+   </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>600</width>
+    <height>600</height>
+   </size>
+  </property>
+  <property name="windowTitle">
+   <string>Иваров листочек</string>
+  </property>
+  <widget class="QMdiArea" name="mdi">
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
+   </property>
+   <property name="verticalScrollBarPolicy">
+    <enum>Qt::ScrollBarAsNeeded</enum>
+   </property>
+   <property name="horizontalScrollBarPolicy">
+    <enum>Qt::ScrollBarAsNeeded</enum>
+   </property>
+   <property name="activationOrder">
+    <enum>QMdiArea::ActivationHistoryOrder</enum>
+   </property>
+   <property name="viewMode">
+    <enum>QMdiArea::SubWindowView</enum>
+   </property>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>600</width>
+     <height>26</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="meiWindow">
+    <property name="title">
+     <string>Окно</string>
+    </property>
+    <widget class="QMenu" name="meiSettings">
+     <property name="title">
+      <string>Настройки</string>
+     </property>
+     <addaction name="meiDevices"/>
+     <addaction name="meiRules"/>
+     <addaction name="meiKeys"/>
+     <addaction name="meiViewSettings"/>
+    </widget>
+    <addaction name="meiGeneral"/>
+    <addaction name="meiLog"/>
+    <addaction name="meiSettings"/>
+    <addaction name="separator"/>
+   </widget>
+   <widget class="QMenu" name="menuView">
+    <property name="title">
+     <string>Вид</string>
+    </property>
+   </widget>
+   <addaction name="meiWindow"/>
+   <addaction name="menuView"/>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+  <action name="meiDevices">
+   <property name="text">
+    <string>Устройства...</string>
+   </property>
+  </action>
+  <action name="meiRules">
+   <property name="text">
+    <string>Правила...</string>
+   </property>
+  </action>
+  <action name="meiKeys">
+   <property name="text">
+    <string>Клавиши...</string>
+   </property>
+  </action>
+  <action name="meiLog">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Журнал</string>
+   </property>
+  </action>
+  <action name="meiGeneral">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Основное окно</string>
+   </property>
+  </action>
+  <action name="meiViewSettings">
+   <property name="text">
+    <string>Внешний вид...</string>
+   </property>
+  </action>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

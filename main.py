@@ -25,7 +25,8 @@ class Greenyy(QtWidgets.QApplication):
         self.logger.info('Инициализация интерфейса завершена')
 
         self.hardware = GreenyyHardware()
-        self.logger.info('Инициализация менеджера устройств завершена')
+        self.hardware.startDevicesSingleThread()
+        self.logger.info('Инициализация устройств завершена')
 
         self.ui.deviceIntegration()
         self.logger.info('Интеграция устройств в интерфейс проведена')
