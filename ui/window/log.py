@@ -1,4 +1,4 @@
-from PyQt5    import QtCore, QtGui, QtWidgets
+from PySide6    import QtCore, QtGui, QtWidgets
 from os       import system
 from datetime import datetime
 from logging  import getLevelName
@@ -34,7 +34,7 @@ class GreenyyLogWindow(
         self.logger.info('Окно журнала инициализировано')
 
     def setupMenu(self):
-        self.logLevelActions = QtWidgets.QActionGroup(self)
+        self.logLevelActions = QtGui.QActionGroup(self)
         self.logLevelActions.setExclusive(True)
 
         for level, action in zip(GreenyyLogLevel, [
@@ -62,7 +62,7 @@ class GreenyyLogWindow(
         self.meiLogSource.setMenu(self.setLoggingSourceActions)
         self.setLoggingSourceActions.triggered.connect(self.setLoggerVisibility)
 
-        self.allLoggersAction = QtWidgets.QAction('Все внутренние логгеры', self)
+        self.allLoggersAction = QtGui.QAction('Все внутренние логгеры', self)
         self.allLoggersAction.setCheckable(True)
         self.allLoggersAction.setChecked(all(l.logWindow for l in log()))
         self.allLoggersAction.setData('logger')
@@ -70,7 +70,7 @@ class GreenyyLogWindow(
         self.setLoggingSourceActions.addAction(self.allLoggersAction)
         
         for logger in log().loggers:
-            action = QtWidgets.QAction(logger.name, self)
+            action = QtGui.QAction(logger.name, self)
             action.setCheckable(True)
             action.setChecked(logger.logWindowVisibility)
             action.setData('logger')
@@ -84,6 +84,7 @@ class GreenyyLogWindow(
         return
 
     def interconnect(self):
+        
         self.meiLog.triggered.connect(self.show)
         self.meiDevices.triggered.connect(ui().settingsWindow.show0)
         self.meiRules.triggered.connect(ui().settingsWindow.show1)
@@ -202,7 +203,7 @@ class GreenyyLogWindow(
         self.scrollDown()
         options().write()
 
-    def setASCIIMode(self, triggered: QtWidgets.QAction):
+    def setASCIIMode(self, triggered: QtGui.QAction):
         text = triggered.text()
         isChecked = triggered.isChecked()
 
@@ -218,7 +219,7 @@ class GreenyyLogWindow(
         self.allASCIIAction.setChecked(all(d.decodeASCIIMode for d in hardware()))
         hardware()[text].decodeASCII = isChecked
 
-    def setLoggerVisibility(self, triggered: QtWidgets.QAction):
+    def setLoggerVisibility(self, triggered: QtGui.QAction):
         text = triggered.text()
         data = triggered.data()
         isChecked = triggered.isChecked()

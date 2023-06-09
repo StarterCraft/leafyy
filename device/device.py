@@ -1,5 +1,5 @@
 #coding=utf-8
-from PyQt5 import QtCore, QtWidgets, QtSerialPort
+from PySide6 import QtCore, QtWidgets, QtSerialPort
 from collections import deque
 from typing import Union
 

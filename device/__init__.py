@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from PyQt5 import QtCore, QtSerialPort, QtWidgets
+from PySide6 import QtCore, QtSerialPort, QtWidgets
 from json import load, dump
 from enum import Enum
 from typing import Union, Iterator, List

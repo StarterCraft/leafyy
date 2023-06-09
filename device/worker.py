@@ -1,5 +1,5 @@
-from PyQt5 import QtCore, QtSerialPort
-from PyQt5.QtCore import pyqtSignal, QObject
+from PySide6 import QtCore, QtSerialPort
+from PySide6.QtCore import Signal, QObject
 from .device import GreenyyDevice
 import sys
 import traceback
@@ -8,10 +8,10 @@ import traceback
 class WorkerSignals(QObject):
     ''' Определяет сигналы, доступные из рабочего рабочего потока Worker(QRunnable).'''
 
-    finish   = pyqtSignal()
-    error    = pyqtSignal(tuple)
-    result   = pyqtSignal(object)
-    progress = pyqtSignal(int)
+    finish   = Signal()
+    error    = Signal(tuple)
+    result   = Signal(object)
+    progress = Signal(int)
 
 
 class GreenyyDeviceIniitializationWorker(QtCore.QRunnable):
@@ -23,7 +23,7 @@ class GreenyyDeviceIniitializationWorker(QtCore.QRunnable):
         self.d = d
         self.signals = WorkerSignals()
 
-    @QtCore.pyqtSlot()
+    @QtCore.Slot()
     def run(self):
         try:
             result = GreenyyDevice(**self.d)

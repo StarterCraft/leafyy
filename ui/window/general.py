@@ -1,4 +1,4 @@
-from PyQt5   import QtCore, QtGui, QtWidgets
+from PySide6   import QtCore, QtGui, QtWidgets
 
 from greenyy import ui, options
 

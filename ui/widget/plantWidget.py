@@ -1,4 +1,4 @@
-from PyQt5 import QtGui, QtWidgets
+from PySide6 import QtGui, QtWidgets
 
 from ui    import GreenyyUiComponent
 from uidef.widget.plantWidget import Ui_PlantWidget

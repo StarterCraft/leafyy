@@ -1,4 +1,4 @@
-from PyQt5 import QtWidgets
+from PySide6 import QtWidgets
 
 from ui    import GreenyyUiComponent, GreenyyUiComponentType
 from uidef.dialog.ruleProperties import Ui_RulePropertiesDialog

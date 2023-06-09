@@ -1,7 +1,7 @@
 {
     "ui": {
         "app": {
-            "theme": "sleek",
+            "theme": "default",
             "size": [
                 1024,
                 768
@@ -26,14 +26,14 @@
     "logLevel": "DEBUG",
     "logScrollMode": true,
     "logLoggers": [
-        "All",
-        "SettingsWindow"
+        "All"
     ],
     "logDevices": [],
     "logDecodeASCII": [
         "COM3"
     ],
     "keys": {
+        "generalWindow": "Ctrl+1",
         "logWindow": "Ctrl+2",
         "settingsWindow": "Ctrl+3",
         "logFolder": "Ctrl+N",
@@ -43,6 +43,8 @@
         "Ctrl+.": "Ctrl+.",
         "Ctrl+,": "Ctrl+,"
     },
+    "webServerDebug": true,
+    "webServer": true,
     "name": "options",
     "displayName": ""
 }

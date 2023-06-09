@@ -1,16 +1,16 @@
 #INITIALIZER не работает по неизвестной причине,
 #которую не удалось установить. Отключен.
 
-from PyQt5 import QtCore, QtSerialPort
-from PyQt5.QtCore import pyqtSignal, QObject
+from PySide6 import QtCore, QtSerialPort
+from PySide6.QtCore import Signal, QObject
 from .device import GreenyyDevice
 import sys
 import traceback
 
 
 class GreenyyDeviceInitializer(QtCore.QThread):
-    error = QtCore.pyqtSignal(tuple)
-    initialized = QtCore.pyqtSignal(GreenyyDevice)
+    error = QtCore.Signal(tuple)
+    initialized = QtCore.Signal(GreenyyDevice)
     #STACKOVERFLOW: https://stackoverflow.com/a/6789205/13677671
     #STACKOVERFLOW: https://ru.stackoverflow.com/a/840447/397716
 

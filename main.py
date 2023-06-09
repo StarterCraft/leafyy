@@ -1,16 +1,19 @@
-from PyQt5  import QtCore, QtWidgets
+from PySide6  import QtCore, QtWidgets
 from sys    import argv, exit
-from typing import List
+from webbrowser import open as url
+
 
 from logger        import GreenyyLogging
 from logger.logger import GreenyyLogger
 from options       import GreenyyOptions
 from ui            import GreenyyUi
 from device        import GreenyyHardware
+from web           import GreenyyWebServer
+from web.api       import GreenyyWebApi
 
 
 class Greenyy(QtWidgets.QApplication):
-    def __init__(self, argv) -> None:
+    def __init__(self, argv: list[str]) -> None:
         super().__init__(argv)
         assert QtWidgets.QApplication.instance() is self
 
@@ -22,11 +25,17 @@ class Greenyy(QtWidgets.QApplication):
 
         self.ui = GreenyyUi()
         self.ui.setupUi()
-        self.logger.info('Инициализация интерфейса завершена')
+        self.logger.info('Инициализирован интерфейс')
+
+        self.web = GreenyyWebServer()
+        self.logger.info('Инициализировано ядро веб-сервера')
+
+        self.api = GreenyyWebApi()
+        self.api.assign(self.web)
+        self.web.start()
 
         self.hardware = GreenyyHardware()
-        self.hardware.startDevicesSingleThread()
-        self.logger.info('Инициализация устройств завершена')
+        self.logger.info('Инициализированы устройства')
 
         self.ui.deviceIntegration()
         self.logger.info('Интеграция устройств в интерфейс проведена')
@@ -40,9 +49,10 @@ class Greenyy(QtWidgets.QApplication):
 
 def main():
     app = Greenyy(argv)
-    app.show()
+    #app.show()
+    url('http://127.0.0.1:8000')
 
-    exit(app.exec_())
+    exit(app.exec())
 
 
 if (__name__ == '__main__'):

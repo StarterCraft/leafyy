@@ -1,4 +1,4 @@
-from PyQt5 import QtCore, QtWidgets
+from PySide6 import QtCore, QtWidgets
 from typing import Union, Iterator, List
 from time import strftime, localtime
 
@@ -6,7 +6,9 @@ from greenyy import options
 from logger.logger import GreenyyLogLevel, GreenyyLogger
 
 
-class GreenyyLogging:
+class GreenyyLogging(QtCore.QObject):
+
+
     def __init__(self) -> None:
         super().__init__()
 

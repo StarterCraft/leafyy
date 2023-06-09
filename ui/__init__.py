@@ -1,5 +1,5 @@
 #coding=utf-8
-from PyQt5    import QtCore, QtGui, QtWidgets
+from PySide6    import QtCore, QtGui, QtWidgets
 from enum     import Enum
 from typing   import Any, List, Dict, Tuple, Iterator, Union
 from json     import load
@@ -111,6 +111,7 @@ class GreenyyUiComponent(GreenyyComponent):
         return super().isVisible()
 
 
+from .window.general          import GreenyyGeneralWindow
 from .window.log              import GreenyyLogWindow
 from .window.settings         import GreenyySettingsWindow
 
@@ -138,6 +139,7 @@ class GreenyyUi(GreenyyComponent):
         return iter(self.components)
 
     def setupUi(self):
+        GreenyyGeneralWindow()
         GreenyySettingsWindow()
         GreenyyLogWindow()
 
@@ -217,13 +219,13 @@ class GreenyyUi(GreenyyComponent):
 
     def deviceIntegration(self):
         'todo: убрать'
-        self.logWindow.allDevicesAction = QtWidgets.QAction('Все устройства', self.logWindow)
+        self.logWindow.allDevicesAction = QtGui.QAction('Все устройства', self.logWindow)
         self.logWindow.allDevicesAction.setCheckable(True)
         self.logWindow.allDevicesAction.setChecked(all(d.logWindow for d in hardware()))
         self.logWindow.allDevicesAction.setData('device')
         self.logWindow.setLoggingSourceActions.addAction(self.logWindow.allDevicesAction)
 
-        self.logWindow.allASCIIAction = QtWidgets.QAction('Все', self.logWindow)
+        self.logWindow.allASCIIAction = QtGui.QAction('Все', self.logWindow)
         self.logWindow.allASCIIAction.setCheckable(True)
         self.logWindow.allASCIIAction.setChecked(all(d.decodeASCIIMode for d in hardware()))
         self.logWindow.setASCIIModeActions.addAction(self.logWindow.allASCIIAction)
@@ -232,12 +234,12 @@ class GreenyyUi(GreenyyComponent):
             self.logWindow.cbbPort.addItem(d.address)
             self.logWindow.cbbPort.setCurrentText(d.address)
 
-            setASCIIModeAction = QtWidgets.QAction(d.address.upper(), self.logWindow)
+            setASCIIModeAction = QtGui.QAction(d.address.upper(), self.logWindow)
             setASCIIModeAction.setCheckable(True)
             setASCIIModeAction.setChecked(d.decodeASCII)
             self.logWindow.setASCIIModeActions.addAction(setASCIIModeAction)
 
-            setLoggerVisibilityAction = QtWidgets.QAction(d.address.upper(), self.logWindow)
+            setLoggerVisibilityAction = QtGui.QAction(d.address.upper(), self.logWindow)
             setLoggerVisibilityAction.setCheckable(True)
             setLoggerVisibilityAction.setChecked(d.logWindow)
             setLoggerVisibilityAction.setData('device')

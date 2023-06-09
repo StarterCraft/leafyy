@@ -1,5 +1,6 @@
-from PyQt5         import QtWidgets
-from typing        import List, Dict, Any
+from PySide6         import QtWidgets
+from fastapi         import FastAPI
+from typing          import List, Dict, Any
 
 
 #Утилитарные функции
@@ -36,6 +37,9 @@ def ui():
 
 def hardware():
     return app().hardware
+
+def web() -> FastAPI:
+    return app().web
 
 
 from logger.logger import GreenyyLogger

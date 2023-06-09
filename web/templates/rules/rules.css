@@ -1,0 +1,66 @@
+/*classes*/
+
+.textblock {
+    border: 2px solid white;
+    border-radius: 4px;
+    padding: 4px;
+}
+
+/*page structure*/
+
+body {
+    background: wheat;
+    padding: 0 24px;
+    margin: 0;
+    height: 100vh;
+    color: black;
+    font-family: system-ui;
+}
+
+header {
+    border-bottom: 3px solid white;
+    border-right: 1.5px solid white;
+    border-left: 1.5px solid white;
+    border-radius: 0 0 8px 8px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 8px;
+    font-family: system-ui;
+    box-shadow: 0 5px 5px white;
+}
+
+header:hover {
+    border-color: limegreen;
+    box-shadow: 0 5px 5px limegreen;
+}
+
+header nav {
+    align-self: center;
+}
+
+header a {
+    padding: 4px;
+    color: black;
+    text-decoration: none;
+    border-radius: 0 0 4px 4px;
+    border-bottom: 2px solid white;
+    border-right: 1px solid white;
+    border-left: 1px solid white;
+}
+
+header a:hover {
+    color: limegreen;
+    border-bottom: 2px solid limegreen;
+    border-right: 1px solid limegreen;
+    border-left: 1px solid limegreen;
+}
+
+header #title {
+    font-size: 24px;
+    font-weight: bold;
+}
+
+header #title:hover {
+    color: limegreen;
+}

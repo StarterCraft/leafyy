@@ -1,4 +1,4 @@
-from PyQt5         import QtCore, QtGui, QtWidgets
+from PySide6         import QtCore, QtGui, QtWidgets
 from enum          import Enum
 
 from greenyy       import deepget
@@ -140,7 +140,7 @@ class GreenyySettingsWindow(
                 print(f'98 {item.data(0, 0x100)} {item.data(1, 0x100)}')
                 
                 item.setCheckState(0, (
-                    2 if (deepget(options().ui, f'{component.name}.onLaunch', default = False)) else 0))
+                    QtCore.Qt.CheckState.Checked if (deepget(options().ui, f'{component.name}.onLaunch', default = False)) else QtCore.Qt.CheckState.Unchecked))
                 
             self.treeUi.addTopLevelItem(root)
 
