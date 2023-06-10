@@ -23,29 +23,8 @@
     </header class="block stretcher">
     <div class="block">
         <div class="grandtitle">
-        Правила
+            Журнал
         </div>
-    </div>
-    <div class="block" id="actions">
-        <input type="button" value="Добавить">
-        <input type="button" value="Изменить">
-        <input type="button" value="Удалить">
-    </div>
-    <div class="block" id="view">
-        {% if rules %}
-        <ul>
-            {% for rule in rules %}
-            <li>
-                <div class="rule">
-                    {{rule.name}}
-                </div>
-                {% endfor %}
-                {% else %}
-                Нет правил для отображения.
-                {% endif %}
-            </li>
-        </ul>
-
     </div>
 </body>
 

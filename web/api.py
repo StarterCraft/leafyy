@@ -1,12 +1,36 @@
 from typing  import Annotated
 from glob    import glob
+from stdlib  import fread, fwrite
 
 from fastapi import FastAPI, Request, Form
 from fastapi.templating import Jinja2Templates
 from starlette.templating import _TemplateResponse
 from fastapi.responses import HTMLResponse, PlainTextResponse, Response
 
+from greenyy import hardware as _hardware
+
 from .page import Template
+
+
+DEVICE_CARD_SINGLE = [
+                    {'name': 'COM0', 'status': 'Active', 'description': 'Device 1'}]
+
+DEVICE_CARD_MANY = [ {'name': 'COM0', 'status': 'Active', 'description': 'Device 1'},
+    {'name': 'COM1', 'status': 'Inactive', 'description': 'Device 2'},
+    {'name': 'COM2', 'status': 'Active', 'description': 'Device 3'},
+    {'name': 'COM3', 'status': 'Inactive', 'description': 'Device 4'},
+    {'name': 'COM4', 'status': 'Active', 'description': 'Device 5'},
+    {'name': 'COM5', 'status': 'Inactive', 'description': 'Device 6'},
+    {'name': 'COM6', 'status': 'Active', 'description': 'Device 7'},
+    {'name': 'COM7', 'status': 'Inactive', 'description': 'Device 8'},
+    {'name': 'COM8', 'status': 'Active', 'description': 'Device 9'},
+    {'name': 'COM9', 'status': 'Inactive', 'description': 'Device 10'},
+    {'name': 'COM10', 'status': 'Active', 'description': 'Device 11'},
+    {'name': 'COM11', 'status': 'Inactive', 'description': 'Device 12'},
+    {'name': 'COM12', 'status': 'Active', 'description': 'Device 13'},
+    {'name': 'COM13', 'status': 'Inactive', 'description': 'Device 14'},
+    {'name': 'COM14', 'status': 'Active', 'description': 'Device 15'},
+    {'name': 'COM15', 'status': 'Inactive', 'description': 'Device 16'}]
 
 
 class GreenyyWebApi:
@@ -29,10 +53,21 @@ class GreenyyWebApi:
             self.pages.update({name: Template(self.jinja, f'{name}/{name}.html.jinja')})
 
     def assign(self, service: FastAPI):
+        @service.get('/greenyy.css', response_class = Response)
+        def getGlobalCss():
+            return fread('web/greenyy.css')
+
         @service.get('/{cssId}.css', response_class = Response)
         def getCss(cssId: str):
-            with open(f'web/templates/{cssId}/{cssId}.css') as f:
-                return f.read()
+            return fread(f'web/templates/{cssId}/{cssId}.css')
+
+        @service.get('/greenyy.js', response_class = Response)
+        def getGlobalJs():
+            return fread('web/greenyy.js')
+
+        @service.get('/{scriptId}.js', response_class = Response)
+        def getJs(scriptId: str):
+            return fread(f'web/templates/{scriptId}/{scriptId}.js')
 
         @service.get('/', response_class = HTMLResponse)
         def index(request: Request) -> _TemplateResponse:
@@ -41,17 +76,29 @@ class GreenyyWebApi:
                 btn1counter = self.btn1c,
                 message = self.lr)
         
-        @service.get('/devices', response_class = HTMLResponse)
-        def index(request: Request) -> _TemplateResponse:
-            return self['devices'].render(
-                request)
-                #devices = [{'name': 'COM0', 'status': 'Active', 'description': 'Device 1'}, {'name': 'COM3', 'status': 'Active', 'description': 'Device 2'}])
+        @service.get('/hardware', response_class = HTMLResponse)
+        def hardware(request: Request) -> _TemplateResponse:
+            return self['hardware'].render(
+                request,
+                devices = _hardware().toDict())
         
         @service.get('/rules', response_class = HTMLResponse)
-        def index(request: Request) -> _TemplateResponse:
+        def rules(request: Request) -> _TemplateResponse:
             return self['rules'].render(
                 request)
         
+        @service.get('/log', response_class = HTMLResponse)
+        def log(request: Request) -> _TemplateResponse:
+            return self['log'].render(
+                request
+            )
+        
+        @service.get('/doc', response_class = HTMLResponse)
+        def log(request: Request) -> _TemplateResponse:
+            return self['doc'].render(
+                request
+            )
+
         @service.get('/clickBtn1', response_class = HTMLResponse)
         def onclickBtn1(request: Request) -> _TemplateResponse:
             self.btn1c += 1

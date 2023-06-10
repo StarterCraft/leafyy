@@ -5,21 +5,28 @@
     <title>
         Иваров листочек: домашняя страница
     </title>
-    <link rel="stylesheet" type="text/css" href="index.css">
+    <link rel="stylesheet" type="text/css" href="greenyy.css">
 </head>
 
 <body>
-    <header>
-        <div id="title">
+    <header class="block stretcher">
+        <div class="grandtitle">
             Листочек
         </div>
-        <nav>
-            <a href="/">домой</a>
-            <a href="/rules">правила</a>
-            <a href="/devices">устройства</a>
+        <nav class="actionblock">
+            <a class="action" href="/">домой</a>
+            <a class="action" href="/rules">правила</a>
+            <a class="action" href="/devices">устройства</a>
+            <a class="action" href="/log">консоль</a>
+            <a class="action" href="/doc">справка</a>
         </nav>
-    </header>
-    <p class="block" id="greet">
+    </header class="block stretcher">
+    <div class="block">
+        <div class="grandtitle">
+        Грядки
+        </div>
+    </div>
+    <div class="block" id="greet">
         Hello and welcome to Greenyy Alpha!
         Hello and welcome to Greenyy Alpha!
         Hello and welcome to Greenyy Alpha!
@@ -27,7 +34,7 @@
         Hello and welcome to Greenyy Alpha!
         Hello and welcome to Greenyy Alpha!
         Hello and welcome to Greenyy Alpha!
-    </p>
+    </div>
     
     <div class="block stretcher" id="btn1c">
     {% if btn1counter %}
@@ -39,7 +46,6 @@
             <input type="submit" title="Click Button 1!">
         </form>
     </div>
-    <p>
     <div class="block stretcher", id="msgShower">
     {% if message %}
         Message: {{message}}
@@ -53,7 +59,6 @@
         </form>
     </div>
     </div>
-    </p>
 </body>
 
 </html>

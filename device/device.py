@@ -1,10 +1,10 @@
 #coding=utf-8
 from PySide6 import QtCore, QtWidgets, QtSerialPort
 from collections import deque
-from typing import Union
+from typing import Any, Iterator
 
 from greenyy  import GreenyyComponent
-from greenyy  import ui, options, hardware
+from greenyy  import app, ui, options, hardware
 from logger   import GreenyyLogger
 from device   import GreenyyStatus
 from .message import GreenyyDeviceMessage
@@ -25,7 +25,7 @@ class GreenyyDevice(GreenyyComponent):
         self.desc = kwargs['desc']
         self.isEnabled = kwargs['enabled']
         self.address = kwargs['address']
-        self.tempSensorDef = kwargs['unifiedTempSensor']
+        self.tempSensorDef = kwargs['tempSensor']
         self.plantsDef = kwargs['plants']
 
         self.logWindow = options().logWindowDevices(self.address)
@@ -39,12 +39,6 @@ class GreenyyDevice(GreenyyComponent):
         self.logger.debug(f'Инициализирован порт {self.address}, 9600 бод')
 
         self.messages = deque(maxlen = 64)
-
-        self.liwDevicesItem = QtWidgets.QTreeWidgetItem(
-            ui().settingsWindow.treeDevices, 
-            [self.name,
-             self.status.name,
-             f'Arduino {self.address}'])
         
         if (self.isEnabled):
             self.logger.debug('Пытаюсь запустить устройство в системе')
@@ -62,8 +56,22 @@ class GreenyyDevice(GreenyyComponent):
             except IndexError as e:
                 raise KeyError(f'Грядка {_id} не существует') from e
 
+    def __iter__(self) -> Iterator[Any]:
+        return iter(self.plants)
+
     def __repr__(self) -> str:
         return f'Arduino at {self.address}, baud {self.port.baudRate()}, {self.port.isOpen()}'
+    
+    def toDict(self) -> dict[str, Any]:
+        print(f'device 72')
+        return {
+            'address': self.address,
+            'name': self.name,
+            'desc': self.desc,
+            'enabled': self.isEnabled,
+            'tempSensor': self.tempSensorDef,
+            'plants': [] #none
+        }
 
     @property
     def logWindowVisibility(self):
@@ -91,14 +99,12 @@ class GreenyyDevice(GreenyyComponent):
         if (self.port.isOpen()): 
             self.logger.info(f'Порт {self.address} открыт, 9600 бод')
             self.status = GreenyyStatus.Enabled
-            self.liwDevicesItem.setText(1, self.status.name)
 
         else:
             self.logger.warning(f'Порт {self.address} открыть не удалось')
             self.status = GreenyyStatus.Failed
-            self.liwDevicesItem.setText(1, self.status.name)
 
-    def send(self, data: Union[str, bytearray]) -> int:
+    def send(self, data: str | bytearray) -> int:
         if (isinstance(data, str)):
             return self.port.write(bytearray(data, 'ascii'))
         

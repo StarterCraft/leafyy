@@ -23,10 +23,6 @@ class Greenyy(QtWidgets.QApplication):
         self.options = GreenyyOptions()
         self.log.setGlobalLogLevel(self.options.logLevel)
 
-        self.ui = GreenyyUi()
-        self.ui.setupUi()
-        self.logger.info('Инициализирован интерфейс')
-
         self.web = GreenyyWebServer()
         self.logger.info('Инициализировано ядро веб-сервера')
 
@@ -35,10 +31,8 @@ class Greenyy(QtWidgets.QApplication):
         self.web.start()
 
         self.hardware = GreenyyHardware()
+        self.hardware.startDevices()
         self.logger.info('Инициализированы устройства')
-
-        self.ui.deviceIntegration()
-        self.logger.info('Интеграция устройств в интерфейс проведена')
 
     def show(self):
         self.ui.show()
@@ -50,7 +44,7 @@ class Greenyy(QtWidgets.QApplication):
 def main():
     app = Greenyy(argv)
     #app.show()
-    url('http://127.0.0.1:8000')
+    url('http://127.0.0.1:8000/hardware')
 
     exit(app.exec())
 

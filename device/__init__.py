@@ -2,7 +2,7 @@
 from PySide6 import QtCore, QtSerialPort, QtWidgets
 from json import load, dump
 from enum import Enum
-from typing import Union, Iterator, List
+from typing import Iterator, List, Any
 
 from greenyy import GreenyyComponent
 from greenyy import options
@@ -139,7 +139,7 @@ class GreenyyByteOperations:
 
 from .device import GreenyyDevice
 from .initializer import GreenyyDeviceInitializer
-from .worker import GreenyyDeviceIniitializationWorker
+from .worker import GreenyyDeviceInitializationWorker
 
 
 class GreenyyHardware(GreenyyComponent):
@@ -168,9 +168,13 @@ class GreenyyHardware(GreenyyComponent):
         except IndexError:
             raise KeyError(f'Устройства по адресу {address} не найдено')
         
-    def __iter__(self) -> Iterator:
+    def __iter__(self) -> Iterator[GreenyyDevice]:
         return iter(self.devices)
     
+    def toDict(self) -> list[dict[str, Any]]:
+        print('init 175')
+        return [d.toDict() for d in self]
+
     def add(self, device: GreenyyDevice):
         self.devices.append(device)
 
@@ -178,7 +182,7 @@ class GreenyyHardware(GreenyyComponent):
             f'Устройство по адресу {device.address} зарегистрировано'
         )
 
-    def remove(self, component: Union[GreenyyDevice, str]):
+    def remove(self, component: GreenyyDevice | str):
         if (isinstance(component, GreenyyDevice)):
             self.devices.remove(component)
 
@@ -199,14 +203,10 @@ class GreenyyHardware(GreenyyComponent):
         for deviceData in self.config:
             self.startDevice(deviceData)
 
-        for th in self.threads:
-            self.logger.debug(f'Запуск инициализатора устройства: {th.d["address"]}')
-            th.start()
-
         self.logger.debug('Выход из метода многопоточной инициализации устройств')
 
     def startDevice(self, deviceData: dict):
         self.logger.debug(f'Создание инициализатора устройства: {deviceData["address"]}')
-        ini = GreenyyDeviceIniitializationWorker(deviceData)
-        ini.signals.result.connect(lambda d: self.devices.append(d))
+        ini = GreenyyDeviceInitializationWorker(deviceData)
+        self.logger.debug(f'Запуск инициализатора устройства: {deviceData["address"]}')
         self.pool.start(ini)

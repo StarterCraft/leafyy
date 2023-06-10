@@ -14,11 +14,11 @@ class WorkerSignals(QObject):
     progress = Signal(int)
 
 
-class GreenyyDeviceIniitializationWorker(QtCore.QRunnable):
+class GreenyyDeviceInitializationWorker(QtCore.QRunnable):
     ''' Наследует от QRunnable, настройки рабочего потока обработчика, сигналов и wrap-up. '''
 
     def __init__(self, d):
-        super(GreenyyDeviceIniitializationWorker, self).__init__()
+        super(GreenyyDeviceInitializationWorker, self).__init__()
 
         self.d = d
         self.signals = WorkerSignals()

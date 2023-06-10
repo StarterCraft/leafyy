@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>
+        Иваров листочек: устройства
+    </title>
+    <link rel="stylesheet" type="text/css" href="greenyy.css">
+    <script src="devices.js"></script>
+</head>
+
+<body>
+    <header class="block stretcher" class="block stretcher">
+        <div class="grandtitle">
+            Листочек
+        </div>
+        <nav class="actionblock">
+            <a class="action" href="/">домой</a>
+            <a class="action" href="/rules">правила</a>
+            <a class="action" href="/devices">устройства</a>
+            <a class="action" href="/log">консоль</a>
+            <a class="action" href="/doc">справка</a>
+        </nav>
+    </header class="block stretcher">
+    <div class="block stretcher">
+        <div class="grandtitle">
+            Устройства
+        </div>
+        <a class="action" href="#">добавить</a>
+    </div>
+    <div class="view">
+        {% if devices %}
+        {% for device in devices %}
+        <div class="block card">
+            <div class="stretcher">
+                <div>
+                    {% if device.status is 1 %}
+                    <span class="title positive">
+                    {% elif device.status is -1 %}
+                    <span class="title negative">
+                    {% else %}
+                    <span class="title">
+                    {% endif %}
+                    {{device.name}}</span>
+                    <span class="title code"> @{{device.address}} </span>
+                </div>
+                <div class="actionblock">
+                    <a class="action" href="#">изменить</a>
+                    <a class="action" href="#">удалить</a>
+                </div>
+            </div>
+            <div>
+                <span>Статус: </span>
+                <span>{{device.enabled}}</span>
+                <span>Описание: </span>
+                <span>{{device.desc}}</span>
+            </div>
+        </div>
+        {% endfor %}
+        {% else %}
+        Нет устройств для отображения.
+        {% endif %}
+    </div>
+</body>
+
+</html>
