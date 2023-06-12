@@ -3,7 +3,7 @@ from typing import Union, Iterator, List
 from time import strftime, localtime
 
 from greenyy import options
-from logger.logger import GreenyyLogLevel, GreenyyLogger
+from inspection.logger import GreenyyLogLevel, GreenyyLogger
 
 
 class GreenyyLogging(QtCore.QObject):

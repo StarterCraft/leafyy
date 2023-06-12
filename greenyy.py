@@ -42,7 +42,7 @@ def web() -> FastAPI:
     return app().web
 
 
-from logger.logger import GreenyyLogger
+from inspection.logger import GreenyyLogger
 
 
 class GreenyyDirectDict:

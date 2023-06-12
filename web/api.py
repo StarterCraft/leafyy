@@ -5,11 +5,11 @@ from stdlib  import fread, fwrite
 from fastapi import FastAPI, Request, Form
 from fastapi.templating import Jinja2Templates
 from starlette.templating import _TemplateResponse
-from fastapi.responses import HTMLResponse, PlainTextResponse, Response
+from fastapi.responses import HTMLResponse, FileResponse, Response
 
 from greenyy import hardware as _hardware
 
-from .page import Template
+from .template import Template
 
 
 DEVICE_CARD_SINGLE = [
@@ -36,8 +36,6 @@ DEVICE_CARD_MANY = [ {'name': 'COM0', 'status': 'Active', 'description': 'Device
 class GreenyyWebApi:
     def __init__(self) -> None:
         self.jinja = Jinja2Templates('web/templates')
-        self.btn1c = 0
-        self.lr = ''
 
         self.pages: dict[str, Template] = {}
 
@@ -54,33 +52,39 @@ class GreenyyWebApi:
 
     def assign(self, service: FastAPI):
         @service.get('/greenyy.css', response_class = Response)
-        def getGlobalCss():
+        def getGlobalCss() -> str:
             return fread('web/greenyy.css')
 
         @service.get('/{cssId}.css', response_class = Response)
-        def getCss(cssId: str):
+        def getCss(cssId: str) -> str:
             return fread(f'web/templates/{cssId}/{cssId}.css')
 
         @service.get('/greenyy.js', response_class = Response)
-        def getGlobalJs():
+        def getGlobalJs() -> str:
             return fread('web/greenyy.js')
 
         @service.get('/{scriptId}.js', response_class = Response)
-        def getJs(scriptId: str):
+        def getJs(scriptId: str) -> str:
             return fread(f'web/templates/{scriptId}/{scriptId}.js')
+        
+        @service.get('/site.webmanifest', response_class = Response)
+        def getWebManifest():
+            return fread('web/site.webmanifest')
+        
+        @service.get('/resources/{resourceId}', response_class = FileResponse)
+        def getResource(resourceId: str) -> FileResponse:
+            return f'web/resources/{resourceId}'
 
         @service.get('/', response_class = HTMLResponse)
         def index(request: Request) -> _TemplateResponse:
             return self['index'].render(
-                request,
-                btn1counter = self.btn1c,
-                message = self.lr)
+                request)
         
         @service.get('/hardware', response_class = HTMLResponse)
         def hardware(request: Request) -> _TemplateResponse:
             return self['hardware'].render(
                 request,
-                devices = _hardware().toDict())
+                hardware = _hardware().toDict())
         
         @service.get('/rules', response_class = HTMLResponse)
         def rules(request: Request) -> _TemplateResponse:
@@ -97,26 +101,4 @@ class GreenyyWebApi:
         def log(request: Request) -> _TemplateResponse:
             return self['doc'].render(
                 request
-            )
-
-        @service.get('/clickBtn1', response_class = HTMLResponse)
-        def onclickBtn1(request: Request) -> _TemplateResponse:
-            self.btn1c += 1
-            
-            return self['index'].render(
-                request,
-                btn1counter = self.btn1c,
-                message = self.lr
-            )
-
-        @service.post('/clickBtn2', response_class = HTMLResponse)
-        def onclickBtn2(request: Request, data: Annotated[str, Form()]) -> _TemplateResponse:
-            self.lr = data
-            
-            return self['index'].render(
-                request,
-                btn1counter = self.btn1c,
-                message = self.lr
-            )
-        
-
+            )      

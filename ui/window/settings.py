@@ -3,7 +3,7 @@ from enum          import Enum
 
 from greenyy       import deepget
 from greenyy       import options, ui
-from logger.logger import GreenyyLogger
+from inspection.logger import GreenyyLogger
 
 from ui            import GreenyyUiComponent, GreenyyUiComponentType
 from uidef.window.settings import Ui_SettingsWindow

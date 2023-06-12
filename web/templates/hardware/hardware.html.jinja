@@ -5,55 +5,64 @@
     <title>
         Иваров листочек: устройства
     </title>
+    <link rel="apple-touch-icon" sizes="180x180" href="/resources/apple-touch-icon.png">
+    <link rel="icon" type="image/svg+xml" href="/resources/favicon.svg">
+    <link rel="icon" type="image/png" href="/resources/favicon.png">
+    <link rel="manifest" href="/site.webmanifest">
+    <link rel="mask-icon" href="/resources/safari-pinned-tab.svg" color="#5bbad5">
+    <meta name="msapplication-TileColor" content="#da532c">
+    <meta name="theme-color" content="#fff3b4">
     <link rel="stylesheet" type="text/css" href="greenyy.css">
-    <script src="devices.js"></script>
+    <script src="hardware.js"></script>
 </head>
 
 <body>
-    <header class="block stretcher" class="block stretcher">
-        <div class="grandtitle">
+    <header class="block stretcher">
+        <div class="title grand">
             Листочек
         </div>
         <nav class="actionblock">
             <a class="action" href="/">домой</a>
             <a class="action" href="/rules">правила</a>
-            <a class="action" href="/devices">устройства</a>
+            <a class="action" href="/hardware">устройства</a>
             <a class="action" href="/log">консоль</a>
             <a class="action" href="/doc">справка</a>
         </nav>
     </header class="block stretcher">
     <div class="block stretcher">
-        <div class="grandtitle">
+        <div class="title grand">
             Устройства
+            {% if hardware %}
+            <span class="code"> {{hardware.devices|length}}</span>
+            {% endif %}
         </div>
         <a class="action" href="#">добавить</a>
     </div>
     <div class="view">
-        {% if devices %}
-        {% for device in devices %}
+        {% if hardware.devices %}
+        {% for device in hardware.devices %}
         <div class="block card">
             <div class="stretcher">
                 <div>
-                    {% if device.status is 1 %}
-                    <span class="title positive">
-                    {% elif device.status is -1 %}
-                    <span class="title negative">
-                    {% else %}
-                    <span class="title">
-                    {% endif %}
-                    {{device.name}}</span>
-                    <span class="title code"> @{{device.address}} </span>
+                    {% if device.status == 1 %}
+                    <span class="title larger positive">
+                        {% elif device.status == -1 %}
+                        <span class="title larger negative">
+                            {% else %}
+                            <span class="title larger">
+                                {% endif %}
+                                {{device.name}}
+                            </span>
+                            <span class="title larger code"> @{{device.address}} </span>
                 </div>
                 <div class="actionblock">
                     <a class="action" href="#">изменить</a>
                     <a class="action" href="#">удалить</a>
                 </div>
             </div>
-            <div>
-                <span>Статус: </span>
-                <span>{{device.enabled}}</span>
-                <span>Описание: </span>
-                <span>{{device.desc}}</span>
+            <div class="vertical">
+                <p>{{device.desc}}</p>
+                <span class="title"></span>
             </div>
         </div>
         {% endfor %}

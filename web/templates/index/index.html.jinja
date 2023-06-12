@@ -5,59 +5,70 @@
     <title>
         Иваров листочек: домашняя страница
     </title>
+    <link rel="apple-touch-icon" sizes="180x180" href="/resources/apple-touch-icon.png">
+    <link rel="icon" type="image/svg+xml" href="/resources/favicon.svg">
+    <link rel="icon" type="image/png" href="/resources/favicon.png">
+    <link rel="manifest" href="/site.webmanifest">
+    <link rel="mask-icon" href="/resources/safari-pinned-tab.svg" color="#5bbad5">
+    <meta name="msapplication-TileColor" content="#da532c">
+    <meta name="theme-color" content="#fff3b4">
     <link rel="stylesheet" type="text/css" href="greenyy.css">
 </head>
 
 <body>
     <header class="block stretcher">
-        <div class="grandtitle">
+        <div class="title grand">
             Листочек
         </div>
         <nav class="actionblock">
             <a class="action" href="/">домой</a>
             <a class="action" href="/rules">правила</a>
-            <a class="action" href="/devices">устройства</a>
+            <a class="action" href="/hardware">устройства</a>
             <a class="action" href="/log">консоль</a>
             <a class="action" href="/doc">справка</a>
         </nav>
     </header class="block stretcher">
     <div class="block">
-        <div class="grandtitle">
-        Грядки
+    <span>
+    Добро пожаловать в центр управления системы "Иваров листочек".
+    Здесь можно контролировать состояние грядок, оборудования и правил.
+    Загляните в <a href="/doc">документацию</a>, если вы открыли это и
+    ничего не понятно.
+    </span>
+    </div>
+    <div class="block vertical">
+    <span class="title">
+    Состояние устройств:
+    </span>
+    <span class="code">
+    {% if hardware %}
+    Устройств: {{hardware.count.total}},
+    активны: {{hardware.count.active}}, 
+    ошибка: {{hardware.count.failed}}, 
+    отключены: {{hardware.count.disabled}}
+    {% else %}
+    Устройства не инициализированы.
+    {% endif %}
+    </span>
+    <span class="title">
+    Ошибки:
+    </span>
+    <div class="code log">
+    {% if errors %}
+    {% for error in errors %}
+    <div class="log-message">
+    {{error}}
+    </div>
+    {% endfor %}
+    {% else %}
+    Ошибок в системе не выявлялось.
+    {% endif %}
+    </div>
+    </div>
+    <div class="block">
+        <div class="title grand">
+            Грядки
         </div>
-    </div>
-    <div class="block" id="greet">
-        Hello and welcome to Greenyy Alpha!
-        Hello and welcome to Greenyy Alpha!
-        Hello and welcome to Greenyy Alpha!
-        Hello and welcome to Greenyy Alpha!
-        Hello and welcome to Greenyy Alpha!
-        Hello and welcome to Greenyy Alpha!
-        Hello and welcome to Greenyy Alpha!
-    </div>
-    
-    <div class="block stretcher" id="btn1c">
-    {% if btn1counter %}
-        Button 1: {{btn1counter}} times clicked!
-    {% else %}
-        Button 1 counter not initialized.
-    {% endif %}
-        <form action="/clickBtn1">
-            <input type="submit" title="Click Button 1!">
-        </form>
-    </div>
-    <div class="block stretcher", id="msgShower">
-    {% if message %}
-        Message: {{message}}
-    {% else %}
-        Message shower not initialized.
-    {% endif %}
-    <div id="btn2">
-        <form action="/clickBtn2" method="post">
-            <input type="text" name="data" />
-            <input type="submit" />
-        </form>
-    </div>
     </div>
 </body>
 

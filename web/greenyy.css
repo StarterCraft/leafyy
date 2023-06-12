@@ -3,7 +3,7 @@
 :root {
     --color-grand-major: #fff3b4;
     --color-grand-minor: #ffffff;
-    --color-grand-highlight: #faad06;
+    --color-grand-highlight: #f4a700;
     --color-accent-major: #ffaf94;
     --color-accent-minor: #fffab6;
     --color-accent-highlight: #1cd000;
@@ -21,8 +21,8 @@
 
 .block {
     display: flex;
-    flex-direction: row;
     justify-content: flex-start;
+    gap: 4px;
     background-color: var(--color-grand-minor);
     border-top: 1.5px solid black;
     border-bottom: 3px solid black;
@@ -37,26 +37,34 @@
     box-shadow: 0 2px 2px var(--color-accent-highlight);
 }
 
+.vertical {
+    flex-direction: column;
+}
+
+.horizontal {
+    flex-direction: row;
+}
+
 .stretcher {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
 }
 
-.title {
+.larger {
     font-size: larger;
 }
 
-.grandtitle {
+.grand {
     font-size: x-large;
 }
 
-.title, .grandtitle {
+.title {
     font-weight: bold;
     cursor: default;
 }
-    
-.title:hover, .grandtitle:hover {
+
+.title:hover {
     color: var(--color-accent-highlight);
 }
 
@@ -74,6 +82,20 @@
     display: block;
     width: auto;
     min-width: fit-content;
+}
+
+/* Scrollable/log div */
+.log {
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+/* Log messages */
+.log-message {
+    display: block;
+    padding: 10px;
+    white-space: pre-wrap;
+    /* Enable word wrap */
 }
 
 .action {
@@ -134,4 +156,12 @@ header.block {
     border-left: 1.5px solid black;
     border-top-left-radius: 0px;
     border-top-right-radius: 0px;
+}
+
+a {
+    color: var(--color-accent-highlight);
+}
+
+a:hover {
+    color: var(--color-grand-highlight);
 }

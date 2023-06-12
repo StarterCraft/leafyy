@@ -3,13 +3,13 @@ from sys    import argv, exit
 from webbrowser import open as url
 
 
-from logger        import GreenyyLogging
-from logger.logger import GreenyyLogger
-from options       import GreenyyOptions
-from ui            import GreenyyUi
-from device        import GreenyyHardware
-from web           import GreenyyWebServer
-from web.api       import GreenyyWebApi
+from inspection        import GreenyyLogging
+from inspection.logger import GreenyyLogger
+from options           import GreenyyOptions
+from ui                import GreenyyUi
+from hardware          import GreenyyHardware
+from web               import GreenyyWebServer
+from web.api           import GreenyyWebApi
 
 
 class Greenyy(QtWidgets.QApplication):
@@ -19,6 +19,8 @@ class Greenyy(QtWidgets.QApplication):
 
         self.log = GreenyyLogging()
         self.logger = GreenyyLogger('App')
+
+        self.errors = GreenyyErrorStack()
 
         self.options = GreenyyOptions()
         self.log.setGlobalLogLevel(self.options.logLevel)
@@ -33,8 +35,6 @@ class Greenyy(QtWidgets.QApplication):
         self.hardware = GreenyyHardware()
         self.hardware.startDevices()
         self.logger.info('Инициализированы устройства')
-
-    def show(self):
         self.ui.show()
 
         if (not self.ui.isVisible()):
@@ -43,8 +43,7 @@ class Greenyy(QtWidgets.QApplication):
 
 def main():
     app = Greenyy(argv)
-    #app.show()
-    url('http://127.0.0.1:8000/hardware')
+    url('http://127.0.0.1:8000/')
 
     exit(app.exec())
 

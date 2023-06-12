@@ -6,13 +6,13 @@ from typing import Iterator, List, Any
 
 from greenyy import GreenyyComponent
 from greenyy import options
-from logger import GreenyyLogger
+from inspection import GreenyyLogger
 
 
 class GreenyyStatus(Enum):
     Failed = -1
     Disabled = 0
-    Enabled = 1
+    Active = 1
     
     
 class GreenyyByteOperations:
@@ -171,9 +171,19 @@ class GreenyyHardware(GreenyyComponent):
     def __iter__(self) -> Iterator[GreenyyDevice]:
         return iter(self.devices)
     
-    def toDict(self) -> list[dict[str, Any]]:
-        print('init 175')
-        return [d.toDict() for d in self]
+    def __len__(self) -> int:
+        return len(self.devices)
+    
+    def toDict(self) -> dict[str, Any]:
+        return {
+            'count': {
+                'total': len(self),
+                'active': len([1 for d in self if d.status == 1]),
+                'disabled': len([1 for d in self if d.status == 0]),
+                'failed': len([1 for d in self if d.status == -1])
+            },
+            'devices': [d.toDict() for d in self]
+        }
 
     def add(self, device: GreenyyDevice):
         self.devices.append(device)

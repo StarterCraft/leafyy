@@ -167,8 +167,8 @@ class GreenyyLogger:
         self.logLevel = logLevel
         self.Logger.setLevel(logLevel.value)
 
-    def publishToLogWindow(self, message: str):
-        'Отправить сообщение в LogWindow'
+    def toStack(self, message: str):
+        'Отправить сообщение куда-то'
         if (self.logWindow):
             try:
                 ui().logWindow.txtLogDisplay.append(message)
@@ -226,7 +226,7 @@ class GreenyyLogger:
         if self.logLevel == GreenyyLogLevel.DEBUG and not self.printDsb:
             print(f'[{Fore.GREEN}{self.name}{Style.RESET_ALL}@{Fore.YELLOW}DEBUG{Style.RESET_ALL}]: {message}')
 
-        self.publishToLogWindow(
+        self.toStack(
             f'<span style="color:gray">{datetime.now().strftime(f"%m.%d %H:%M:%S.%f")}</span> '
             f'[<span style="color:green">{self.name}</span>'
             f'@<span style="color:darkgray">DEBUG</span>]: {message}')
@@ -268,7 +268,7 @@ class GreenyyLogger:
         if self.logLevel <= GreenyyLogLevel.INFO and not self.printDsb:
             print(f'[{Fore.GREEN}{self.name}{Style.RESET_ALL}@{Fore.YELLOW}INFO{Style.RESET_ALL}]: {message}')
 
-        self.publishToLogWindow(
+        self.toStack(
             f'<span style="color:gray">{datetime.now().strftime(f"%m.%d %H:%M:%S.%f")}</span> '
             f'[<span style="color:green">{self.name}</span>'
             f'@<span style="color:blue">INFO</span>]: {message}')
@@ -310,7 +310,7 @@ class GreenyyLogger:
         if self.logLevel <= GreenyyLogLevel.WARNING and not self.printDsb:
             print(f'[{Fore.GREEN}{self.name}{Style.RESET_ALL}@{Fore.YELLOW}WARN{Style.RESET_ALL}]: {message}')
 
-        self.publishToLogWindow(
+        self.toStack(
             f'<span style="color:gray">{datetime.now().strftime(f"%m.%d %H:%M:%S.%f")}</span> '
             f'[<span style="color:green">{self.name}</span>'
             f'@<span style="color:orange">WARN</span>]: {message}')
@@ -352,7 +352,7 @@ class GreenyyLogger:
         if self.logLevel <= GreenyyLogLevel.ERROR and not self.printDsb:
             print(f'[{Fore.GREEN}{self.name}{Style.RESET_ALL}@{Fore.YELLOW}ERROR{Style.RESET_ALL}]: {message}')
 
-        self.publishToLogWindow(
+        self.toStack(
             f'<span style="color:gray">{datetime.now().strftime(f"%m.%d %H:%M:%S.%f")}</span> '
             f'[<span style="color:green">{self.name}</span>'
             f'@<span style="color:red">ERROR</span>]: {message}')
@@ -394,7 +394,7 @@ class GreenyyLogger:
         if self.logLevel <= GreenyyLogLevel.CRITICAL and not self.printDsb:
             print(f'[{Fore.GREEN}{self.name}{Style.RESET_ALL}@{Fore.YELLOW}CRITICAL{Style.RESET_ALL}]: {message}')
 
-        self.publishToLogWindow(
+        self.toStack(
             f'<span style="color:gray">{datetime.now().strftime(f"%m.%d %H:%M:%S.%f")}</span> '
             f'[<span style="color:green">{self.name}</span>'
             f'@<span style="color:magenta">CRITICAL</span>]: {message}')
@@ -413,7 +413,7 @@ class GreenyyLogger:
         self.Logger.exception(f'Программа аварийно завершила работу из-за исклоючения {type(_exception)}:',
                                 exc_info = _exception)
         
-        self.publishToLogWindow(
+        self.toStack(
             f'<span style="color:gray">{datetime.now().strftime(f"%m.%d %H:%M:%S.%f")}</span> '
             f'[<span style="color:green">{self.name}</span>'
             f'@<span style="color:brown">EXCEPTION</span>]: '

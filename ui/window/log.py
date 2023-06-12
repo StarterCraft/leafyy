@@ -6,7 +6,7 @@ from enum     import Enum
 
 from greenyy  import log
 from greenyy  import ui, options, hardware
-from logger   import GreenyyLogger, GreenyyLogLevel
+from inspection   import GreenyyLogger, GreenyyLogLevel
 
 from ui       import GreenyyUiComponent, GreenyyUiComponentType
 from uidef.window.log import Ui_LogWindow

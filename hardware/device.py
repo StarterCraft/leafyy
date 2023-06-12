@@ -5,8 +5,8 @@ from typing import Any, Iterator
 
 from greenyy  import GreenyyComponent
 from greenyy  import app, ui, options, hardware
-from logger   import GreenyyLogger
-from device   import GreenyyStatus
+from inspection   import GreenyyLogger
+from hardware   import GreenyyStatus
 from .message import GreenyyDeviceMessage
 
 
@@ -63,12 +63,11 @@ class GreenyyDevice(GreenyyComponent):
         return f'Arduino at {self.address}, baud {self.port.baudRate()}, {self.port.isOpen()}'
     
     def toDict(self) -> dict[str, Any]:
-        print(f'device 72')
         return {
             'address': self.address,
             'name': self.name,
             'desc': self.desc,
-            'enabled': self.isEnabled,
+            'status': self.status.value,
             'tempSensor': self.tempSensorDef,
             'plants': [] #none
         }
