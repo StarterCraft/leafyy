@@ -3,7 +3,7 @@
 
 <head>
     <title>
-        Листочек: правила
+        Листочек: просмотр файла журнала
     </title>
     <link rel="apple-touch-icon" sizes="180x180" href="/resources/apple-touch-icon.png">
     <link rel="icon" type="image/svg+xml" href="/resources/favicon.svg">
@@ -28,11 +28,35 @@
             <a class="action" href="/doc">справка</a>
         </nav>
     </header class="block stretcher">
-    <div class="block">
+    <div class="block stretcher">
         <div class="title grand">
-            Документация
+            Просмотр файла журнала
+            <span class="code"> 
+            {% if logFile %}
+            {{logFile.name}} ({{logFile.size}} Кб)
+            {% endif %}
+            </span>
         </div>
+        <nav class="actionblock">
+            {% if logFile %}
+            <a class="action" href="/log/{{logFile.name}}">скачать</a>
+            {% endif %}
+            <a class="action" href="/log/view">к списку</a>
+        </nav>
     </div>
+    {% if logFile %}
+    <div class="block code log-view vertical">
+        {% for line in logFile.lines %}
+        <div class="log-message">
+            {{line|safe}}
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="block">
+    Нет файлов для отображения.
+    </div>
+    {% endif %}
 </body>
 
 </html>

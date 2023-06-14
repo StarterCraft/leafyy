@@ -3,7 +3,7 @@
 
 <head>
     <title>
-        Иваров листочек: домашняя страница
+        Листочек: домашняя страница
     </title>
     <link rel="apple-touch-icon" sizes="180x180" href="/resources/apple-touch-icon.png">
     <link rel="icon" type="image/svg+xml" href="/resources/favicon.svg">
@@ -12,7 +12,7 @@
     <link rel="mask-icon" href="/resources/safari-pinned-tab.svg" color="#5bbad5">
     <meta name="msapplication-TileColor" content="#da532c">
     <meta name="theme-color" content="#fff3b4">
-    <link rel="stylesheet" type="text/css" href="greenyy.css">
+    <link rel="stylesheet" type="text/css" href="/leafyy.css">
 </head>
 
 <body>
@@ -29,46 +29,57 @@
         </nav>
     </header class="block stretcher">
     <div class="block">
-    <span>
-    Добро пожаловать в центр управления системы "Иваров листочек".
-    Здесь можно контролировать состояние грядок, оборудования и правил.
-    Загляните в <a href="/doc">документацию</a>, если вы открыли это и
-    ничего не понятно.
-    </span>
+        <span>
+            Добро пожаловать в центр управления системы "Листочек".
+            Здесь можно контролировать состояние грядок, оборудования и правил.
+            Загляните в <a href="/doc">документацию</a>, если вы открыли это и
+            ничего не понятно.
+        </span>
     </div>
     <div class="block vertical">
-    <span class="title">
-    Состояние устройств:
-    </span>
-    <span class="code">
-    {% if hardware %}
-    Устройств: {{hardware.count.total}},
-    активны: {{hardware.count.active}}, 
-    ошибка: {{hardware.count.failed}}, 
-    отключены: {{hardware.count.disabled}}
-    {% else %}
-    Устройства не инициализированы.
-    {% endif %}
-    </span>
-    <span class="title">
-    Ошибки:
-    </span>
-    <div class="code log">
-    {% if errors %}
-    {% for error in errors %}
-    <div class="log-message">
-    {{error}}
-    </div>
-    {% endfor %}
-    {% else %}
-    Ошибок в системе не выявлялось.
-    {% endif %}
-    </div>
+        <span class="title">
+            Состояние устройств:
+        </span>
+        <span class="code">
+            {% if hardware %}
+            Устройств: {{hardware.count.total}},
+            активны: {{hardware.count.active}},
+            ошибка: {{hardware.count.failed}},
+            отключены: {{hardware.count.disabled}}
+            {% else %}
+            Устройства не инициализированы.
+            {% endif %}
+        </span>
+        <span class="title">
+            Ошибки:
+        </span>
+        <div class="code log">
+            {% if errors %}
+            {% for error in errors %}
+            <div class="log-message">
+                {{error}}
+            </div>
+            {% endfor %}
+            {% else %}
+            Ошибок в системе не выявлялось.
+            {% endif %}
+        </div>
     </div>
     <div class="block">
         <div class="title grand">
             Грядки
+            <span class="code">
+                {% if plants %}
+                {{plants|length}}
+                {% else %}
+                0
+                {% endif %}
+            </span>
         </div>
+    </div>
+    <div class="view horizontal">
+    <!-- заглушка -->
+    Нет грядок для отображения.
     </div>
 </body>
 

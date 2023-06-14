@@ -1,19 +1,19 @@
 from PySide6   import QtCore, QtGui, QtWidgets
 
-from greenyy import ui, options
+from leafyy import ui, options
 
-from ui      import GreenyyUiComponent, GreenyyUiComponentType
+from ui      import LeafyyUiComponent, LeafyyUiComponentType
 from uidef.window.general import Ui_GeneralWindow
 
 
-class GreenyyGeneralWindow(
-    GreenyyUiComponent,
+class LeafyyGeneralWindow(
+    LeafyyUiComponent,
     QtWidgets.QMainWindow, 
     Ui_GeneralWindow):
     def __init__(self):
         super().__init__(
             'generalWindow',
-            GreenyyUiComponentType.Window,
+            LeafyyUiComponentType.Window,
             displayName = 'Основное окно'
         )
         

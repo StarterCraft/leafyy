@@ -3,14 +3,14 @@
 
 from PySide6 import QtCore, QtSerialPort
 from PySide6.QtCore import Signal, QObject
-from .device import GreenyyDevice
+from .device import LeafyyDevice
 import sys
 import traceback
 
 
-class GreenyyDeviceInitializer(QtCore.QThread):
+class LeafyyDeviceInitializer(QtCore.QThread):
     error = QtCore.Signal(tuple)
-    initialized = QtCore.Signal(GreenyyDevice)
+    initialized = QtCore.Signal(LeafyyDevice)
     #STACKOVERFLOW: https://stackoverflow.com/a/6789205/13677671
     #STACKOVERFLOW: https://ru.stackoverflow.com/a/840447/397716
 
@@ -21,7 +21,7 @@ class GreenyyDeviceInitializer(QtCore.QThread):
 
     def run(self):
         try:
-            result = GreenyyDevice(**self.data)
+            result = LeafyyDevice(**self.data)
         except:
             traceback.print_exc()
             exctype, value = sys.exc_info()[:2]

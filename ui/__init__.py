@@ -5,12 +5,12 @@ from typing   import Any, List, Dict, Tuple, Iterator, Union
 from json     import load
 from glob     import glob
 
-from greenyy      import GreenyyComponent, GreenyyDirectDict
-from greenyy      import deepget
-from greenyy      import app, ui, options, hardware
+from leafyy      import LeafyyComponent, LeafyyDirectDict
+from leafyy      import deepget
+from leafyy      import app, ui, options, hardware
 
 
-class GreenyyUiTheme(GreenyyDirectDict):
+class LeafyyUiTheme(LeafyyDirectDict):
     'Тема интерфейса.'
     def __init__(self, name) -> None:
         super().__init__({'name': name})
@@ -44,18 +44,18 @@ class GreenyyUiTheme(GreenyyDirectDict):
                 self.update({targetName: f.read()})
 
 
-class GreenyyUiComponentType(Enum):
+class LeafyyUiComponentType(Enum):
     Window = 2
     Dialog = 1
     Widget = 0
 
 
-class GreenyyUiComponent(GreenyyComponent):
+class LeafyyUiComponent(LeafyyComponent):
     'Создание униформизма между всеми компонентами интерфейса.'
     def __init__(
             self,
             name: str,
-            cmType: GreenyyUiComponentType,
+            cmType: LeafyyUiComponentType,
             *args,
             displayName: str = '',
             loggerName: str = '',
@@ -111,37 +111,37 @@ class GreenyyUiComponent(GreenyyComponent):
         return super().isVisible()
 
 
-from .window.general          import GreenyyGeneralWindow
-from .window.log              import GreenyyLogWindow
-from .window.settings         import GreenyySettingsWindow
+from .window.general          import LeafyyGeneralWindow
+from .window.log              import LeafyyLogWindow
+from .window.settings         import LeafyySettingsWindow
 
-from .dialog.deviceProperties import GreenyyDeviceDialog
-from .dialog.plantProperties  import GreenyyPlantDialog
-from .dialog.ruleItem         import GreenyyRuleItemDialog
-from .dialog.ruleProperties   import GreenyyRuleDialog
+from .dialog.deviceProperties import LeafyyDeviceDialog
+from .dialog.plantProperties  import LeafyyPlantDialog
+from .dialog.ruleItem         import LeafyyRuleItemDialog
+from .dialog.ruleProperties   import LeafyyRuleDialog
 
-from .widget.plantWidget      import GreenyyPlantWidget
+from .widget.plantWidget      import LeafyyPlantWidget
 
 
-class GreenyyUi(GreenyyComponent):
+class LeafyyUi(LeafyyComponent):
     def __init__(self) -> None:
         super().__init__('ui')
 
-        self.components: List[GreenyyUiComponent] = []
+        self.components: List[LeafyyUiComponent] = []
 
-    def __getitem__(self, name: str) -> GreenyyUiComponent:
+    def __getitem__(self, name: str) -> LeafyyUiComponent:
         try:
             return [c for c in self.components if (c.name == name)][0]
         except IndexError:
             raise KeyError(f'Компонент GUI {name} не найден или не зарегистрирован')
 
-    def __iter__(self) -> Iterator[GreenyyUiComponent]:
+    def __iter__(self) -> Iterator[LeafyyUiComponent]:
         return iter(self.components)
 
     def setupUi(self):
-        GreenyyGeneralWindow()
-        GreenyySettingsWindow()
-        GreenyyLogWindow()
+        LeafyyGeneralWindow()
+        LeafyySettingsWindow()
+        LeafyyLogWindow()
 
         for c in self: 
             self.logger.debug(f'{c.name} size: {c.size()}')
@@ -188,7 +188,7 @@ class GreenyyUi(GreenyyComponent):
             if (component.name in options().ui.keys()):
                 self.showComponent(component)
 
-    def showComponent(self, component: GreenyyUiComponent):
+    def showComponent(self, component: LeafyyUiComponent):
         if (options().ui[component.name].get('onLaunch', False)):
             component.show()
 
@@ -196,7 +196,7 @@ class GreenyyUi(GreenyyComponent):
                 f'Компонент {component.name} отображён согласно настройкам'
             )
 
-    def add(self, component: GreenyyUiComponent):
+    def add(self, component: LeafyyUiComponent):
         self.components.append(component)
         setattr(self, component.name, component)
 
@@ -204,8 +204,8 @@ class GreenyyUi(GreenyyComponent):
             f'Компонент {component.name} зарегистрирован'
         )
 
-    def remove(self, component: Union[GreenyyUiComponent, str]):
-        if (isinstance(component, GreenyyUiComponent)):
+    def remove(self, component: Union[LeafyyUiComponent, str]):
+        if (isinstance(component, LeafyyUiComponent)):
             self.components.remove(component)
             delattr(self, component.name)
 
@@ -250,11 +250,11 @@ class GreenyyUi(GreenyyComponent):
             d.port.readyRead.connect(lambda: self.logWindow.writeDeviceMessage(d))
     
     def loadThemes(self):
-        self.themes: List[GreenyyUiTheme] = []
+        self.themes: List[LeafyyUiTheme] = []
 
         for themePath in glob('theme/*'):
             themeName = themePath.split('\\')[-1]
-            theme = GreenyyUiTheme(themeName)
+            theme = LeafyyUiTheme(themeName)
             self.themes.append(theme)
 
             self.logger.debug(
@@ -262,7 +262,7 @@ class GreenyyUi(GreenyyComponent):
                 f'{len(theme.componentList)} QSS)'
             )
 
-    def getTheme(self, name: str) -> GreenyyUiTheme:
+    def getTheme(self, name: str) -> LeafyyUiTheme:
         return [t for t in self.themes if (t.name == name)][0]
 
     def themize(self, theme: str = ''):
@@ -284,7 +284,7 @@ class GreenyyUi(GreenyyComponent):
         self.logger.debug(f'Тема {appTheme.name}: установлен глобальный QSS длиной {len(appQss)}')
         self.logger.debug(f'Тема {appTheme.name}: установлен глобальный QStyle {appTheme.style}')
 
-    def themizeComponent(self, c: GreenyyUiComponent, theme: str = ''):
+    def themizeComponent(self, c: LeafyyUiComponent, theme: str = ''):
         theme = self.getTheme(
             theme if theme else deepget(options().ui, f'{c.name}.theme', 'default')
         )

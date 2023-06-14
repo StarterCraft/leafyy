@@ -1,52 +1,121 @@
 from PySide6 import QtCore, QtWidgets
 from typing import Union, Iterator, List
 from time import strftime, localtime
+from glob import glob
+from os.path import getsize, sep
+from stdlib import fread
 
-from greenyy import options
-from inspection.logger import GreenyyLogLevel, GreenyyLogger
+from leafyy import options
+from inspection.logger import LeafyyLogLevel, LeafyyLogger
 
 
-class GreenyyLogging(QtCore.QObject):
-
-
+class LeafyyLogging(QtCore.QObject):
     def __init__(self) -> None:
         super().__init__()
 
-        self.fileName = f'logs/Greenyy_{strftime("""%d.%m.%Y_%H%M%S""", localtime())}.log'
+        self.fileName = f'logs/Leafyy_{strftime("""%d.%m.%Y_%H%M%S""", localtime())}.log'
 
-        self.loggers: List[GreenyyLogger] = []
-        self.globalLevel = GreenyyLogLevel.DEBUG
+        self.loggers: List[LeafyyLogger] = []
+        self.globalLevel = LeafyyLogLevel.DEBUG
         
-    def __getitem__(self, name: str) -> GreenyyLogger:
+    def __getitem__(self, name: str) -> LeafyyLogger:
         try:
             return [l for l in self.loggers if (l.name == name)][0]
         except IndexError:
             raise KeyError(f'Канала журналирования {name} не найдено', name)
         
-    def __iter__(self) -> Iterator[GreenyyLogger]:
+    def __iter__(self) -> Iterator[LeafyyLogger]:
         return iter(self.loggers)
 
-    def add(self, logger: GreenyyLogger):
+    def add(self, logger: LeafyyLogger):
         self.loggers.append(logger)
 
-    def remove(self, logger: Union[GreenyyLogger, str]):
-        if (isinstance(logger, GreenyyLogger)):
+    def remove(self, logger: Union[LeafyyLogger, str]):
+        if (isinstance(logger, LeafyyLogger)):
             self.loggers.remove(logger)
 
         if (isinstance(logger, str)):
             self.loggers.remove(
                 [l for l in self if (l.name == logger)][0])
 
-    def setGlobalLogLevel(self, level: Union[GreenyyLogLevel, str, int]):
-        lvl = GreenyyLogLevel.DEBUG
+    def setGlobalLogLevel(self, level: Union[LeafyyLogLevel, str, int]):
+        lvl = LeafyyLogLevel.DEBUG
 
         if (isinstance(level, str)):
-            lvl = GreenyyLogLevel[level]
+            lvl = LeafyyLogLevel[level]
 
-        if (isinstance(level, GreenyyLogLevel) or isinstance(level, int)):
-            lvl = GreenyyLogLevel(level)
+        if (isinstance(level, LeafyyLogLevel) or isinstance(level, int)):
+            lvl = LeafyyLogLevel(level)
 
         self.globalLevel = lvl
 
         for logger in self:
             logger.setLogLevel(lvl)
+
+    def logFolderSummary(self, reversed) -> list[dict[str, str]]:
+        data = [
+            {'name': fileName.split(sep)[-1],
+             'size': f'{(getsize(fileName) / 1000):.2f}',
+            } 
+            for fileName in glob('logs/*.log')]
+        
+        if (reversed):
+            data = data[::-1]
+
+        return data
+    
+    def formatLog(self, log: list[str]) -> list[str]:
+        logs = []
+        for line in log:
+            #Найти последнее двоеточие
+            lastColonIndex = line.index(']:') + 1
+            message = line[lastColonIndex:]
+            dataChunks = line[:lastColonIndex].split()
+
+            #Для обычного сообщения журнала разделители ниже:
+            #Дата и время сообщения журнала
+            dateTimeChunk = f'{dataChunks[0]} {dataChunks[1]}'
+            dateTimeChunk = '{<span style="text-decoration: underline;">%s</span>}' % dateTimeChunk[1:-1]
+
+            #Канал и уровень журналирования
+            loggerInfoChunk = f'[<span style="color: green;">{dataChunks[2][1:].split("@")[0]}</span>:'
+            
+            loggerLvl = dataChunks[2][:-1].split('@')[1]
+            lvlColor = ''
+            match loggerLvl:
+                case 'DEBUG': lvlColor = 'green'
+                case 'INFO': lvlColor = 'blue'
+                case 'WARNING': lvlColor = 'orange'
+                case _: lvlColor = 'red'
+
+            loggerInfoChunk += f'<span style="color: {lvlColor};">{dataChunks[2][:-1].split("@")[1]}</span>]'
+
+            #Источник сообщения, вплоть до строки кода
+            sourceChunk = f'[<span style="color: blue;">{dataChunks[3][1:]}</span> '
+            sourceChunk += f'{dataChunks[4]}'
+
+            #Собираем всё
+            completeLine = ' '.join((dateTimeChunk, loggerInfoChunk, sourceChunk))
+            completeLine += message
+
+            #Отправляем в сборщик
+            logs.append(completeLine)
+
+        return logs
+
+    def logFile(self, name: str, html: bool = False) -> dict[str, str | list[str]]:
+        data = {
+            'name': name,
+            'size': f'{(getsize(f"logs/{name}") / 1000):.2f}'
+        }
+
+        if (html):
+            initial = fread(f'logs/{name}', encoding = 'utf-8').splitlines()
+            decorated = self.formatLog(initial)
+            data.update(lines = decorated)
+
+        else:
+            data.update(lines = fread(f'logs/{name}', encoding = 'utf-8').splitlines())
+                
+        return data
+        

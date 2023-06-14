@@ -4,27 +4,27 @@ from datetime import datetime
 from logging  import getLevelName
 from enum     import Enum
 
-from greenyy  import log
-from greenyy  import ui, options, hardware
-from inspection   import GreenyyLogger, GreenyyLogLevel
+from leafyy  import log
+from leafyy  import ui, options, hardware
+from inspection   import LeafyyLogger, LeafyyLogLevel
 
-from ui       import GreenyyUiComponent, GreenyyUiComponentType
+from ui       import LeafyyUiComponent, LeafyyUiComponentType
 from uidef.window.log import Ui_LogWindow
 
 
-class GreenyyLogWindowSource(Enum):
+class LeafyyLogWindowSource(Enum):
     Logger = 0
     Device = 1
 
 
-class GreenyyLogWindow(
-    GreenyyUiComponent, 
+class LeafyyLogWindow(
+    LeafyyUiComponent, 
     QtWidgets.QMainWindow,
     Ui_LogWindow):
     def __init__(self):
         super().__init__(
             'logWindow',
-            GreenyyUiComponentType.Window,
+            LeafyyUiComponentType.Window,
             displayName = 'Журнал'
         )
 
@@ -37,7 +37,7 @@ class GreenyyLogWindow(
         self.logLevelActions = QtGui.QActionGroup(self)
         self.logLevelActions.setExclusive(True)
 
-        for level, action in zip(GreenyyLogLevel, [
+        for level, action in zip(LeafyyLogLevel, [
             self.meiLogLvlDEBUG, self.meiLogLvlINFO,
             self.meiLogLvlWARNING, self.meiLogLvlERROR,
             self.meiLogLvlCRITICAL

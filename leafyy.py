@@ -42,10 +42,10 @@ def web() -> FastAPI:
     return app().web
 
 
-from inspection.logger import GreenyyLogger
+from inspection.logger import LeafyyLogger
 
 
-class GreenyyDirectDict:
+class LeafyyDirectDict:
     __reserved__ = [
         'keys',
         'get',
@@ -94,7 +94,7 @@ class GreenyyDirectDict:
         )}
 
 
-class GreenyyComponent(object):
+class LeafyyComponent(object):
     '''
     Класс для большого количества похожих
     друг на друга объектов, имеющих общие атрибуты имени и логгера.
@@ -110,7 +110,7 @@ class GreenyyComponent(object):
         super().__init__(*args, **kwargs) #устранение ошибки инициализации
         self.name = name
         self.displayName = displayName
-        self.logger = GreenyyLogger(
+        self.logger = LeafyyLogger(
             loggerName if loggerName else
             f'{name[0].capitalize()}{name[1:]}'
         )

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'g:\Work\Code\greenyy\uisrc\window\general.ui'
+# Form implementation generated from reading ui file 'g:\Work\Code\leafyy\uisrc\window\general.ui'
 #
 # Created by: PySide6 UI code generator 5.15.2
 #
@@ -70,7 +70,7 @@ class Ui_GeneralWindow(object):
 
     def retranslateUi(self, GeneralWindow):
         _translate = QtCore.QCoreApplication.translate
-        GeneralWindow.setWindowTitle(_translate("GeneralWindow", "Иваров листочек"))
+        GeneralWindow.setWindowTitle(_translate("GeneralWindow", "Листочек"))
         self.meiWindow.setTitle(_translate("GeneralWindow", "Окно"))
         self.meiSettings.setTitle(_translate("GeneralWindow", "Настройки"))
         self.menuView.setTitle(_translate("GeneralWindow", "Вид"))

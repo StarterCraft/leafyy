@@ -2,11 +2,11 @@
 from typing import List, Dict, Any
 from json   import load, dump
 
-from greenyy import GreenyyComponent, GreenyyDirectDict
-from greenyy import hardware
+from leafyy import LeafyyComponent, LeafyyDirectDict
+from leafyy import hardware
 
 
-class GreenyyOptions(GreenyyComponent):
+class LeafyyOptions(LeafyyComponent):
     __reserved__ = [
         'name',
         'displayName',
@@ -56,14 +56,14 @@ class GreenyyOptions(GreenyyComponent):
 
     def toDict(self):
         return {
-            k: (v.toDict() if (isinstance(v, GreenyyDirectDict)) else v)
+            k: (v.toDict() if (isinstance(v, LeafyyDirectDict)) else v)
             for k, v in self.__dict__.items() if (
             '_' not in k and any([
             isinstance(v, str),
             isinstance(v, int),
             isinstance(v, list),
             isinstance(v, dict),
-            isinstance(v, GreenyyDirectDict)])
+            isinstance(v, LeafyyDirectDict)])
         )}
 
     def read(self):
@@ -76,8 +76,8 @@ class GreenyyOptions(GreenyyComponent):
                 setattr(self, key, configData[key])
 
         self._logDecodeASCII: List[str] = configData['logDecodeASCII']
-        self.ui = GreenyyDirectDict(configData['ui'])
-        self.keys = GreenyyDirectDict(configData['keys'])
+        self.ui = LeafyyDirectDict(configData['ui'])
+        self.keys = LeafyyDirectDict(configData['keys'])
         self.logger.info('Настройки программы загружены')
 
     def write(self):

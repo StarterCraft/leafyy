@@ -3,47 +3,43 @@ from sys    import argv, exit
 from webbrowser import open as url
 
 
-from inspection        import GreenyyLogging
-from inspection.logger import GreenyyLogger
-from options           import GreenyyOptions
-from ui                import GreenyyUi
-from hardware          import GreenyyHardware
-from web               import GreenyyWebServer
-from web.api           import GreenyyWebApi
+from inspection        import LeafyyLogging
+from inspection.errors import LeafyyErrors
+from inspection.logger import LeafyyLogger
+from options           import LeafyyOptions
+from hardware          import LeafyyHardware
+from web               import LeafyyWebServer
+from web.api           import LeafyyWebApi
 
 
-class Greenyy(QtWidgets.QApplication):
+class Leafyy(QtWidgets.QApplication):
     def __init__(self, argv: list[str]) -> None:
         super().__init__(argv)
         assert QtWidgets.QApplication.instance() is self
 
-        self.log = GreenyyLogging()
-        self.logger = GreenyyLogger('App')
+        self.log = LeafyyLogging()
+        self.logger = LeafyyLogger('App')
 
-        self.errors = GreenyyErrorStack()
+        self.errors = LeafyyErrors()
 
-        self.options = GreenyyOptions()
+        self.options = LeafyyOptions()
         self.log.setGlobalLogLevel(self.options.logLevel)
 
-        self.web = GreenyyWebServer()
+        self.web = LeafyyWebServer()
         self.logger.info('Инициализировано ядро веб-сервера')
 
-        self.api = GreenyyWebApi()
+        self.api = LeafyyWebApi()
         self.api.assign(self.web)
         self.web.start()
 
-        self.hardware = GreenyyHardware()
+        self.hardware = LeafyyHardware()
         self.hardware.startDevices()
         self.logger.info('Инициализированы устройства')
-        self.ui.show()
-
-        if (not self.ui.isVisible()):
-            self.logger.critical(f'Ни одно окно программы не было открыто!')
 
 
 def main():
-    app = Greenyy(argv)
-    url('http://127.0.0.1:8000/')
+    app = Leafyy(argv)
+    url('http://127.0.0.1:38001/log/view')
 
     exit(app.exec())
 

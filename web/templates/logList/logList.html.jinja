@@ -3,7 +3,7 @@
 
 <head>
     <title>
-        Листочек: правила
+        Листочек: файлы журнала
     </title>
     <link rel="apple-touch-icon" sizes="180x180" href="/resources/apple-touch-icon.png">
     <link rel="icon" type="image/svg+xml" href="/resources/favicon.svg">
@@ -12,6 +12,7 @@
     <link rel="mask-icon" href="/resources/safari-pinned-tab.svg" color="#5bbad5">
     <meta name="msapplication-TileColor" content="#da532c">
     <meta name="theme-color" content="#fff3b4">
+    <script src="/logList.js"></script>
     <link rel="stylesheet" type="text/css" href="/leafyy.css">
 </head>
 
@@ -28,39 +29,45 @@
             <a class="action" href="/doc">справка</a>
         </nav>
     </header class="block stretcher">
-    <div class="block">
+    <div class="block stretcher">
         <div class="title grand">
-            Правила
-            <span class="code">
-                {% if rules %}
-                {{rules|length}}
-                {% else %}
-                0
-                {% endif %}
+            Файлы журнала
+            <span class="code"> 
+            {% if logData %}
+            {{logData|length}}
+            {% else %}
+            0
+            {% endif %}
             </span>
         </div>
+        <nav class="actionblock">
+            {% if reversed %}
+            <a class="action" href="/log/view">по убыванию</a>
+            {% else %}
+            <a class="action" href="/log/view?reversed=1">по возрастанию</a>
+            {% endif %}
+            <a class="action" href="/log">к консоли</a>
+        </nav>
     </div>
-    <div class="block" id="actions">
-        <input type="button" value="Добавить">
-        <input type="button" value="Изменить">
-        <input type="button" value="Удалить">
+    {% if logData %}
+    <div class="block file-view" id="view">
+        {% for file in logData %}
+        <div class="file-card">
+            <div>
+                <img class="icon" src="/resources/file.svg"/>
+                <a href="/log/view/{{file.name}}">{{file.name}}</a>
+            </div>
+            <div class="code">
+                <a href="/log/{{file.name}}">{{file.size}} Кб</a>
+            </div>
+        </div>
+        {% endfor %}
     </div>
-    <div class="block" id="view">
-        {% if rules %}
-        <ul>
-            {% for rule in rules %}
-            <li>
-                <div class="rule">
-                    {{rule.name}}
-                </div>
-                {% endfor %}
-                {% else %}
-                Нет правил для отображения.
-                {% endif %}
-            </li>
-        </ul>
-
+    {% else %}
+    <div class="block">
+    Нет файлов для отображения.
     </div>
+    {% endif %}
 </body>
 
 </html>

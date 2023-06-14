@@ -3,7 +3,7 @@
 
 <head>
     <title>
-        Иваров листочек: устройства
+        Листочек: устройства
     </title>
     <link rel="apple-touch-icon" sizes="180x180" href="/resources/apple-touch-icon.png">
     <link rel="icon" type="image/svg+xml" href="/resources/favicon.svg">
@@ -12,7 +12,7 @@
     <link rel="mask-icon" href="/resources/safari-pinned-tab.svg" color="#5bbad5">
     <meta name="msapplication-TileColor" content="#da532c">
     <meta name="theme-color" content="#fff3b4">
-    <link rel="stylesheet" type="text/css" href="greenyy.css">
+    <link rel="stylesheet" type="text/css" href="/leafyy.css">
     <script src="hardware.js"></script>
 </head>
 
@@ -32,13 +32,17 @@
     <div class="block stretcher">
         <div class="title grand">
             Устройства
-            {% if hardware %}
-            <span class="code"> {{hardware.devices|length}}</span>
-            {% endif %}
+            <span class="code">
+                {% if hardware %}
+                {{hardware.devices|length}}
+                {% else %}
+                0
+                {% endif %}
+            </span>
         </div>
         <a class="action" href="#">добавить</a>
     </div>
-    <div class="view">
+    <div class="view horizontal">
         {% if hardware.devices %}
         {% for device in hardware.devices %}
         <div class="block card">

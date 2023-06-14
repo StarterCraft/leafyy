@@ -1,29 +1,29 @@
 from PySide6         import QtCore, QtGui, QtWidgets
 from enum          import Enum
 
-from greenyy       import deepget
-from greenyy       import options, ui
-from inspection.logger import GreenyyLogger
+from leafyy       import deepget
+from leafyy       import options, ui
+from inspection.logger import LeafyyLogger
 
-from ui            import GreenyyUiComponent, GreenyyUiComponentType
+from ui            import LeafyyUiComponent, LeafyyUiComponentType
 from uidef.window.settings import Ui_SettingsWindow
 
 
-class GreenyySettingsWindowTab(Enum):
+class LeafyySettingsWindowTab(Enum):
     Devices = 0
     Rules = 1
     Keys = 2
     View = 3
 
 
-class GreenyySettingsWindow(
-    GreenyyUiComponent, 
+class LeafyySettingsWindow(
+    LeafyyUiComponent, 
     QtWidgets.QMainWindow,
     Ui_SettingsWindow):
     def __init__(self):
         super().__init__(
             'settingsWindow',
-            GreenyyUiComponentType.Window,
+            LeafyyUiComponentType.Window,
             displayName = 'Настройки'
         )
         
@@ -112,11 +112,11 @@ class GreenyySettingsWindow(
 
         windowSettingsItemDef = {
             n: dn for n, dn in
-            zip(GreenyyUiComponentType._member_names_, ['Окна', 'Диалоги', 'Виджеты'])
+            zip(LeafyyUiComponentType._member_names_, ['Окна', 'Диалоги', 'Виджеты'])
         }
 
         for n, dn in windowSettingsItemDef.items():
-            components = [c for c in ui() if (c.cmType == GreenyyUiComponentType[n])]
+            components = [c for c in ui() if (c.cmType == LeafyyUiComponentType[n])]
             root = QtWidgets.QTreeWidgetItem(self.treeUi, [f'{dn} ({len(components)})'])
 
             for component in components:
@@ -163,22 +163,22 @@ class GreenyySettingsWindow(
 
     def show0(self):
         self.tabs.setCurrentIndex(
-            GreenyySettingsWindowTab.Devices.value)
+            LeafyySettingsWindowTab.Devices.value)
         self.show()
 
     def show1(self):
         self.tabs.setCurrentIndex(
-            GreenyySettingsWindowTab.Rules.value)
+            LeafyySettingsWindowTab.Rules.value)
         self.show()
 
     def show2(self):
         self.tabs.setCurrentIndex(
-            GreenyySettingsWindowTab.Keys.value)
+            LeafyySettingsWindowTab.Keys.value)
         self.show()
 
     def show3(self):
         self.tabs.setCurrentIndex(
-            GreenyySettingsWindowTab.View.value)
+            LeafyySettingsWindowTab.View.value)
         self.show()
 
     def close(self):

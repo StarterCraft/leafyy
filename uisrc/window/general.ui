@@ -17,7 +17,7 @@
    </size>
   </property>
   <property name="windowTitle">
-   <string>Иваров листочек</string>
+   <string>Листочек</string>
   </property>
   <widget class="QMdiArea" name="mdi">
    <property name="sizePolicy">

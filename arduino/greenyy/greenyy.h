@@ -5,11 +5,11 @@
 #include <Arduino.h>
 
 
-namespace GreenyyArduino {
-    class GreenyyCommand {
+namespace LeafyyArduino {
+    class LeafyyCommand {
         public:
-            GreenyyCommand(uint8_t associateWith, void (*function)());
-            GreenyyCommand(char[] associateWith, void (*function)());
+            LeafyyCommand(uint8_t associateWith, void (*function)());
+            LeafyyCommand(char[] associateWith, void (*function)());
 
         private:
             uint8_t id;
@@ -18,14 +18,14 @@ namespace GreenyyArduino {
     }
 
 
-    class GreenyyPalette {
+    class LeafyyPalette {
         public:
-            GreenyyPalette();
+            LeafyyPalette();
             execute(uint8_t commandId);
             execute(char[] commandId);
 
         private:
-            GreenyyCommand commands[256];
+            LeafyyCommand commands[256];
             uint8_t ix;
     }
 }

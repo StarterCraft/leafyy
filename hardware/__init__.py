@@ -4,18 +4,18 @@ from json import load, dump
 from enum import Enum
 from typing import Iterator, List, Any
 
-from greenyy import GreenyyComponent
-from greenyy import options
-from inspection import GreenyyLogger
+from leafyy import LeafyyComponent
+from leafyy import options
+from inspection import LeafyyLogger
 
 
-class GreenyyStatus(Enum):
+class LeafyyStatus(Enum):
     Failed = -1
     Disabled = 0
     Active = 1
     
     
-class GreenyyByteOperations:
+class LeafyyByteOperations:
     '''
     Большое спасибо ChatGPT 2.0 за код для этого класса.
     Здесь собраны некоторые функции и константы для работы с 
@@ -80,7 +80,7 @@ class GreenyyByteOperations:
         '''
         cleansy = data.upper()
         
-        for prefix in GreenyyByteOperations.possiblePrefixes:
+        for prefix in LeafyyByteOperations.possiblePrefixes:
             cleansy = cleansy.replace(prefix, '')
 
     @staticmethod
@@ -90,7 +90,7 @@ class GreenyyByteOperations:
 
         Например, '0B00010000 0B10111010 0B10111111' -> QByteArray(b'\\X10\\XBA\\XBF')
         '''
-        binary = GreenyyByteOperations.clean(binary).replace(' ', '')
+        binary = LeafyyByteOperations.clean(binary).replace(' ', '')
         array = QtCore.QByteArray()
         for i in range(0, len(binary), 8):
             byte = int(binary[i:i+8], 2)
@@ -103,7 +103,7 @@ class GreenyyByteOperations:
         Преобразует восьмеричную строку в QByteArray.
         Например, '020 272 277' -> QByteArray(b'\\X10\\XBA\\XBF')
         '''
-        octal = GreenyyByteOperations.clean(octal).replace(' ', '')
+        octal = LeafyyByteOperations.clean(octal).replace(' ', '')
         array = QtCore.QByteArray()
         for i in range(0, len(octal), 3):
             byte = int(octal[i:i+3], 8)
@@ -129,7 +129,7 @@ class GreenyyByteOperations:
         Преобразует шестнадцатеричную строку в QByteArray.
         Например, '0X10 0XBA 0XBF' -> QByteArray(b'\\X10\\XBA\\XBF')
         '''
-        hexadecimal = GreenyyByteOperations.clean(hexadecimal).replace(' ', '')
+        hexadecimal = LeafyyByteOperations.clean(hexadecimal).replace(' ', '')
         array = QtCore.QByteArray()
         for i in range(0, len(hexadecimal), 2):
             byte = int(hexadecimal[i:i+2], 16)
@@ -137,12 +137,12 @@ class GreenyyByteOperations:
         return array
 
 
-from .device import GreenyyDevice
-from .initializer import GreenyyDeviceInitializer
-from .worker import GreenyyDeviceInitializationWorker
+from .device import LeafyyDevice
+from .initializer import LeafyyDeviceInitializer
+from .worker import LeafyyDeviceInitializationWorker
 
 
-class GreenyyHardware(GreenyyComponent):
+class LeafyyHardware(LeafyyComponent):
     def __init__(self):
         super().__init__('hardware')
 
@@ -154,7 +154,7 @@ class GreenyyHardware(GreenyyComponent):
 
         self.logger.info('Загружены настройки устройств')
 
-        self.devices: List[GreenyyDevice] = []
+        self.devices: List[LeafyyDevice] = []
         self.threads = []
         self.pool = QtCore.QThreadPool()
 
@@ -162,13 +162,13 @@ class GreenyyHardware(GreenyyComponent):
         #self.startDevices()
         #INITIALIZER не работает. Пока без многопотокового решения
 
-    def __getitem__(self, address: str) -> GreenyyDevice:
+    def __getitem__(self, address: str) -> LeafyyDevice:
         try:
             return [d for d in self.devices if (d.address == address)][0]
         except IndexError:
             raise KeyError(f'Устройства по адресу {address} не найдено')
         
-    def __iter__(self) -> Iterator[GreenyyDevice]:
+    def __iter__(self) -> Iterator[LeafyyDevice]:
         return iter(self.devices)
     
     def __len__(self) -> int:
@@ -185,15 +185,15 @@ class GreenyyHardware(GreenyyComponent):
             'devices': [d.toDict() for d in self]
         }
 
-    def add(self, device: GreenyyDevice):
+    def add(self, device: LeafyyDevice):
         self.devices.append(device)
 
         self.logger.debug(
             f'Устройство по адресу {device.address} зарегистрировано'
         )
 
-    def remove(self, component: GreenyyDevice | str):
-        if (isinstance(component, GreenyyDevice)):
+    def remove(self, component: LeafyyDevice | str):
+        if (isinstance(component, LeafyyDevice)):
             self.devices.remove(component)
 
         if (isinstance(component, str)):
@@ -205,7 +205,7 @@ class GreenyyHardware(GreenyyComponent):
 
     def startDevicesSingleThread(self):
         for deviceData in self.config:
-            GreenyyDevice(**deviceData)
+            LeafyyDevice(**deviceData)
         
     def startDevices(self):
         self.logger.info('Начата инициализация устройств (многопоточная)')
@@ -217,6 +217,6 @@ class GreenyyHardware(GreenyyComponent):
 
     def startDevice(self, deviceData: dict):
         self.logger.debug(f'Создание инициализатора устройства: {deviceData["address"]}')
-        ini = GreenyyDeviceInitializationWorker(deviceData)
+        ini = LeafyyDeviceInitializationWorker(deviceData)
         self.logger.debug(f'Запуск инициализатора устройства: {deviceData["address"]}')
         self.pool.start(ini)

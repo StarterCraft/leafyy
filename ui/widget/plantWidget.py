@@ -1,11 +1,11 @@
 from PySide6 import QtGui, QtWidgets
 
-from ui    import GreenyyUiComponent
+from ui    import LeafyyUiComponent
 from uidef.widget.plantWidget import Ui_PlantWidget
 
 
-class GreenyyPlantWidget(
-    GreenyyUiComponent, 
+class LeafyyPlantWidget(
+    LeafyyUiComponent, 
     QtWidgets.QMainWindow,
     Ui_PlantWidget):
     def __init__(self):

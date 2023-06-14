@@ -1,6 +1,6 @@
 from PySide6 import QtCore, QtSerialPort
 from PySide6.QtCore import Signal, QObject
-from .device import GreenyyDevice
+from .device import LeafyyDevice
 import sys
 import traceback
 
@@ -14,11 +14,11 @@ class WorkerSignals(QObject):
     progress = Signal(int)
 
 
-class GreenyyDeviceInitializationWorker(QtCore.QRunnable):
+class LeafyyDeviceInitializationWorker(QtCore.QRunnable):
     ''' Наследует от QRunnable, настройки рабочего потока обработчика, сигналов и wrap-up. '''
 
     def __init__(self, d):
-        super(GreenyyDeviceInitializationWorker, self).__init__()
+        super(LeafyyDeviceInitializationWorker, self).__init__()
 
         self.d = d
         self.signals = WorkerSignals()
@@ -26,7 +26,7 @@ class GreenyyDeviceInitializationWorker(QtCore.QRunnable):
     @QtCore.Slot()
     def run(self):
         try:
-            result = GreenyyDevice(**self.d)
+            result = LeafyyDevice(**self.d)
         except:
             traceback.print_exc()
             exctype, value = sys.exc_info()[:2]

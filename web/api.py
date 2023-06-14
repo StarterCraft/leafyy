@@ -7,7 +7,8 @@ from fastapi.templating import Jinja2Templates
 from starlette.templating import _TemplateResponse
 from fastapi.responses import HTMLResponse, FileResponse, Response
 
-from greenyy import hardware as _hardware
+from leafyy import hardware as _hardware
+from leafyy import log as logging
 
 from .template import Template
 
@@ -33,7 +34,7 @@ DEVICE_CARD_MANY = [ {'name': 'COM0', 'status': 'Active', 'description': 'Device
     {'name': 'COM15', 'status': 'Inactive', 'description': 'Device 16'}]
 
 
-class GreenyyWebApi:
+class LeafyyWebApi:
     def __init__(self) -> None:
         self.jinja = Jinja2Templates('web/templates')
 
@@ -51,17 +52,17 @@ class GreenyyWebApi:
             self.pages.update({name: Template(self.jinja, f'{name}/{name}.html.jinja')})
 
     def assign(self, service: FastAPI):
-        @service.get('/greenyy.css', response_class = Response)
+        @service.get('/leafyy.css', response_class = Response)
         def getGlobalCss() -> str:
-            return fread('web/greenyy.css')
+            return fread('web/leafyy.css')
 
         @service.get('/{cssId}.css', response_class = Response)
         def getCss(cssId: str) -> str:
             return fread(f'web/templates/{cssId}/{cssId}.css')
 
-        @service.get('/greenyy.js', response_class = Response)
+        @service.get('/leafyy.js', response_class = Response)
         def getGlobalJs() -> str:
-            return fread('web/greenyy.js')
+            return fread('web/leafyy.js')
 
         @service.get('/{scriptId}.js', response_class = Response)
         def getJs(scriptId: str) -> str:
@@ -74,6 +75,10 @@ class GreenyyWebApi:
         @service.get('/resources/{resourceId}', response_class = FileResponse)
         def getResource(resourceId: str) -> FileResponse:
             return f'web/resources/{resourceId}'
+
+        @service.get('/favicon.ico', response_class = FileResponse)
+        def getFavicon() -> FileResponse:
+            return f'web/resources/favicon.svg'
 
         @service.get('/', response_class = HTMLResponse)
         def index(request: Request) -> _TemplateResponse:
@@ -97,8 +102,28 @@ class GreenyyWebApi:
                 request
             )
         
+        @service.get('/log/view', response_class = HTMLResponse)
+        def logList(request: Request, reversed = 0) -> _TemplateResponse:
+            return self['logList'].render(
+                request,
+                logData = logging().logFolderSummary(reversed),
+                reversed = reversed
+            )
+        
+        @service.get('/log/{name}')
+        def logFile(request: Request, name: str) -> FileResponse:
+            return FileResponse(f'logs/{name}', media_type='application/octet-stream',filename = name)
+        
+        @service.get('/log/view/{name}', response_class = HTMLResponse)
+        def logFileView(request: Request, name: str) -> _TemplateResponse:
+            print(0b111001011011)
+            return self['logView'].render(
+                request,
+                logFile = logging().logFile(name, html = True)
+            )
+
         @service.get('/doc', response_class = HTMLResponse)
-        def log(request: Request) -> _TemplateResponse:
+        def doc(request: Request) -> _TemplateResponse:
             return self['doc'].render(
                 request
             )      

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'g:\Work\Code\Greenyy\uisrc\plantSettings.ui'
+# Form implementation generated from reading ui file 'g:\Work\Code\Leafyy\uisrc\plantSettings.ui'
 #
 # Created by: PySide6 UI code generator 5.15.2
 #

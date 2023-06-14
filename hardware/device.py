@@ -3,14 +3,14 @@ from PySide6 import QtCore, QtWidgets, QtSerialPort
 from collections import deque
 from typing import Any, Iterator
 
-from greenyy  import GreenyyComponent
-from greenyy  import app, ui, options, hardware
-from inspection   import GreenyyLogger
-from hardware   import GreenyyStatus
-from .message import GreenyyDeviceMessage
+from leafyy  import LeafyyComponent
+from leafyy  import app, ui, options, hardware
+from inspection   import LeafyyLogger
+from hardware   import LeafyyStatus
+from .message import LeafyyDeviceMessage
 
 
-class GreenyyDevice(GreenyyComponent):
+class LeafyyDevice(LeafyyComponent):
     def __init__(self, **kwargs):
         super().__init__(
             kwargs['name'],
@@ -31,7 +31,7 @@ class GreenyyDevice(GreenyyComponent):
         self.logWindow = options().logWindowDevices(self.address)
         self.decodeASCIIMode = options().logDecodeASCII(self.address)
 
-        self.status = GreenyyStatus.Disabled
+        self.status = LeafyyStatus.Disabled
         self.logger.info(f'Инициализация устройства по адресу {self.address}')
 
         self.port = QtSerialPort.QSerialPort(self.address)
@@ -97,11 +97,11 @@ class GreenyyDevice(GreenyyComponent):
 
         if (self.port.isOpen()): 
             self.logger.info(f'Порт {self.address} открыт, 9600 бод')
-            self.status = GreenyyStatus.Enabled
+            self.status = LeafyyStatus.Enabled
 
         else:
             self.logger.warning(f'Порт {self.address} открыть не удалось')
-            self.status = GreenyyStatus.Failed
+            self.status = LeafyyStatus.Failed
 
     def send(self, data: str | bytearray) -> int:
         if (isinstance(data, str)):
@@ -110,5 +110,5 @@ class GreenyyDevice(GreenyyComponent):
         return self.port.write(data)
 
     def receive(self):
-        msg = GreenyyDeviceMessage(self.address, self.port.readLine())
+        msg = LeafyyDeviceMessage(self.address, self.port.readLine())
         self.messages.append(msg)

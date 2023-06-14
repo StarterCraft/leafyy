@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'g:\Work\Code\greenyy\uisrc\widget\logSettings.ui'
+# Form implementation generated from reading ui file 'g:\Work\Code\leafyy\uisrc\widget\logSettings.ui'
 #
 # Created by: PySide6 UI code generator 5.15.2
 #

@@ -2,14 +2,15 @@
 import logging
 import os
 import time
+import inspect
 
-from greenyy      import ui, log, options
+from leafyy      import ui, log, options
 from enum     import Enum
 from colorama import Fore, Style
 from datetime import datetime
 
 
-class GreenyyLogLevel(Enum):
+class LeafyyLogLevel(Enum):
     'Объект для представления уровня журналирования'
 
     #Возможные уровни журналирования:
@@ -24,49 +25,49 @@ class GreenyyLogLevel(Enum):
 
     #Спасибо ChatGPT
     def __lt__(self, other):
-        if isinstance(other, GreenyyLogLevel):
+        if isinstance(other, LeafyyLogLevel):
             return self.value < other.value
         elif isinstance(other, int):
             return self.value < other
         return NotImplemented
     
     def __le__(self, other):
-        if isinstance(other, GreenyyLogLevel):
+        if isinstance(other, LeafyyLogLevel):
             return self.value <= other.value
         elif isinstance(other, int):
             return self.value <= other
         return NotImplemented
     
     def __eq__(self, other):
-        if isinstance(other, GreenyyLogLevel):
+        if isinstance(other, LeafyyLogLevel):
             return self.value == other.value
         elif isinstance(other, int):
             return self.value == other
         return NotImplemented
     
     def __ne__(self, other):
-        if isinstance(other, GreenyyLogLevel):
+        if isinstance(other, LeafyyLogLevel):
             return self.value != other.value
         elif isinstance(other, int):
             return self.value != other
         return NotImplemented
     
     def __gt__(self, other):
-        if isinstance(other, GreenyyLogLevel):
+        if isinstance(other, LeafyyLogLevel):
             return self.value > other.value
         elif isinstance(other, int):
             return self.value > other
         return NotImplemented
     
     def __ge__(self, other):
-        if isinstance(other, GreenyyLogLevel):
+        if isinstance(other, LeafyyLogLevel):
             return self.value >= other.value
         elif isinstance(other, int):
             return self.value >= other
         return NotImplemented
 
 
-class GreenyyLogger:
+class LeafyyLogger:
     '''
     Класс канала журналирования.
 
@@ -85,7 +86,7 @@ class GreenyyLogger:
     '''
 
 
-    def __init__(self, name: str, logLevel: GreenyyLogLevel = GreenyyLogLevel.DEBUG,
+    def __init__(self, name: str, logLevel: LeafyyLogLevel = LeafyyLogLevel.DEBUG,
                                   disableStdPrint: bool = False,
                                   disableLogWindow: bool = False,
                                   useColorama = 1):
@@ -95,7 +96,7 @@ class GreenyyLogger:
         :param 'name': str
             Имя канала журналирования
 
-        :param 'logLevel': GreenyyLogger.LogLevel = DEBUG
+        :param 'logLevel': LeafyyLogger.LogLevel = DEBUG
             Необходимый уровень журналирования.
 
             Возможные уровни журналирования:
@@ -119,7 +120,7 @@ class GreenyyLogger:
             1 —— использовать цветной текст для вывода
                  сообщений в консоль
         '''
-        super(GreenyyLogger, self).__init__()
+        super(LeafyyLogger, self).__init__()
         self.name = name
         self.logLevel = logLevel
         self.printDsb = disableStdPrint
@@ -146,11 +147,11 @@ class GreenyyLogger:
         self.logWindow = value
         options().setlogWindowLoggers(self.name, value)
 
-    def setLogLevel(self, logLevel: GreenyyLogLevel):
+    def setLogLevel(self, logLevel: LeafyyLogLevel):
         '''
         Установить уровень журналирования.
 
-        :param 'logLevel': GreenyyLogger.LogLevel
+        :param 'logLevel': LeafyyLogger.LogLevel
             Необходимый уровень журналирования.
 
             Возможные уровни журналирования:
@@ -176,10 +177,10 @@ class GreenyyLogger:
             except:
                 return
             
-    def publish(self, value: GreenyyLogLevel, message: str):
+    def publish(self, value: LeafyyLogLevel, message: str):
         'Опубликовать сообщение с заданным уровнем.'
-        methods = dict.fromkeys(GreenyyLogLevel)
-        for level in GreenyyLogLevel:
+        methods = dict.fromkeys(LeafyyLogLevel)
+        for level in LeafyyLogLevel:
             methods[level] = getattr(self, level.name)
 
         methods[value](message)
@@ -193,37 +194,25 @@ class GreenyyLogger:
 
         :returns: None
         '''
-        callerInfo = self.Logger.findCaller()
-        fileName = (
-            callerInfo[0][callerInfo[0].index('greenyy'):]
-            if ('greenyy' in callerInfo[0])
-            else callerInfo[0]
-            )
-        lineNo = str(callerInfo[1])
-        moduleName = (
-            'UNKNOWN'
-            if (callerInfo[0] == '(unknown file)')
-            else (callerInfo[0][callerInfo[0].index('greenyy') + 8:callerInfo[0].index('.')].replace('\\', '.')
-            if ('greenyy' in callerInfo[0])
-            else (callerInfo[0][:callerInfo[0].index('.')])))
-        funcName = callerInfo[2]
+        callerFrame = inspect.currentframe().f_back
+        fileName = callerFrame.f_code.co_filename
+        lineNo = callerFrame.f_lineno
+        funcName = callerFrame.f_code.co_name
+        
+        callSource = '.'.join(fileName.split(os.path.sep)[fileName.split(os.path.sep).index('leafyy'):])[:-3]
+        callSource += f'.{funcName}'
 
-        if self.useColorama <= 1 and self.logLevel == GreenyyLogLevel.DEBUG:
+        if self.logLevel == LeafyyLogLevel.DEBUG:
             self.formatString = ('{%(asctime)s} [%(name)s@%(levelname)s] '
-                                 f'[{fileName} <{lineNo}>: {moduleName}.{funcName}]: '
+                                 f'[{callSource} <{lineNo}>]: '
                                  '%(message)s')
-        elif self.useColorama <= 1 and self.logLevel >= GreenyyLogLevel.INFO:
+        else:
             self.formatString = '{%(asctime)s} [%(name)s@%(levelname)s] %(message)s'
-            
-            self.formatString = (str(Fore.CYAN)   +  '{%(asctime)s} [' + str(Style.RESET_ALL) +
-                                 str(Fore.GREEN)  +   '%(name)s'       + str(Style.RESET_ALL) + ':'   +
-                                 str(Fore.YELLOW) +   '%(levelname)s'  + str(Style.RESET_ALL) + '] [' +
-                                 str(Fore.BLUE)   +   moduleName       + str(Style.RESET_ALL) + '.'   + 
-                                                      funcName + ': %(message)s')
+
         self.handler.setFormatter(logging.Formatter(self.formatString))
 
         self.Logger.debug(message)
-        if self.logLevel == GreenyyLogLevel.DEBUG and not self.printDsb:
+        if self.logLevel == LeafyyLogLevel.DEBUG and not self.printDsb:
             print(f'[{Fore.GREEN}{self.name}{Style.RESET_ALL}@{Fore.YELLOW}DEBUG{Style.RESET_ALL}]: {message}')
 
         self.toStack(
@@ -240,32 +229,25 @@ class GreenyyLogger:
 
         :returns: None
         '''
-        callerInfo = self.Logger.findCaller()
-        fileName = (
-            callerInfo[0][callerInfo[0].index('greenyy'):]
-            if ('greenyy' in callerInfo[0])
-            else callerInfo[0]
-            )
-        lineNo = str(callerInfo[1])
-        moduleName = (
-            'UNKNOWN'
-            if (callerInfo[0] == '(unknown file)')
-            else (callerInfo[0][callerInfo[0].index('greenyy') + 8:callerInfo[0].index('.')].replace('\\', '.')
-            if ('greenyy' in callerInfo[0])
-            else (callerInfo[0][:callerInfo[0].index('.')])))
-        funcName = callerInfo[2]
+        callerFrame = inspect.currentframe().f_back
+        fileName = callerFrame.f_code.co_filename
+        lineNo = callerFrame.f_lineno
+        funcName = callerFrame.f_code.co_name
+        
+        callSource = '.'.join(fileName.split(os.path.sep)[fileName.split(os.path.sep).index('leafyy'):])[:-3]
+        callSource += f'.{funcName}'
 
-        if self.useColorama <= 1 and self.logLevel == GreenyyLogLevel.DEBUG:
+        if self.logLevel == LeafyyLogLevel.DEBUG:
             self.formatString = ('{%(asctime)s} [%(name)s@%(levelname)s] '
-                                 f'[{fileName} <{lineNo}>: {moduleName}.{funcName}]: '
+                                 f'[{callSource} <{lineNo}>]: '
                                  '%(message)s')
-        elif self.useColorama <= 1 and self.logLevel >= GreenyyLogLevel.INFO:
+        else:
             self.formatString = '{%(asctime)s} [%(name)s@%(levelname)s] %(message)s'
 
         self.handler.setFormatter(logging.Formatter(self.formatString))
 
         self.Logger.info(message)
-        if self.logLevel <= GreenyyLogLevel.INFO and not self.printDsb:
+        if self.logLevel <= LeafyyLogLevel.INFO and not self.printDsb:
             print(f'[{Fore.GREEN}{self.name}{Style.RESET_ALL}@{Fore.YELLOW}INFO{Style.RESET_ALL}]: {message}')
 
         self.toStack(
@@ -282,32 +264,25 @@ class GreenyyLogger:
 
         :returns: None
         '''
-        callerInfo = self.Logger.findCaller()
-        fileName = (
-            callerInfo[0][callerInfo[0].index('greenyy'):]
-            if ('greenyy' in callerInfo[0])
-            else callerInfo[0]
-            )
-        lineNo = str(callerInfo[1])
-        moduleName = (
-            'UNKNOWN'
-            if (callerInfo[0] == '(unknown file)')
-            else (callerInfo[0][callerInfo[0].index('greenyy') + 8:callerInfo[0].index('.')].replace('\\', '.')
-            if ('greenyy' in callerInfo[0])
-            else (callerInfo[0][:callerInfo[0].index('.')])))
-        funcName = callerInfo[2]
+        callerFrame = inspect.currentframe().f_back
+        fileName = callerFrame.f_code.co_filename
+        lineNo = callerFrame.f_lineno
+        funcName = callerFrame.f_code.co_name
+        
+        callSource = '.'.join(fileName.split(os.path.sep)[fileName.split(os.path.sep).index('leafyy'):])[:-3]
+        callSource += f'.{funcName}'
 
-        if self.useColorama <= 1 and self.logLevel == GreenyyLogLevel.DEBUG:
+        if self.logLevel == LeafyyLogLevel.DEBUG:
             self.formatString = ('{%(asctime)s} [%(name)s@%(levelname)s] '
-                                 f'[{fileName} <{lineNo}>: {moduleName}.{funcName}]: '
+                                 f'[{callSource} <{lineNo}>]: '
                                  '%(message)s')
-        elif self.useColorama <= 1 and self.logLevel >= GreenyyLogLevel.INFO:
+        else:
             self.formatString = '{%(asctime)s} [%(name)s@%(levelname)s] %(message)s'
 
         self.handler.setFormatter(logging.Formatter(self.formatString))
 
         self.Logger.warning(message)
-        if self.logLevel <= GreenyyLogLevel.WARNING and not self.printDsb:
+        if self.logLevel <= LeafyyLogLevel.WARNING and not self.printDsb:
             print(f'[{Fore.GREEN}{self.name}{Style.RESET_ALL}@{Fore.YELLOW}WARN{Style.RESET_ALL}]: {message}')
 
         self.toStack(
@@ -324,32 +299,24 @@ class GreenyyLogger:
 
         :returns: None
         '''
-        callerInfo = self.Logger.findCaller()
-        fileName = (
-            callerInfo[0][callerInfo[0].index('greenyy'):]
-            if ('greenyy' in callerInfo[0])
-            else callerInfo[0]
-            )
-        lineNo = str(callerInfo[1])
-        moduleName = (
-            'UNKNOWN'
-            if (callerInfo[0] == '(unknown file)')
-            else (callerInfo[0][callerInfo[0].index('greenyy') + 8:callerInfo[0].index('.')].replace('\\', '.')
-            if ('greenyy' in callerInfo[0])
-            else (callerInfo[0][:callerInfo[0].index('.')])))
-        funcName = callerInfo[2]
+        callerFrame = inspect.currentframe().f_back
+        fileName = callerFrame.f_code.co_filename
+        lineNo = callerFrame.f_lineno
+        funcName = callerFrame.f_code.co_name
+        
+        callSource = '.'.join(fileName.split(os.path.sep)[fileName.split(os.path.sep).index('leafyy'):])[:-3]
+        callSource += f'.{funcName}'
 
-        if self.useColorama <= 1 and self.logLevel == GreenyyLogLevel.DEBUG:
+        if self.logLevel == LeafyyLogLevel.DEBUG:
             self.formatString = ('{%(asctime)s} [%(name)s@%(levelname)s] '
-                                 f'[{fileName} <{lineNo}>: {moduleName}.{funcName}]: '
+                                 f'[{callSource} <{lineNo}>]: '
                                  '%(message)s')
-        elif self.useColorama <= 1 and self.logLevel >= GreenyyLogLevel.INFO:
+        else:
             self.formatString = '{%(asctime)s} [%(name)s@%(levelname)s] %(message)s'
-
         self.handler.setFormatter(self.formatString)
 
         self.Logger.error(message)
-        if self.logLevel <= GreenyyLogLevel.ERROR and not self.printDsb:
+        if self.logLevel <= LeafyyLogLevel.ERROR and not self.printDsb:
             print(f'[{Fore.GREEN}{self.name}{Style.RESET_ALL}@{Fore.YELLOW}ERROR{Style.RESET_ALL}]: {message}')
 
         self.toStack(
@@ -366,32 +333,25 @@ class GreenyyLogger:
 
         :returns: None
         '''
-        callerInfo = self.Logger.findCaller()
-        fileName = (
-            callerInfo[0][callerInfo[0].index('greenyy'):]
-            if ('greenyy' in callerInfo[0])
-            else callerInfo[0]
-            )
-        lineNo = str(callerInfo[1])
-        moduleName = (
-            'UNKNOWN'
-            if (callerInfo[0] == '(unknown file)')
-            else (callerInfo[0][callerInfo[0].index('greenyy') + 8:callerInfo[0].index('.')].replace('\\', '.')
-            if ('greenyy' in callerInfo[0])
-            else (callerInfo[0][:callerInfo[0].index('.')])))
-        funcName = callerInfo[2]
+        callerFrame = inspect.currentframe().f_back
+        fileName = callerFrame.f_code.co_filename
+        lineNo = callerFrame.f_lineno
+        funcName = callerFrame.f_code.co_name
+        
+        callSource = '.'.join(fileName.split(os.path.sep)[fileName.split(os.path.sep).index('leafyy'):])[:-3]
+        callSource += f'.{funcName}'
 
-        if self.useColorama <= 1 and self.logLevel == GreenyyLogLevel.DEBUG:
+        if self.logLevel == LeafyyLogLevel.DEBUG:
             self.formatString = ('{%(asctime)s} [%(name)s@%(levelname)s] '
-                                 f'[{fileName} <{lineNo}>: {moduleName}.{funcName}]: '
+                                 f'[{callSource} <{lineNo}>]: '
                                  '%(message)s')
-        elif self.useColorama <= 1 and self.logLevel >= GreenyyLogLevel.INFO:
+        else:
             self.formatString = '{%(asctime)s} [%(name)s@%(levelname)s] %(message)s'
-            
+
         self.handler.setFormatter(logging.Formatter(self.formatString))
         
         self.Logger.critical(message)
-        if self.logLevel <= GreenyyLogLevel.CRITICAL and not self.printDsb:
+        if self.logLevel <= LeafyyLogLevel.CRITICAL and not self.printDsb:
             print(f'[{Fore.GREEN}{self.name}{Style.RESET_ALL}@{Fore.YELLOW}CRITICAL{Style.RESET_ALL}]: {message}')
 
         self.toStack(

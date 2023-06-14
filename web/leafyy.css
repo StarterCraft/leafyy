@@ -1,11 +1,9 @@
 /*globals*/
 
 :root {
-    --color-grand-major: #fff3b4;
-    --color-grand-minor: #ffffff;
-    --color-grand-highlight: #f4a700;
-    --color-accent-major: #ffaf94;
-    --color-accent-minor: #fffab6;
+    --color-background-major: #fff3b4;
+    --color-background-minor: #ffffff;
+    --color-accent-minor: #000000;
     --color-accent-highlight: #1cd000;
 }
 
@@ -23,7 +21,7 @@
     display: flex;
     justify-content: flex-start;
     gap: 4px;
-    background-color: var(--color-grand-minor);
+    background-color: var(--color-background-minor);
     border-top: 1.5px solid black;
     border-bottom: 3px solid black;
     border-right: 1.5px solid black;
@@ -71,10 +69,21 @@
 .view {
     display: flex;
     flex-wrap: wrap;
-    flex-direction: row;
     justify-content: stretch;
     font-size: small;
     gap: 4px;
+}
+
+.file-view {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(324px, 1fr));
+    column-gap: 16px;
+    row-gap: 8px;
+}
+
+.icon {
+    width: 16px;
+    height: 16px;
 }
 
 .card {
@@ -84,17 +93,38 @@
     min-width: fit-content;
 }
 
+.file-card {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    border-bottom: 2px solid black;
+    border-right: 1px solid black;
+    border-left: 1px solid black;
+    border-radius: 0 0 4px 4px;
+
+    padding: 4px;
+}
+
+.file-card:hover {
+    color: var(--color-accent-highlight);
+    border-bottom: 2px solid var(--color-accent-highlight);
+    border-right: 1px solid var(--color-accent-highlight);
+    border-left: 1px solid var(--color-accent-highlight);
+    border-radius: 0 0 4px 4px;
+    box-shadow: 0 2px 2px var(--color-accent-highlight);
+}
+
 /* Scrollable/log div */
-.log {
-    max-height: 200px;
+.log-view {
+    max-height: max-content;
     overflow-y: auto;
+    overflow-x: auto;
 }
 
 /* Log messages */
 .log-message {
     display: block;
-    padding: 10px;
-    white-space: pre-wrap;
+    white-space: nowrap;
     /* Enable word wrap */
 }
 
@@ -137,7 +167,7 @@
 /*page structure*/
 
 body {
-    background: var(--color-grand-major);
+    background: var(--color-background-major);
     display: flex;
     flex-direction: column;
     align-items: stretch;
@@ -159,9 +189,9 @@ header.block {
 }
 
 a {
-    color: var(--color-accent-highlight);
+    color: var(--color-accent-minor);
 }
 
 a:hover {
-    color: var(--color-grand-highlight);
+    color: var(--color-accent-highlight);
 }

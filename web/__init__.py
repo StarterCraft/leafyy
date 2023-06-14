@@ -1,29 +1,29 @@
 from PySide6 import QtCore
 
-from greenyy import options
-from greenyy import GreenyyComponent
+from leafyy import options
+from leafyy import LeafyyComponent
 
 from fastapi import FastAPI
 from fastapi.responses import HTMLResponse
 from uvicorn import run as uvicornate
 from glob    import glob 
 
-class GreenyyWebServer(
-    GreenyyComponent,
+class LeafyyWebServer(
+    LeafyyComponent,
     QtCore.QObject,
     FastAPI):
     def __init__(self) -> None:
         super().__init__(
             'WebServer',
             loggerName = 'WebServer',
-            title = 'Greenyy Web Interface', 
+            title = 'Leafyy Web Interface', 
             description = 'Testing!',
             debug = options().webServerDebug)
 
     def run(self):
         'Run with Uvicorn'
         pool = QtCore.QThreadPool.globalInstance()
-        w = WebWorker(lambda: uvicornate(self))
+        w = WebWorker(lambda: uvicornate(self, port = 38001))
         pool.start(w)
         
     def start(self):

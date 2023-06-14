@@ -1,6 +1,6 @@
 import datetime
 
-class GreenyyDeviceMessage:
+class LeafyyDeviceMessage:
     def __init__(self, author, raw: bytes):
         self.author = author
         self.raw = raw
