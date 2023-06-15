@@ -2,7 +2,7 @@
 from typing import List, Dict, Any
 from json   import load, dump
 
-from leafyy import LeafyyComponent, LeafyyDirectDict
+from leafyy import LeafyyComponent
 from leafyy import hardware
 
 
@@ -16,12 +16,6 @@ class LeafyyOptions(LeafyyComponent):
     ]
 
     defaults = {
-        'ui': {
-            'generalWindow': {
-                'onLaunch': True,
-            }
-        },
-
         'logLevel': 'DEBUG',
         'logScrollMode': False,
         'logLoggers': [
@@ -29,18 +23,7 @@ class LeafyyOptions(LeafyyComponent):
         ],
         'logDecodeASCII': [
             'All'
-        ],
-
-        'keys': {
-            'generalWindow': 'Ctrl+1',
-            'logWindow': 'Ctrl+2',
-            'settingsWindow': 'Ctrl+3',
-
-            'logFolder': 'Ctrl+N',
-            'logScrollMode': 'Ctrl+M',
-            'logIncreaseFontSize': 'Ctrl+.',
-            'logReduceFontSize': 'Ctrl+,'
-        }
+        ]
     }
 
     def __init__(self) -> None:
@@ -56,14 +39,14 @@ class LeafyyOptions(LeafyyComponent):
 
     def toDict(self):
         return {
-            k: (v.toDict() if (isinstance(v, LeafyyDirectDict)) else v)
+            k: v
             for k, v in self.__dict__.items() if (
-            '_' not in k and any([
+            '_' not in k and
+            k not in ['name', 'displayName'] and any([
             isinstance(v, str),
             isinstance(v, int),
             isinstance(v, list),
-            isinstance(v, dict),
-            isinstance(v, LeafyyDirectDict)])
+            isinstance(v, dict)])
         )}
 
     def read(self):
@@ -76,8 +59,6 @@ class LeafyyOptions(LeafyyComponent):
                 setattr(self, key, configData[key])
 
         self._logDecodeASCII: List[str] = configData['logDecodeASCII']
-        self.ui = LeafyyDirectDict(configData['ui'])
-        self.keys = LeafyyDirectDict(configData['keys'])
         self.logger.info('Настройки программы загружены')
 
     def write(self):
@@ -103,6 +84,9 @@ class LeafyyOptions(LeafyyComponent):
 
         return (deviceAddress in self._logDecodeASCII)
     
+    def get(self, key: str, default: Any) -> Any:
+        return getattr(self, key, default)
+
     def setLogDecodeASCII(self, deviceAddress: str, value: bool) -> None:
         if (self._logDecodeASCII == ['All']):
             if (value):

@@ -17,7 +17,7 @@
 
 <body>
     <header class="block stretcher">
-        <div class="title grand">
+        <div class="title grand" onclick="window.location = '/';">
             Листочек
         </div>
         <nav class="actionblock">
@@ -65,7 +65,7 @@
             {% endif %}
         </div>
     </div>
-    <div class="block">
+    <div class="block stretcher">
         <div class="title grand">
             Грядки
             <span class="code">
@@ -76,8 +76,9 @@
                 {% endif %}
             </span>
         </div>
+        <a class="action" href="#">добавить</a>
     </div>
-    <div class="view horizontal">
+    <div class="block view horizontal">
     <!-- заглушка -->
     Нет грядок для отображения.
     </div>

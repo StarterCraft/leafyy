@@ -59,7 +59,6 @@
 
 .title {
     font-weight: bold;
-    cursor: default;
 }
 
 .title:hover {
@@ -131,8 +130,10 @@
 .action {
     padding: 4px;
     color: black;
+    background-color: white;
     text-decoration: none;
     border-radius: 0 0 4px 4px;
+    border-top: none;
     border-bottom: 2px solid black;
     border-right: 1px solid black;
     border-left: 1px solid black;
@@ -162,6 +163,16 @@
     /*background-color: var(--color-accent-minor);
     color: gray;*/
     font-family: monospace;
+}
+
+.forminp {
+    cursor: text;
+    border-bottom: 3px solid black;
+    border-top: none;
+    border-left: none;
+    border-right: none;
+    /* font-family: monospace; */
+    width: -webkit-fill-available;
 }
 
 /*page structure*/

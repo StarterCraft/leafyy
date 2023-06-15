@@ -17,7 +17,7 @@
 
 <body>
     <header class="block stretcher">
-        <div class="title grand">
+        <div class="title grand" onclick="window.location = '/';">
             Листочек
         </div>
         <nav class="actionblock">
@@ -28,7 +28,7 @@
             <a class="action" href="/doc">справка</a>
         </nav>
     </header class="block stretcher">
-    <div class="block">
+    <div class="block stretcher">
         <div class="title grand">
             Правила
             <span class="code">
@@ -39,11 +39,7 @@
                 {% endif %}
             </span>
         </div>
-    </div>
-    <div class="block" id="actions">
-        <input type="button" value="Добавить">
-        <input type="button" value="Изменить">
-        <input type="button" value="Удалить">
+        <a class="action" href="#">добавить</a>
     </div>
     <div class="block" id="view">
         {% if rules %}

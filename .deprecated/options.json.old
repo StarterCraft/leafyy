@@ -1,0 +1,50 @@
+{
+    "ui": {
+        "app": {
+            "theme": "default",
+            "size": [
+                1024,
+                768
+            ]
+        },
+        "logWindow": {
+            "onLaunch": true,
+            "theme": "sleek"
+        },
+        "settingsWindow": {
+            "onLaunch": false,
+            "theme": "default",
+            "size": [
+                1024,
+                768
+            ]
+        },
+        "generalWindow": {
+            "theme": "default"
+        }
+    },
+    "logLevel": "DEBUG",
+    "logScrollMode": true,
+    "logLoggers": [
+        "All"
+    ],
+    "logDevices": [],
+    "logDecodeASCII": [
+        "COM3"
+    ],
+    "keys": {
+        "generalWindow": "Ctrl+1",
+        "logWindow": "Ctrl+2",
+        "settingsWindow": "Ctrl+3",
+        "logFolder": "Ctrl+N",
+        "logScrollMode": "Ctrl+M",
+        "logIncreaseFontSize": "Ctrl+.",
+        "logReduceFontSize": "Ctrl+,",
+        "Ctrl+.": "Ctrl+.",
+        "Ctrl+,": "Ctrl+,"
+    },
+    "webServerDebug": true,
+    "webServer": true,
+    "name": "options",
+    "displayName": ""
+}

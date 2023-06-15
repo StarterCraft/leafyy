@@ -60,9 +60,9 @@ class LeafyyLogging(QtCore.QObject):
             for fileName in glob('logs/*.log')]
         
         if (reversed):
-            data = data[::-1]
+            return data
 
-        return data
+        return data[::-1]
     
     def formatLog(self, log: list[str]) -> list[str]:
         logs = []

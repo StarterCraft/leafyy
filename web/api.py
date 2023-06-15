@@ -69,7 +69,7 @@ class LeafyyWebApi:
             return fread(f'web/templates/{scriptId}/{scriptId}.js')
         
         @service.get('/site.webmanifest', response_class = Response)
-        def getWebManifest():
+        def getWebManifest() -> str:
             return fread('web/site.webmanifest')
         
         @service.get('/resources/{resourceId}', response_class = FileResponse)
@@ -79,6 +79,11 @@ class LeafyyWebApi:
         @service.get('/favicon.ico', response_class = FileResponse)
         def getFavicon() -> FileResponse:
             return f'web/resources/favicon.svg'
+        
+        @service.get('/auth', response_class = HTMLResponse)
+        def auth(request: Request) -> _TemplateResponse:
+            return self['auth'].render(
+                request)
 
         @service.get('/', response_class = HTMLResponse)
         def index(request: Request) -> _TemplateResponse:

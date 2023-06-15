@@ -13,6 +13,10 @@ from web               import LeafyyWebServer
 from web.api           import LeafyyWebApi
 
 
+#Интерфейс на основе Qt GUI отброшен за ненадобностью,
+#связанный с ним код закомментирован или удалён
+
+
 class LeafyyServiceMode(Enum):
     WebOnly = 0
     QtGuiOnly = 1
@@ -37,7 +41,6 @@ class Leafyy(QtWidgets.QApplication):
 
         self.api = LeafyyWebApi()
         self.api.assign(self.web)
-        self.web.start()
 
         self.hardware = LeafyyHardware()
         self.hardware.startDevices()
@@ -46,6 +49,12 @@ class Leafyy(QtWidgets.QApplication):
 
 def main():
     app = Leafyy(argv)
+
+    match app.options.get('serviceMode', 0):
+        case 0: app.web.start()
+        case 2: app.web.startSeparately()
+        case _: pass
+
     url('http://127.0.0.1:38001/log/view')
 
     exit(app.exec())
