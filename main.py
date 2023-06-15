@@ -1,6 +1,7 @@
-from PySide6  import QtCore, QtWidgets
-from sys    import argv, exit
-from webbrowser import open as url
+from PySide6           import QtCore, QtWidgets
+from sys               import argv, exit
+from webbrowser        import open as url
+from enum              import Enum
 
 
 from inspection        import LeafyyLogging
@@ -10,6 +11,12 @@ from options           import LeafyyOptions
 from hardware          import LeafyyHardware
 from web               import LeafyyWebServer
 from web.api           import LeafyyWebApi
+
+
+class LeafyyServiceMode(Enum):
+    WebOnly = 0
+    QtGuiOnly = 1
+    Combined = 2
 
 
 class Leafyy(QtWidgets.QApplication):
