@@ -4,6 +4,7 @@ from time import strftime, localtime
 from glob import glob
 from os.path import getsize, sep
 from stdlib import fread
+from collections import deque
 
 from leafyy import options
 from inspection.logger import LeafyyLogLevel, LeafyyLogger
@@ -14,6 +15,9 @@ class LeafyyLogging(QtCore.QObject):
         super().__init__()
 
         self.fileName = f'logs/Leafyy_{strftime("""%d.%m.%Y_%H%M%S""", localtime())}.log'
+
+        self.completeStack = deque(maxlen = 1024)
+        self.updateStack = deque(maxlen = 128)
 
         self.loggers: List[LeafyyLogger] = []
         self.globalLevel = LeafyyLogLevel.DEBUG
@@ -38,6 +42,25 @@ class LeafyyLogging(QtCore.QObject):
             self.loggers.remove(
                 [l for l in self if (l.name == logger)][0])
 
+    def toStack(self, message: str):
+        self.completeStack.append(message)
+        self.updateStack.append(message)
+
+    def toUpdateStack(self, message: str):
+        self.updateStack.append(message)
+
+    def flushUpdateStack(self):
+        self.updateStack.clear()
+
+    def getCompleteStack(self) -> list[str]:
+        self.flushUpdateStack()
+        return [m for m in self.completeStack]
+    
+    def getUpdateStack(self) -> list[str]:
+        d = [m for m in self.updateStack]
+        self.flushUpdateStack()
+        return d
+
     def setGlobalLogLevel(self, level: Union[LeafyyLogLevel, str, int]):
         lvl = LeafyyLogLevel.DEBUG
 
@@ -55,12 +78,14 @@ class LeafyyLogging(QtCore.QObject):
     def logFolderSummary(self, reversed) -> list[dict[str, str]]:
         data = [
             {'name': fileName.split(sep)[-1],
-             'size': f'{(getsize(fileName) / 1000):.2f}',
+             'size': getsize(fileName),
             } 
             for fileName in glob('logs/*.log')]
         
         if (reversed):
             return data
+        
+        print(data)
 
         return data[::-1]
     
@@ -103,10 +128,10 @@ class LeafyyLogging(QtCore.QObject):
 
         return logs
 
-    def logFile(self, name: str, html: bool = False) -> dict[str, str | list[str]]:
+    def logFile(self, name: str, html: bool = False) -> dict[str, str | int | list[str]]:
         data = {
             'name': name,
-            'size': f'{(getsize(f"logs/{name}") / 1000):.2f}'
+            'size': getsize(f"logs/{name}")
         }
 
         if (html):
@@ -117,5 +142,7 @@ class LeafyyLogging(QtCore.QObject):
         else:
             data.update(lines = fread(f'logs/{name}', encoding = 'utf-8').splitlines())
                 
+        print(data['size'])
+
         return data
         

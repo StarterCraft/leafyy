@@ -178,9 +178,9 @@ class LeafyyHardware(LeafyyComponent):
         return {
             'count': {
                 'total': len(self),
-                'active': len([1 for d in self if d.status == 1]),
-                'disabled': len([1 for d in self if d.status == 0]),
-                'failed': len([1 for d in self if d.status == -1])
+                'active': len([1 for d in self if d.status == LeafyyStatus.Active]),
+                'disabled': len([1 for d in self if d.status == LeafyyStatus.Disabled]),
+                'failed': len([1 for d in self if d.status == LeafyyStatus.Failed])
             },
             'devices': [d.toDict() for d in self]
         }

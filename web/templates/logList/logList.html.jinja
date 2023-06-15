@@ -18,7 +18,7 @@
 
 <body>
     <header class="block stretcher">
-        <div class="title grand" onclick="window.location = '/';">
+        <div class=" grand" onclick="window.location = '/';">
             Листочек
         </div>
         <nav class="actionblock">
@@ -30,7 +30,7 @@
         </nav>
     </header class="block stretcher">
     <div class="block stretcher">
-        <div class="title grand">
+        <div class="bold grand">
             Файлы журнала
             <span class="code"> 
             {% if logData %}
@@ -58,7 +58,7 @@
                 <a href="/log/view/{{file.name}}">{{file.name}}</a>
             </div>
             <div class="code">
-                <a href="/log/{{file.name}}">{{file.size}} Кб</a>
+                <a href="/log/{{file.name}}">{{file.size|filesizeformat}}</a>
             </div>
         </div>
         {% endfor %}

@@ -52,62 +52,97 @@ class LeafyyWebApi:
             self.pages.update({name: Template(self.jinja, f'{name}/{name}.html.jinja')})
 
     def assign(self, service: FastAPI):
-        @service.get('/leafyy.css', response_class = Response)
+        @service.get('/leafyy.css', response_class = Response,   
+            name = 'Получить глобальный CSS',
+            description = 'Получает глобальный CSS-файл, необходимый для работы веб-сервиса.')
         def getGlobalCss() -> str:
             return fread('web/leafyy.css')
 
-        @service.get('/{cssId}.css', response_class = Response)
+        @service.get('/{cssId}.css', response_class = Response,
+            name = 'Получить CSS по ID',
+            description = 'Получает указанный CSS-файл на основе предоставленного ID.')
         def getCss(cssId: str) -> str:
             return fread(f'web/templates/{cssId}/{cssId}.css')
 
-        @service.get('/leafyy.js', response_class = Response)
+        @service.get('/leafyy.js', response_class = Response,
+            name = 'Получить глобальный JS',
+            description = 'Получает глобальный JS-файл, необходимый для работы веб-сервиса.')
         def getGlobalJs() -> str:
             return fread('web/leafyy.js')
 
-        @service.get('/{scriptId}.js', response_class = Response)
+        @service.get('/{scriptId}.js', response_class = Response,
+            name = 'Получить JS по ID',
+            description = 'Получает указанный JS-файл на основе предоставленного ID.')
         def getJs(scriptId: str) -> str:
             return fread(f'web/templates/{scriptId}/{scriptId}.js')
-        
-        @service.get('/site.webmanifest', response_class = Response)
+
+        @service.get('/site.webmanifest', response_class = Response,
+            name = 'Получить веб манифест',
+            description = 'Получает файл веб манифеста.')
         def getWebManifest() -> str:
             return fread('web/site.webmanifest')
-        
-        @service.get('/resources/{resourceId}', response_class = FileResponse)
+
+        @service.get('/resources/{resourceId}', response_class = FileResponse,
+            name = 'Получить ресурс по ID',
+            description = 'Получает указанный ресурс на основе предоставленного ID.')
         def getResource(resourceId: str) -> FileResponse:
             return f'web/resources/{resourceId}'
 
-        @service.get('/favicon.ico', response_class = FileResponse)
+        @service.get('/favicon.ico', response_class = FileResponse,
+            name = 'Получить favicon',
+            description = 'Получает favicon.')
         def getFavicon() -> FileResponse:
             return f'web/resources/favicon.svg'
-        
-        @service.get('/auth', response_class = HTMLResponse)
-        def auth(request: Request) -> _TemplateResponse:
-            return self['auth'].render(
-                request)
 
-        @service.get('/', response_class = HTMLResponse)
+        @service.get('/auth', response_class = HTMLResponse,
+            name = 'Авторизация',
+            description = 'Отрисовывает страницу авторизации.')
+        def auth(request: Request) -> _TemplateResponse:
+            return self['auth'].render(request)
+
+        @service.get('/', response_class = HTMLResponse,
+            name = 'Главная страница',
+            description = 'Отрисовывает главную страницу с информацией о грядках.')
         def index(request: Request) -> _TemplateResponse:
             return self['index'].render(
-                request)
-        
-        @service.get('/hardware', response_class = HTMLResponse)
+                request,
+                hardware = _hardware().toDict()
+            )
+
+        @service.get('/hardware', response_class = HTMLResponse,
+            name = 'Страница оборудования',
+            description = 'Отрисовывает страницу оборудования с информацией о нем.')
         def hardware(request: Request) -> _TemplateResponse:
             return self['hardware'].render(
                 request,
-                hardware = _hardware().toDict())
-        
-        @service.get('/rules', response_class = HTMLResponse)
+                hardware = _hardware().toDict()
+            )
+
+        @service.get('/rules', response_class = HTMLResponse,
+            name = 'Правила',
+            description = 'Отрисовывает страницу с правилами.')
         def rules(request: Request) -> _TemplateResponse:
-            return self['rules'].render(
-                request)
+            return self['rules'].render(request)
         
-        @service.get('/log', response_class = HTMLResponse)
+        @service.get('/log', response_class = HTMLResponse,
+            name = 'Журнал',
+            description = 'Отрисовывает страницу доступа к консоли и журналу.')
         def log(request: Request) -> _TemplateResponse:
             return self['log'].render(
-                request
+                request,
+                hardware = _hardware().toDict(),
+                console = logging().getCompleteStack()
             )
         
-        @service.get('/log/view', response_class = HTMLResponse)
+        @service.get('/log/update', 
+            name = '',
+            description = 'hghfb')
+        def logUpdate():
+            return logging().getUpdateStack()
+        
+        @service.get('/log/view', response_class = HTMLResponse,
+            name = 'Просмотр файла журнала',
+            description = 'Отрисовывает страницу со списком файлов журнала.')
         def logList(request: Request, reversed = 0) -> _TemplateResponse:
             return self['logList'].render(
                 request,
@@ -115,20 +150,31 @@ class LeafyyWebApi:
                 reversed = reversed
             )
         
-        @service.get('/log/{name}')
+        @service.get('/log/{name}',
+            name = 'Скачивание файла журнала',
+            description = 'Отправляет указанный файл журнала.')
         def logFile(request: Request, name: str) -> FileResponse:
-            return FileResponse(f'logs/{name}', media_type='application/octet-stream',filename = name)
+            return FileResponse(f'logs/{name}', media_type='application/octet-stream', filename = name)
         
-        @service.get('/log/view/{name}', response_class = HTMLResponse)
+        @service.get('/log/view/{name}', response_class = HTMLResponse,
+            name = 'Просмотр файла журнала',
+            description = 'Отрисовывает страницу просмотра указанного файла журнала.')
         def logFileView(request: Request, name: str) -> _TemplateResponse:
-            print(0b111001011011)
             return self['logView'].render(
                 request,
                 logFile = logging().logFile(name, html = True)
             )
 
-        @service.get('/doc', response_class = HTMLResponse)
+        @service.get('/doc', response_class = HTMLResponse,
+            name = 'Документация',
+            description = 'Отрисовывает страницу с документацией.')
         def doc(request: Request) -> _TemplateResponse:
-            return self['doc'].render(
-                request
-            )      
+            return self['doc'].render(request)
+
+        @service.post('/console')
+        def testConsole(
+            target: Annotated[str, Form()],
+            data: Annotated[str, Form()],
+            datatype: Annotated[str, Form()]):
+            print(target, data, datatype)
+

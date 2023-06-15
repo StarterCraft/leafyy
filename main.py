@@ -49,11 +49,8 @@ class Leafyy(QtWidgets.QApplication):
 
 def main():
     app = Leafyy(argv)
-
-    match app.options.get('serviceMode', 0):
-        case 0: app.web.start()
-        case 2: app.web.startSeparately()
-        case _: pass
+    
+    app.web.startSeparately()
 
     url('http://127.0.0.1:38001/log/view')
 

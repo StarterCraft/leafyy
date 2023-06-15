@@ -175,7 +175,9 @@ class LeafyyLogger:
                 ui().logWindow.txtLogDisplay.append(message)
                 ui().logWindow.scrollDown()
             except:
-                return
+                pass
+            
+        log().toStack(message)
             
     def publish(self, value: LeafyyLogLevel, message: str):
         'Опубликовать сообщение с заданным уровнем.'
