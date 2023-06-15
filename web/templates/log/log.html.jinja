@@ -12,12 +12,13 @@
     <link rel="mask-icon" href="/resources/safari-pinned-tab.svg" color="#5bbad5">
     <meta name="msapplication-TileColor" content="#da532c">
     <meta name="theme-color" content="#fff3b4">
+    <script src="/log.js"></script>
     <link rel="stylesheet" type="text/css" href="/leafyy.css">
 </head>
 
 <body>
     <header class="block stretcher">
-        <div class="title grand" onclick="window.location = '/';">
+        <div class="bold grand" onclick="window.location = '/';">
             Листочек
         </div>
         <nav class="actionblock">
@@ -29,12 +30,45 @@
         </nav>
     </header class="block stretcher">
     <div class="block stretcher">
-        <div class="title grand">
+        <div class="bold grand">
             Журнал и консоль
         </div>
         <nav class="actionblock">
-        <a class="action" href="/log/view">к файлам</a>
+        <a class="action" href="#" onclick="onUpdateConsoleData()">обновить</a>
+        <a class="action" href="/log/view">к журналу</a>
         </nav>
+    </div>
+    <div class="block maxheight">
+        <div class="code log-view vertical" id="view">
+            {% for line in console %}
+            <div class="log-lineno">
+                {{loop.index}}
+            </div>
+            <div class="log-message">
+                {{line|safe}}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    <div class="block">
+        <div id="console" style="display: contents;">
+            <select class="code formi" id="target">
+                <option value="server">Сервер</option>
+                {% for device in hardware.devices %}
+                {% if device.status == 1 %}
+                <option>{{device.address}}</option>
+                {% endif %}
+                {% endfor %}
+            </select>
+            <input class="code formi maxwidth" type="text" id="data">
+            <select class="code formi" id="datatype">
+                <option value="ascii">ASCII</option>
+                <option value="binbytes">BIN</option>
+                <option value="octbytes">OCT</option>
+                <option value="hexbytes">HEX</option>
+            </select>
+            <button class="code formi" id="consoleSend" type="button" value=">" onclick="onConsoleSend()">
+        </div>
     </div>
 </body>
 
