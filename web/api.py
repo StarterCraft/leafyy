@@ -152,7 +152,9 @@ class LeafyyWebApi(LeafyyComponent):
             name = 'Опубликовать сообщение журнала сервера',
             description = 'Приказывает серверу опубликовать сообщение журнала от логгера Web.')
         def logReport(message: LogReport, request: Request, response: Response):
-            self.logger.publish(message.level, message.message)
+            self.logger.publish(message.level, message.message.replace(
+                'USER_IP', f'{request.client.host}:{request.client.port}'
+            ))
             response.status_code = 202
             return response
 

@@ -81,6 +81,17 @@ function onSetUpdatePeriod() {
     // not implemented yet
 }
 
+function onConsoleInputKeyDown(event) {
+    switch (event.key) {
+        case "Enter":
+            onConsoleSend();
+            break;
+
+        default:
+            break;
+    }
+}
+
 function onConsoleTargetSelected() {
     const selectTarget = document.getElementById("target");
     const target = selectTarget.options[selectTarget.selectedIndex].value;
@@ -120,6 +131,7 @@ function onUpdateConsoleData() {
         if (xmlHttp.readyState == 4 && xmlHttp.status == 200)
             onReceivedUpdatedConsoleData(xmlHttp.responseText)
     };
+    console.warn("update!");
     xmlHttp.open("GET", "/log/update", true); // true for asynchronous
     xmlHttp.send(null);
 }
@@ -128,14 +140,17 @@ function onConsoleSendResult(status, responseText, message) {
     if (status == 202) {
         report(
             "INFO", 
-            "Console >> " + message.target + " [Accepted] " + message.data
+            "USER_IP >> " + message.target + " [Accepted] " + message.data
         );
+
+        const inputData = document.getElementById("data");
+        inputData.value = "";
     }
 
     else {
         report(
             "ERROR", 
-            "Console >> " + message.target + " [Failure (" + status + ", " + responseText + ")] " + message.data
+            "USER_IP >> " + message.target + " [Failure (" + status + ", " + responseText + ")] " + message.data
         );
     }
 

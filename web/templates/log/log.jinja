@@ -70,7 +70,7 @@
                 {% endif %}
                 {% endfor %}
             </select>
-            <input class="code formi maxwidth" type="text" id="data">
+            <input class="code formi maxwidth" type="text" id="data" onkeydown="onConsoleInputKeyDown(event)">
             <select class="code formi" id="type" onchange="onConsoleInputTypeSelected()">
                 <option value="ascii">ASCII</option>
                 <option value="bin">BIN</option>
