@@ -56,11 +56,19 @@
 }
 
 .maxheight {
+    height: 100%;
+    height: -moz-available;
     height: -webkit-fill-available;
+    height: fill-available;
+    overflow-y: hidden;
 }
 
 .maxwidth {
-    width: -webkit-fill-available;
+    width: 100%;
+    width: -moz-available;          /* WebKit-based browsers will ignore this. */
+    width: -webkit-fill-available;  /* Mozilla-based browsers will ignore this. */
+    width: fill-available;
+    overflow-x: hidden;
 }
 
 .larger {
@@ -133,6 +141,7 @@
     grid-auto-rows: max-content;
     grid-template-columns: max-content max-content;
     max-height: max-content;
+    width: -webkit-fill-available;
     overflow-y: auto;
     overflow-x: auto;
 }

@@ -1,3 +1,16 @@
+function setStatus(content) {
+    const status = document.getElementById("status");
+    status.innerHTML = content;
+
+    const statusBar = document.getElementById("statusBar");
+    statusBar.style.display = "inherit";
+}
+
+function hideStatusBar() {
+    const statusBar = document.getElementById("statusBar");
+    statusBar.style.display = "none";
+}
+
 /** 
 *    @param {string} content контент для размещения в новой строке консоли
 *    @param {number} [index=1] 
@@ -32,33 +45,7 @@ function prepare() {
 
 window.onload = prepare;
 
-function onSetUpdatePeriod() {
-    // not implemented yet
-}
-
-function onConsoleTargetSelected() {
-    const selectTarget = document.getElementById("target");
-    const target = selectTarget.options[selectTarget.selectedIndex].value;
-
-    if (target == "server") {
-        var selectType = document.getElementById("type");
-        selectType.value = "ascii";
-        selectType.classList.add("hidden");
-    }
-
-    else {
-        var selectType = document.getElementById("type");
-        selectType.value = "ascii";
-        selectType.classList.remove("hidden");
-    }
-
-    onConsoleInputTypeSelected();
-}
-
-function onConsoleInputTypeSelected() {
-    const inputData = document.getElementById("data");
-    const selectType = document.getElementById("type");
-    const type = selectType.options[selectType.selectedIndex].value;
+function dataTypeToRegex(type) {
     var expression = "";
     
     switch (type) {
@@ -87,7 +74,38 @@ function onConsoleInputTypeSelected() {
             break;
     }
 
-    inputData.pattern = expression;
+    return expression;
+}
+
+function onSetUpdatePeriod() {
+    // not implemented yet
+}
+
+function onConsoleTargetSelected() {
+    const selectTarget = document.getElementById("target");
+    const target = selectTarget.options[selectTarget.selectedIndex].value;
+
+    if (target == "server") {
+        var selectType = document.getElementById("type");
+        selectType.value = "ascii";
+        selectType.classList.add("hidden");
+    }
+
+    else {
+        var selectType = document.getElementById("type");
+        selectType.value = "ascii";
+        selectType.classList.remove("hidden");
+    }
+
+    onConsoleInputTypeSelected();
+}
+
+function onConsoleInputTypeSelected() {
+    const inputData = document.getElementById("data");
+    const selectType = document.getElementById("type");
+    const type = selectType.options[selectType.selectedIndex].value;
+    
+    inputData.pattern = dataTypeToRegex(type);
 }
 
 function onReceivedUpdatedConsoleData(data) {
@@ -145,6 +163,25 @@ function fetchConsoleForm() {
 
 function onConsoleSend() {
     var d = fetchConsoleForm();
+    var re =  new RegExp(dataTypeToRegex(d.type), "u")
+
+    if (!d.data) {
+        setStatus(
+            "<span class=\"negative bold\">" + 
+            "Не удалось отправить:</span>" +
+            " нет текста сообщения."
+        );
+        return;
+    }
+
+    if (!re.test(d.data)) {
+        setStatus(
+            "<span class=\"negative bold\">" + 
+            "Не удалось отправить:</span> " +
+            "сообщение не соответствует формату "+ d.type.toUpperCase() + "."
+        );
+        return;
+    }
 
     var xmlHttp = new XMLHttpRequest();
 

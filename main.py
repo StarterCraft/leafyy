@@ -1,5 +1,6 @@
 from PySide6           import QtCore, QtWidgets
 from sys               import argv, exit
+from os                import makedirs
 from webbrowser        import open as url
 from enum              import Enum
 
@@ -46,8 +47,19 @@ class Leafyy(QtWidgets.QApplication):
         self.hardware.startDevices()
         self.logger.info('Инициализированы устройства')
 
+    @staticmethod
+    def checkEnvironment():
+        DIRS = [
+            'logs/buffer'
+        ]
+
+        for dir in DIRS:
+            makedirs(dir, exist_ok = True)
+
 
 def main():
+    Leafyy.checkEnvironment()
+
     app = Leafyy(argv)
     
     app.web.startSeparately()

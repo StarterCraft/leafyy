@@ -32,7 +32,7 @@ class LeafyyWebApi(LeafyyComponent):
         templateNames = [name.split('\\')[-1] for name in glob('web/templates/*')]
 
         for name in templateNames:
-            self.pages.update({name: Template(self.jinja, f'{name}/{name}.html.jinja')})
+            self.pages.update({name: Template(self.jinja, f'{name}/{name}.jinja')})
 
     def assign(self, service: FastAPI):
         @service.get('/leafyy.css', response_class = Response,   

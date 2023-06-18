@@ -3,7 +3,7 @@ from typing import Union, Iterator, List
 from time import strftime, localtime
 from glob import glob
 from os.path import getsize, sep
-from stdlib import fread
+from stdlib import fread, fwrite
 from collections import deque
 
 from leafyy import options
@@ -16,8 +16,16 @@ class LeafyyLogging(QtCore.QObject):
 
         self.fileName = f'logs/Leafyy_{strftime("""%d.%m.%Y_%H%M%S""", localtime())}.log'
 
-        self.completeStack = deque(maxlen = 1024)
-        self.updateStack = deque(maxlen = 128)
+        #Вместо стеков попробуем использовать буферы
+        self.completeBuffer = 'logs/buffer/.log'
+        self.updateBuffer = 'logs/buffer/update.log'
+        self.errorBuffer = 'logs/buffer/error.log'
+        #self.completeStack = deque(maxlen = 1024)
+        #self.updateStack = deque(maxlen = 128)
+
+        fwrite(self.completeBuffer, '')
+        fwrite(self.updateBuffer, '')
+        fwrite(self.errorBuffer, '')
 
         self.loggers: List[LeafyyLogger] = []
         self.globalLevel = LeafyyLogLevel.DEBUG
@@ -43,21 +51,21 @@ class LeafyyLogging(QtCore.QObject):
                 [l for l in self if (l.name == logger)][0])
 
     def toStack(self, message: str):
-        self.completeStack.append(message)
-        self.updateStack.append(message)
+        fwrite(self.completeBuffer, f'{message}\n', mode = 'a')
+        fwrite(self.updateBuffer, f'{message}\n', mode = 'a')
 
     def toUpdateStack(self, message: str):
-        self.updateStack.append(message)
+        fwrite(self.updateBuffer, f'{message}\n', mode = 'a')
 
     def flushUpdateStack(self):
-        self.updateStack.clear()
+        fwrite(self.updateBuffer, '')
 
     def getCompleteStack(self) -> list[str]:
         self.flushUpdateStack()
-        return [m for m in self.completeStack]
+        return fread(self.completeBuffer).splitlines()
     
     def getUpdateStack(self) -> list[str]:
-        d = [m for m in self.updateStack]
+        d = fread(self.updateBuffer).splitlines()
         self.flushUpdateStack()
         return d
 
