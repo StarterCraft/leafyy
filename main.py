@@ -52,7 +52,7 @@ def main():
     
     app.web.startSeparately()
 
-    url('http://127.0.0.1:38001/log/view')
+    app.logger.debug('Hi Ellie!')
 
     exit(app.exec())
 

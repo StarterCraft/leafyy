@@ -29,9 +29,8 @@ class LeafyyWebServer(
 
     def runSeparately(self):
         'Run with Uvicorn'
-        pool = QtCore.QThreadPool.globalInstance()
-        w = WebWorker(self.uvicornate)
-        pool.start(w)
+        self.w = WebWorker(self.uvicornate)
+        self.w.start()
         
     def start(self):
         self.run()
@@ -44,11 +43,11 @@ class LeafyyWebServer(
         self.logger.info('Веб-сервер запущен в отдельном потоке')
 
 
-class WebWorker(QtCore.QRunnable):
+class WebWorker(QtCore.QThread):
     def __init__(self, f) -> None:
         super().__init__()
         self.f = f
 
-    @QtCore.Slot()
     def run(self):
         self.f()
+        super().run()

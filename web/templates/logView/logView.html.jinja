@@ -33,7 +33,7 @@
             Просмотр файла журнала
             <span class="code"> 
             {% if logFile %}
-            {{logFile.name}} ({{logFile.size|filesizeformat}})
+            {{logFile.name}} ({{logFile.size|filesizeformat}}, {{logFile.lines|length}} строк)
             {% endif %}
             </span>
         </div>
@@ -47,7 +47,7 @@
     {% if logFile %}
     <div class="block maxheight">
         <div class="code log-view vertical" id="view">
-            {% for line in console %}
+            {% for line in logFile.lines %}
             <div class="log-lineno">
                 {{loop.index}}
             </div>

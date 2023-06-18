@@ -27,10 +27,10 @@ class LeafyyByteOperations:
         '0X', 'X'
     ]
 
-    binaryInputRegEx = QtCore.QRegularExpression('(0b|B)[01]{1,8}', QtCore.QRegularExpression.CaseInsensitiveOption)
-    octalInputRegEx = QtCore.QRegularExpression('(0o|O)[0-7]{1,8}', QtCore.QRegularExpression.CaseInsensitiveOption)
-    decimalInputRegEx = QtCore.QRegularExpression('\d{1,3}')
-    hexadecimalInputRegEx = QtCore.QRegularExpression('(0x|X)[0-9a-f]{1,2}', QtCore.QRegularExpression.CaseInsensitiveOption)
+    binaryInputRegEx = QtCore.QRegularExpression(r'((0b|0B|b|B)[01]{1,8}[ ]*)+')
+    octalInputRegEx = QtCore.QRegularExpression(r'((0o|0O|o|O)[0-7]{1,8}[ ]*)+')
+    decimalInputRegEx = QtCore.QRegularExpression(r'(\d{1,3}[ ]*)+')
+    hexadecimalInputRegEx = QtCore.QRegularExpression(r'((0x|0X|x|X)[0-9a-f]{1,2}[ ]*)+')
 
     #Конверсия QByteArray в строки форматов различных систем счисления
 

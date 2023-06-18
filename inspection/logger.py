@@ -179,15 +179,18 @@ class LeafyyLogger:
             
         log().toStack(message)
             
-    def publish(self, value: LeafyyLogLevel, message: str):
+    def publish(self, value: LeafyyLogLevel | str, message: str):
         'Опубликовать сообщение с заданным уровнем.'
-        methods = dict.fromkeys(LeafyyLogLevel)
-        for level in LeafyyLogLevel:
-            methods[level] = getattr(self, level.name)
+        if (isinstance(value, LeafyyLogLevel)):
+            value = value.name
 
-        methods[value](message)
+        methods = dict.fromkeys(LeafyyLogLevel._member_names_)
+        for level in LeafyyLogLevel._member_names_:
+            methods[level] = getattr(self, level.lower())
 
-    def debug(self, message: str):
+        methods[value](message, back = 2)
+
+    def debug(self, message: str, back: int = 1):
         '''
         Опубликовать сообщение с уровнем DEBUG (ОТЛАДКА).
 
@@ -196,12 +199,21 @@ class LeafyyLogger:
 
         :returns: None
         '''
-        callerFrame = inspect.currentframe().f_back
+        callerFrame = inspect.currentframe()
+
+        for i in range(back):
+            callerFrame = callerFrame.f_back
+
         fileName = callerFrame.f_code.co_filename
         lineNo = callerFrame.f_lineno
-        funcName = callerFrame.f_code.co_name
+        funcName = callerFrame.f_code.co_qualname
         
-        callSource = '.'.join(fileName.split(os.path.sep)[fileName.split(os.path.sep).index('leafyy'):])[:-3]
+        indexFrom = 0
+
+        if ('leafyy' in fileName):
+            indexFrom = fileName.split(os.path.sep).index('leafyy') + 1
+
+        callSource = '.'.join(fileName.split(os.path.sep)[indexFrom:])[:-3]
         callSource += f'.{funcName}'
 
         if self.logLevel == LeafyyLogLevel.DEBUG:
@@ -222,7 +234,7 @@ class LeafyyLogger:
             f'[<span style="color:green">{self.name}</span>'
             f'@<span style="color:darkgray">DEBUG</span>]: {message}')
 
-    def info(self, message: str):
+    def info(self, message: str, back: int = 1):
         '''
         Опубликовать сообщение с уровнем INFO (ИНФОРМАЦИЯ).
 
@@ -231,12 +243,21 @@ class LeafyyLogger:
 
         :returns: None
         '''
-        callerFrame = inspect.currentframe().f_back
+        callerFrame = inspect.currentframe()
+
+        for i in range(back):
+            callerFrame = callerFrame.f_back
+
         fileName = callerFrame.f_code.co_filename
         lineNo = callerFrame.f_lineno
-        funcName = callerFrame.f_code.co_name
+        funcName = callerFrame.f_code.co_qualname
         
-        callSource = '.'.join(fileName.split(os.path.sep)[fileName.split(os.path.sep).index('leafyy'):])[:-3]
+        indexFrom = 0
+
+        if ('leafyy' in fileName):
+            indexFrom = fileName.split(os.path.sep).index('leafyy') + 1
+
+        callSource = '.'.join(fileName.split(os.path.sep)[indexFrom:])[:-3]
         callSource += f'.{funcName}'
 
         if self.logLevel == LeafyyLogLevel.DEBUG:
@@ -257,7 +278,7 @@ class LeafyyLogger:
             f'[<span style="color:green">{self.name}</span>'
             f'@<span style="color:blue">INFO</span>]: {message}')
         
-    def warning(self, message: str):
+    def warning(self, message: str, back: int = 1):
         '''
         Опубликовать сообщение с уровнем WARNING (ПРЕДУПРЕЖДЕНИE).
 
@@ -266,12 +287,21 @@ class LeafyyLogger:
 
         :returns: None
         '''
-        callerFrame = inspect.currentframe().f_back
+        callerFrame = inspect.currentframe()
+
+        for i in range(back):
+            callerFrame = callerFrame.f_back
+
         fileName = callerFrame.f_code.co_filename
         lineNo = callerFrame.f_lineno
-        funcName = callerFrame.f_code.co_name
+        funcName = callerFrame.f_code.co_qualname
         
-        callSource = '.'.join(fileName.split(os.path.sep)[fileName.split(os.path.sep).index('leafyy'):])[:-3]
+        indexFrom = 0
+
+        if ('leafyy' in fileName):
+            indexFrom = fileName.split(os.path.sep).index('leafyy') + 1
+
+        callSource = '.'.join(fileName.split(os.path.sep)[indexFrom:])[:-3]
         callSource += f'.{funcName}'
 
         if self.logLevel == LeafyyLogLevel.DEBUG:
@@ -292,7 +322,7 @@ class LeafyyLogger:
             f'[<span style="color:green">{self.name}</span>'
             f'@<span style="color:orange">WARN</span>]: {message}')
         
-    def error(self, message: str):
+    def error(self, message: str, back: int = 1):
         '''
         Опубликовать сообщение с уровнем ERROR (ОШИБКА).
 
@@ -301,12 +331,21 @@ class LeafyyLogger:
 
         :returns: None
         '''
-        callerFrame = inspect.currentframe().f_back
+        callerFrame = inspect.currentframe()
+
+        for i in range(back):
+            callerFrame = callerFrame.f_back
+
         fileName = callerFrame.f_code.co_filename
         lineNo = callerFrame.f_lineno
-        funcName = callerFrame.f_code.co_name
+        funcName = callerFrame.f_code.co_qualname
         
-        callSource = '.'.join(fileName.split(os.path.sep)[fileName.split(os.path.sep).index('leafyy'):])[:-3]
+        indexFrom = 0
+
+        if ('leafyy' in fileName):
+            indexFrom = fileName.split(os.path.sep).index('leafyy') + 1
+
+        callSource = '.'.join(fileName.split(os.path.sep)[indexFrom:])[:-3]
         callSource += f'.{funcName}'
 
         if self.logLevel == LeafyyLogLevel.DEBUG:
@@ -326,7 +365,7 @@ class LeafyyLogger:
             f'[<span style="color:green">{self.name}</span>'
             f'@<span style="color:red">ERROR</span>]: {message}')
         
-    def critical(self, message: str):
+    def critical(self, message: str, back: int = 1):
         '''
         Опубликовать сообщение с уровнем CRITICAL (КРИТИЧЕСКИЙ).
 
@@ -335,12 +374,21 @@ class LeafyyLogger:
 
         :returns: None
         '''
-        callerFrame = inspect.currentframe().f_back
+        callerFrame = inspect.currentframe()
+
+        for i in range(back):
+            callerFrame = callerFrame.f_back
+
         fileName = callerFrame.f_code.co_filename
         lineNo = callerFrame.f_lineno
-        funcName = callerFrame.f_code.co_name
+        funcName = callerFrame.f_code.co_qualname
         
-        callSource = '.'.join(fileName.split(os.path.sep)[fileName.split(os.path.sep).index('leafyy'):])[:-3]
+        indexFrom = 0
+
+        if ('leafyy' in fileName):
+            indexFrom = fileName.split(os.path.sep).index('leafyy') + 1
+
+        callSource = '.'.join(fileName.split(os.path.sep)[indexFrom:])[:-3]
         callSource += f'.{funcName}'
 
         if self.logLevel == LeafyyLogLevel.DEBUG:
