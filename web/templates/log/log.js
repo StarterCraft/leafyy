@@ -50,7 +50,7 @@ function dataTypeToRegex(type) {
     
     switch (type) {
         case "ascii":
-            expression = "[a-zA-Z0-9 \\-,;()]+";
+            expression = "[a-zA-Z0-9,;()!?-]+";
             break;
         
         case "bin":
@@ -70,7 +70,7 @@ function dataTypeToRegex(type) {
             break;
     
         default:
-            expression = "[a-zA-Z0-9 \\-,;()]+";
+            expression = "[a-zA-Z0-9,;()!?-]+";
             break;
     }
 

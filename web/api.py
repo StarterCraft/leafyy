@@ -1,6 +1,8 @@
-from typing  import Annotated
-from glob    import glob
-from stdlib  import fread, fwrite
+#encoding=utf-8
+from typing   import Annotated
+from glob     import glob
+from stdlib   import fread, fwrite
+from requests import get
 
 from fastapi import FastAPI, Request, Form
 from fastapi.templating import Jinja2Templates
@@ -70,6 +72,35 @@ class LeafyyWebApi(LeafyyComponent):
             description = 'Получает указанный ресурс на основе предоставленного ID.')
         def getResource(resourceId: str) -> FileResponse:
             return f'web/resources/{resourceId}'
+
+        @service.get('/libraries/web/{libraryId}.js',
+            name = 'stub',
+            description = 'stub')
+        def getWebLibrary(libraryId: str) -> str:
+            uri = get(f'https://api.cdnjs.com/libraries/{libraryId}?fields=latest').json()['latest']
+            return get(uri).text
+
+        @service.get('/libraries/cache/{libraryId}',
+            name = 'stub',
+            description = 'stub')
+        def getCachedLibrary(libraryId: str) -> str:
+            return fread(f'web/libraries/{libraryId}.js')
+
+        @service.get('/libraries/{libraryId}',
+            name = 'stub',
+            description = 'stub')
+        def getLibrary(libraryId: str, request: Request) -> str:
+            try: 
+                d = getWebLibrary(libraryId)
+                self.logger.debug(
+                    f'Загружена актуальная библиотека {libraryId} для клиента {request.client.host}')
+                return d
+
+            except: 
+                d = getCachedLibrary(libraryId)
+                self.logger.debug(
+                    f'Загружена локальная библиотека {libraryId} для клиента {request.client.host}')
+                return d
 
         @service.get('/favicon.ico', response_class = FileResponse,
             name = 'Получить favicon',
@@ -155,6 +186,7 @@ class LeafyyWebApi(LeafyyComponent):
             self.logger.publish(message.level, message.message.replace(
                 'USER_IP', f'{request.client.host}:{request.client.port}'
             ))
+
             response.status_code = 202
             return response
 
