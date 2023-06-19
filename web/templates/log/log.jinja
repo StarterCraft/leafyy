@@ -12,11 +12,11 @@
     <link rel="mask-icon" href="/resources/safari-pinned-tab.svg" color="#5bbad5">
     <meta name="msapplication-TileColor" content="#da532c">
     <meta name="theme-color" content="#fff3b4">
+    <link rel="stylesheet" type="text/css" href="/leafyy.css">
     <script src="/libraries/jquery.js"></script>
     <script src="/libraries/js-cookie.js"></script>
     <script src="/leafyy.js"></script>
     <script src="/log.js"></script>
-    <link rel="stylesheet" type="text/css" href="/leafyy.css">
 </head>
 
 <body>
@@ -37,13 +37,29 @@
             Журнал и консоль
         </div>
         <nav class="actionblock">
-            <span>обновлять каждые</span>
-            <input class="formi" type="number" min="1" max="3600" id="updatePeriod" onchange="onSetUpdatePeriod()">
-            <span>сек.</span>
-            <a class="action" href="#" onclick="onUpdateConsoleData()">сейчас</a>
+            <a class="action" href="#" onclick="onToggleModal('log-settings')">настройки</a> <!-- автообновление! -->
+            <a class="action" href="#" onclick="onUpdateConsoleData()">обновить</a>
             <a class="action" href="/log/view">к журналу</a>
         </nav>
     </div>
+    <!-- Диалоговые окна -->
+    <div class="modal-field">
+        <div class="block vertical modal" id="log-settings">
+
+            <div class="modal-header stretcher">
+                <span>Modal Header</span>
+                <a class="action" onclick="onToggleModal('log-settings')">скрыть</a>
+            </div>
+            <div class="modal-body">
+                <p>Some text in the Modal Body</p>
+                <p>Some other text...</p>
+            </div>
+            <div class="modal-footer">
+                <h3>Modal Footer</h3>
+            </div>
+        </div>
+    </div>
+    <!-- Основное содержимое -->
     <div class="block maxheight">
         <div class="code log-view vertical" id="view">
             {% for line in console %}
@@ -57,10 +73,10 @@
         </div>
     </div>
     <div class="block stretcher" style="display: none;" id="statusBar">
-    <div id="status"></div>
-    <div>
-    <a class="action" href="#" onclick="hideStatusBar()">скрыть</a>
-    </div>
+        <div id="status"></div>
+        <div>
+            <a class="action" href="#" onclick="hideStatusBar()">скрыть</a>
+        </div>
     </div>
     <div class="block">
         <div id="console" style="display: contents;">

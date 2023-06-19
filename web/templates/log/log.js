@@ -1,14 +1,19 @@
 function setStatus(content) {
-    const status = document.getElementById("status");
+    const status = $("#status")[0];
     status.innerHTML = content;
 
-    const statusBar = document.getElementById("statusBar");
+    const statusBar = $("#statusBar")[0];
     statusBar.style.display = "inherit";
 }
 
 function hideStatusBar() {
-    const statusBar = document.getElementById("statusBar");
+    const statusBar = $("#statusBar")[0];
     statusBar.style.display = "none";
+}
+
+function onToggleModal(modalId) {
+    $(".modal-field").toggle();
+    $(".modal#" + modalId).toggle();
 }
 
 /** 
@@ -16,7 +21,7 @@ function hideStatusBar() {
 *    @param {number} [index=1] 
 */
 function addConsoleMessageLine(content, index = 1) {
-    const view = document.getElementById("view");
+    const view = $("#view")[0];
     const lastLength = view.childElementCount / 2;
 
     var divLineNo = document.createElement("div");
@@ -31,7 +36,7 @@ function addConsoleMessageLine(content, index = 1) {
 }
 
 function prepare() {
-    const selectTarget = document.getElementById("target");
+    const selectTarget = $("#target")[0];
     if (selectTarget.options.length > 1) {
         selectTarget.selectedIndex = 1;
     }
@@ -50,7 +55,7 @@ function dataTypeToRegex(type) {
     
     switch (type) {
         case "ascii":
-            expression = "[a-zA-Z0-9,;()!?-]+";
+            expression = "[ a-zA-Z0-9,;()!?-]+";
             break;
         
         case "bin":
@@ -93,17 +98,17 @@ function onConsoleInputKeyDown(event) {
 }
 
 function onConsoleTargetSelected() {
-    const selectTarget = document.getElementById("target");
+    const selectTarget = $("#target")[0];
     const target = selectTarget.options[selectTarget.selectedIndex].value;
 
     if (target == "server") {
-        var selectType = document.getElementById("type");
+        var selectType = $("#type")[0];
         selectType.value = "ascii";
         selectType.classList.add("hidden");
     }
 
     else {
-        var selectType = document.getElementById("type");
+        var selectType = $("#type")[0];
         selectType.value = "ascii";
         selectType.classList.remove("hidden");
     }
@@ -112,29 +117,59 @@ function onConsoleTargetSelected() {
 }
 
 function onConsoleInputTypeSelected() {
-    const inputData = document.getElementById("data");
-    const selectType = document.getElementById("type");
+    const inputData = $("#data")[0];
+    const selectType = $("#type")[0];
     const type = selectType.options[selectType.selectedIndex].value;
     
     inputData.pattern = dataTypeToRegex(type);
 }
 
-function onReceivedUpdatedConsoleData(data) {
-    var array = JSON.parse(data);
+let lastConsoleUpdateResult = false;
 
-    array.forEach(addConsoleMessageLine);
+function onReceivedUpdatedConsoleData(data) {
+    data.forEach(addConsoleMessageLine);
+    lastConsoleUpdateResult = (data.length > 0);
 }
 
 function onUpdateConsoleData() {
-    var xmlHttp = new XMLHttpRequest();
-    xmlHttp.onreadystatechange = function () {
-        if (xmlHttp.readyState == 4 && xmlHttp.status == 200)
-            onReceivedUpdatedConsoleData(xmlHttp.responseText)
-    };
-    console.warn("update!");
-    xmlHttp.open("GET", "/log/update", true); // true for asynchronous
-    xmlHttp.send(null);
+    $.get("/log/update",
+        function (data, textStatus, jqXHR) {
+            onReceivedUpdatedConsoleData(data);
+        },
+        
+    );
 }
+
+const minConsoleUpdatePeriod = 2;
+const maxConsoleUpdatePeriod = 3600;
+let consoleUpdatePeriod = 2;
+let consoleUpdateIntervalId = null;
+
+function keepConsoleUpdated() {
+    onUpdateConsoleData();
+
+    console.debug("Periodic update " + (lastConsoleUpdateResult ? "done " : "failed: empty ") + 
+        "with period of " + consoleUpdatePeriod + " (range " + minConsoleUpdatePeriod + "..." + maxConsoleUpdatePeriod + ")"
+    );
+
+    if (!lastConsoleUpdateResult && consoleUpdatePeriod < maxConsoleUpdatePeriod) {
+        window.clearInterval(consoleUpdateIntervalId);
+        consoleUpdatePeriod *= 2;
+        consoleUpdateIntervalId = window.setInterval(keepConsoleUpdated, consoleUpdatePeriod * 1000);
+        console.debug("Periodic update period increases: no update messages. Set period to " + consoleUpdatePeriod);
+        return;
+    }
+
+    if (lastConsoleUpdateResult && consoleUpdatePeriod > minConsoleUpdatePeriod) {
+        consoleUpdatePeriod = minConsoleUpdatePeriod;
+        window.clearInterval(consoleUpdateIntervalId);
+        consoleUpdateIntervalId = window.setInterval(keepConsoleUpdated, consoleUpdatePeriod * 1000);
+        console.debug("Periodic update period set to minimum: update messages detected. Set period to " + consoleUpdatePeriod);
+        return;
+    }
+}
+
+consoleUpdateIntervalId = window.setInterval(keepConsoleUpdated, consoleUpdatePeriod)
 
 function onConsoleSendResult(status, responseText, message) {
     if (status == 202) {
@@ -143,7 +178,7 @@ function onConsoleSendResult(status, responseText, message) {
             "USER_IP >> " + message.target + " [Accepted] " + message.data
         );
 
-        const inputData = document.getElementById("data");
+        const inputData = $("#data")[0];
         inputData.value = "";
     }
 
@@ -158,13 +193,13 @@ function onConsoleSendResult(status, responseText, message) {
 }
 
 function fetchConsoleForm() {
-    var selectTarget = document.getElementById("target");
+    var selectTarget = $("#target")[0];
     var target = selectTarget.options[selectTarget.selectedIndex].value;
 
-    var inputData = document.getElementById("data");
-    var data = inputData.value;
+    var inputData = $("#data")[0];
+    var data = inputData.value.trim();
 
-    var selectType = document.getElementById("type");
+    var selectType = $("#type")[0];
     var type = selectType.options[selectType.selectedIndex].value;
 
     var d = {
@@ -198,21 +233,12 @@ function onConsoleSend() {
         return;
     }
 
-    var xmlHttp = new XMLHttpRequest();
-
-    xmlHttp.onreadystatechange = () => {
-        if (xmlHttp.readyState == 4) {
-            onConsoleSendResult(
-                xmlHttp.status, 
-                (xmlHttp.responseText ? xmlHttp.responseText : "none"),
-                d);
-        }
-    };
-
-    xmlHttp.open("POST", "/console", true); // true for asynchronous
-
-    // Send the proper header information along with the request
-    xmlHttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-
-    xmlHttp.send(JSON.stringify(d));
+    $.ajax({
+        type: "post",
+        url: "/console",
+        data: JSON.stringify(d)
+    }).then(
+        (data, textStatus, request) => onConsoleSendResult(request.status, data, d),
+        (request, textStatus, error) => onConsoleSendResult(request.status, request.responseText, d)
+    );
 }

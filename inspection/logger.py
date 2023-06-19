@@ -354,7 +354,7 @@ class LeafyyLogger:
                                  '%(message)s')
         else:
             self.formatString = '{%(asctime)s} [%(name)s@%(levelname)s] %(message)s'
-        self.handler.setFormatter(self.formatString)
+        self.handler.setFormatter(logging.Formatter(self.formatString))
 
         self.Logger.error(message)
         if self.logLevel <= LeafyyLogLevel.ERROR and not self.printDsb:

@@ -1,20 +1,21 @@
-#encoding=utf-8
+#coding=utf-8
 from typing   import Annotated
 from glob     import glob
 from stdlib   import fread, fwrite
 from requests import get
+from re       import findall
 
-from fastapi import FastAPI, Request, Form
-from fastapi.templating import Jinja2Templates
+from fastapi              import FastAPI, Request
+from fastapi.templating   import Jinja2Templates
 from starlette.templating import _TemplateResponse
-from fastapi.responses import HTMLResponse, FileResponse, Response
+from fastapi.responses    import HTMLResponse, FileResponse, Response
 
 from leafyy import hardware as _hardware
 from leafyy import log as logging
 from leafyy import LeafyyComponent
 
 from .template import Template
-from .models import *
+from .models   import *
 
 
 class LeafyyWebApi(LeafyyComponent):
@@ -73,34 +74,54 @@ class LeafyyWebApi(LeafyyComponent):
         def getResource(resourceId: str) -> FileResponse:
             return f'web/resources/{resourceId}'
 
-        @service.get('/libraries/web/{libraryId}.js',
+        @service.get('/libraries/web/{libraryId}.js', response_class = Response,
             name = 'stub',
             description = 'stub')
-        def getWebLibrary(libraryId: str) -> str:
-            uri = get(f'https://api.cdnjs.com/libraries/{libraryId}?fields=latest').json()['latest']
+        def getWebLibrary(libraryId: str, request: Request) -> str:
+            fetched = get(f'https://api.cdnjs.com/libraries/{libraryId}?fields=latest,version').json()
+            version = fetched['version']
+            uri = fetched['latest']
+
+            self.logger.debug(
+                f'Загружена актуальная библиотека {libraryId} (версия {version})'
+                f' для клиента {request.client.host}'
+            )
+
             return get(uri).text
 
-        @service.get('/libraries/cache/{libraryId}',
+        @service.get('/libraries/cache/{libraryId}.js', response_class = Response,
             name = 'stub',
             description = 'stub')
-        def getCachedLibrary(libraryId: str) -> str:
-            return fread(f'web/libraries/{libraryId}.js')
+        def getCachedLibrary(libraryId: str, request: Request) -> str:
+            code = fread(f'web/libraries/{libraryId}.js')
+            versions = findall(r'(v([0-9A-Za-z][.]{0,1})+)|$', code)
+            version = 'undefined'
 
-        @service.get('/libraries/{libraryId}',
+            if (versions[0]):
+                version = versions[0]
+
+            self.logger.debug(
+                f'Загружена локальная библиотека {libraryId} (версия {version})'
+                f' для клиента {request.client.host}'
+            )
+
+        @service.get('/libraries/{libraryId}.js', response_class = Response,
             name = 'stub',
             description = 'stub')
         def getLibrary(libraryId: str, request: Request) -> str:
-            try: 
-                d = getWebLibrary(libraryId)
-                self.logger.debug(
-                    f'Загружена актуальная библиотека {libraryId} для клиента {request.client.host}')
-                return d
+            d = ''
 
-            except: 
-                d = getCachedLibrary(libraryId)
-                self.logger.debug(
-                    f'Загружена локальная библиотека {libraryId} для клиента {request.client.host}')
-                return d
+            try: 
+                d = getWebLibrary(libraryId, request)
+            except Exception as e:
+                self.logger.error(
+                    f'Не удалось подключить актуальную версию библиотеки {libraryId} '
+                    f'для клиента {request.client.host}: {e}. Подключаю локальную '
+                    'библиотеку...'
+                ) 
+                d = getCachedLibrary(libraryId, request)
+
+            return d
 
         @service.get('/favicon.ico', response_class = FileResponse,
             name = 'Получить favicon',

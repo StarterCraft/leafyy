@@ -1,3 +1,11 @@
+if (typeof(String.prototype.trim) === "undefined")
+{
+    String.prototype.trim = function() 
+    {
+        return String(this).replace(/^\s+|\s+$/g, '');
+    };
+}
+
 /**
 *
 * @param obj {object} объект со значениями перечисления
@@ -21,11 +29,14 @@ function Enum(obj) {
     return Object.freeze(newObj);
 }
 
+$.ajaxSetup({
+    processData: false,
+    contentType: "application/json"
+})
+
 function reportStdCallback(request) {
     if (request.status > 299)
         console.warn(request.responseText);
-
-    onUpdateConsoleData();
 }
 
 function report(level, message, callback = reportStdCallback) {
