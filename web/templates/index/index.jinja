@@ -38,14 +38,29 @@
     </div>
     <div class="block vertical">
         <span class="bold">
-            Состояние устройств:
+            Устройства:
         </span>
         <span class="code">
             {% if hardware %}
-            Устройств: {{hardware.count.total}},
-            активны: {{hardware.count.active}},
-            ошибка: {{hardware.count.failed}},
-            отключены: {{hardware.count.disabled}}
+            всего: {{hardware.count.total}},
+            {% if hardware.count.active %}
+            <span class="positive">
+            {% else %}
+            <span>
+            {% endif %}
+            активны: {{hardware.count.active}}</span>,
+            {% if hardware.count.failed %}
+            <span class="negative">
+            {% else %}
+            <span>
+            {% endif %}
+            ошибка: {{hardware.count.failed}}</span>,
+            {% if hardware.count.disabled %}
+            <span class="inactive">
+            {% else %}
+            <span>
+            {% endif %}
+            отключены: {{hardware.count.disabled}}</span>
             {% else %}
             Устройства не инициализированы.
             {% endif %}

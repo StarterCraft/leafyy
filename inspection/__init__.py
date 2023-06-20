@@ -92,8 +92,6 @@ class LeafyyLogging(QtCore.QObject):
         
         if (reversed):
             return data
-        
-        print(data)
 
         return data[::-1]
     
@@ -124,8 +122,34 @@ class LeafyyLogging(QtCore.QObject):
             loggerInfoChunk += f'<span style="color: {lvlColor};">{dataChunks[2][:-1].split("@")[1]}</span>]'
 
             #Источник сообщения, вплоть до строки кода
-            sourceChunk = f'[<span style="color: blue;">{dataChunks[3][1:]}</span> '
-            sourceChunk += f'{dataChunks[4]}'
+            #Сделаем подсветку синтаксиса для каждого элемента пути
+            sourceTokens = dataChunks[3][1:].split('.')
+
+            sourceChunk = '['
+
+
+            toFunctions = False
+            for ix, token in enumerate(sourceTokens):
+                if (token.startswith('<')):
+                    continue
+
+                if (ix > 0):
+                    sourceChunk += '.'
+
+                if (token[0].istitle()):
+                    toFunctions = True
+                    sourceChunk += f'<span class="bold" style="color:darkorange;">{token}</span>'
+                    continue
+
+                if (toFunctions or (ix == len(sourceTokens) - 1)):
+                    sourceChunk += f'<span style="color:blue;">{token}</span>'
+                    continue
+
+                else:
+                    sourceChunk += f'<span class="bold" style="color:coral;">{token}</span>'
+                    continue
+
+            sourceChunk += f' {dataChunks[4]}' #строка кода
 
             #Собираем всё
             completeLine = ' '.join((dateTimeChunk, loggerInfoChunk, sourceChunk))

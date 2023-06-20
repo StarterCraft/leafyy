@@ -1,21 +1,23 @@
 #coding=utf-8
-from typing   import Annotated
-from glob     import glob
-from stdlib   import fread, fwrite
-from requests import get
-from re       import findall
+from typing     import Annotated
+from glob       import glob
+from stdlib     import fread, fwrite
+from requests   import get
+from packaging  import version
+from re         import findall
 
 from fastapi              import FastAPI, Request
 from fastapi.templating   import Jinja2Templates
 from starlette.templating import _TemplateResponse
-from fastapi.responses    import HTMLResponse, FileResponse, Response
+from fastapi.responses    import Response, JSONResponse, HTMLResponse, FileResponse
 
-from leafyy import hardware as _hardware
-from leafyy import log as logging
-from leafyy import LeafyyComponent
+from leafyy     import hardware as _hardware
+from leafyy     import log as logging
+from leafyy     import LeafyyComponent
 
-from .template import Template
-from .models   import *
+from .template  import Template
+from .responses import *
+from .models    import *
 
 
 class LeafyyWebApi(LeafyyComponent):
@@ -38,31 +40,31 @@ class LeafyyWebApi(LeafyyComponent):
             self.pages.update({name: Template(self.jinja, f'{name}/{name}.jinja')})
 
     def assign(self, service: FastAPI):
-        @service.get('/leafyy.css', response_class = Response,   
+        @service.get('/leafyy.css', response_class = CssResponse,   
             name = 'Получить глобальный CSS',
             description = 'Получает глобальный CSS-файл, необходимый для работы веб-сервиса.')
         def getGlobalCss() -> str:
             return fread('web/leafyy.css')
 
-        @service.get('/{cssId}.css', response_class = Response,
+        @service.get('/{cssId}.css', response_class = CssResponse,
             name = 'Получить CSS по ID',
             description = 'Получает указанный CSS-файл на основе предоставленного ID.')
         def getCss(cssId: str) -> str:
             return fread(f'web/templates/{cssId}/{cssId}.css')
 
-        @service.get('/leafyy.js', response_class = Response,
+        @service.get('/leafyy.js', response_class = JsResponse,
             name = 'Получить глобальный JS',
             description = 'Получает глобальный JS-файл, необходимый для работы веб-сервиса.')
         def getGlobalJs() -> str:
             return fread('web/leafyy.js')
 
-        @service.get('/{scriptId}.js', response_class = Response,
+        @service.get('/{scriptId}.js', response_class = JsResponse,
             name = 'Получить JS по ID',
             description = 'Получает указанный JS-файл на основе предоставленного ID.')
         def getJs(scriptId: str) -> str:
             return fread(f'web/templates/{scriptId}/{scriptId}.js')
 
-        @service.get('/site.webmanifest', response_class = Response,
+        @service.get('/site.webmanifest', response_class = JSONResponse,
             name = 'Получить веб манифест',
             description = 'Получает файл веб манифеста.')
         def getWebManifest() -> str:
@@ -74,38 +76,48 @@ class LeafyyWebApi(LeafyyComponent):
         def getResource(resourceId: str) -> FileResponse:
             return f'web/resources/{resourceId}'
 
-        @service.get('/libraries/web/{libraryId}.js', response_class = Response,
+        @service.get('/libraries/web/{libraryId}.js', response_class = JsResponse,
             name = 'stub',
             description = 'stub')
         def getWebLibrary(libraryId: str, request: Request) -> str:
             fetched = get(f'https://api.cdnjs.com/libraries/{libraryId}?fields=latest,version').json()
-            version = fetched['version']
+            _version = fetched['version']
             uri = fetched['latest']
+            code = get(uri).text
 
             self.logger.debug(
                 f'Загружена актуальная библиотека {libraryId} (версия {version})'
                 f' для клиента {request.client.host}'
             )
 
-            return get(uri).text
+            if (version.parse(_version) > version.parse(getCachedLibraryVersion(libraryId))):
+                fwrite(f'web/libraries/{libraryId}.js', code)
 
-        @service.get('/libraries/cache/{libraryId}.js', response_class = Response,
-            name = 'stub',
-            description = 'stub')
-        def getCachedLibrary(libraryId: str, request: Request) -> str:
+            return code
+
+        def getCachedLibraryVersion(libraryId: str) -> str:
             code = fread(f'web/libraries/{libraryId}.js')
             versions = findall(r'(v([0-9A-Za-z][.]{0,1})+)|$', code)
             version = 'undefined'
 
             if (versions[0]):
-                version = versions[0]
+                version = versions[0][1:]
+
+            return version
+
+        @service.get('/libraries/cache/{libraryId}.js', response_class = JsResponse,
+            name = 'stub',
+            description = 'stub')
+        def getCachedLibrary(libraryId: str, request: Request) -> str:
+            code = fread(f'web/libraries/{libraryId}.js')
+            version = getCachedLibraryVersion(libraryId)
 
             self.logger.debug(
                 f'Загружена локальная библиотека {libraryId} (версия {version})'
                 f' для клиента {request.client.host}'
             )
 
-        @service.get('/libraries/{libraryId}.js', response_class = Response,
+        @service.get('/libraries/{libraryId}.js', response_class = JsResponse,
             name = 'stub',
             description = 'stub')
         def getLibrary(libraryId: str, request: Request) -> str:
@@ -135,7 +147,7 @@ class LeafyyWebApi(LeafyyComponent):
         def auth(request: Request) -> _TemplateResponse:
             return self['auth'].render(request)
 
-        @service.get('/', response_class = HTMLResponse,
+        @service.get('/', response_class = HTMLResponse, 
             name = 'Главная страница',
             description = 'Отрисовывает главную страницу с информацией о грядках.')
         def index(request: Request) -> _TemplateResponse:
@@ -188,8 +200,8 @@ class LeafyyWebApi(LeafyyComponent):
         @service.get('/log/{name}',
             name = 'Скачивание файла журнала',
             description = 'Отправляет указанный файл журнала.')
-        def logFile(request: Request, name: str) -> FileResponse:
-            return FileResponse(f'logs/{name}', media_type='application/octet-stream', filename = name)
+        def logFile(request: Request, name: str) -> FileStreamResponse:
+            return f'logs/{name}'
         
         @service.get('/log/view/{name}', response_class = HTMLResponse,
             name = 'Просмотр файла журнала',

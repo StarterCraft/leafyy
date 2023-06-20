@@ -11,4 +11,6 @@ class Template:
     def render(self, request: Request, **kw: dict[str, Any]) -> _TemplateResponse: 
         return self.engine.TemplateResponse(
             self.address,
-            {'request': request, **kw})
+            {'request': request, **kw},
+            headers = {'Content-Security-Policy': 'upgrade-insecure-requests'}
+            )

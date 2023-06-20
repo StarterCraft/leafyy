@@ -23,6 +23,10 @@
     color: var(--color-negation-highlight);
 }
 
+.inactive {
+    color: #bbbbbb;
+}
+
 .block {
     display: flex;
     justify-content: flex-start;
@@ -269,7 +273,7 @@
 }
 
 .card:hover .actionblock {
-    display: unset;
+    display: inherit;
 }
 
 .code {

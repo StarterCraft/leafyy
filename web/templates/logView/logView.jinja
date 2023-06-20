@@ -29,8 +29,10 @@
         </nav>
     </header class="block stretcher">
     <div class="block stretcher">
-        <div class="bold grand">
+        <div class="bold">
+            <div class="grand">
             Просмотр файла журнала
+            </div>
             <span class="code"> 
             {% if logFile %}
             {{logFile.name}} ({{logFile.size|filesizeformat}}, {{logFile.lines|length}} строк)

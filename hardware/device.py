@@ -97,7 +97,7 @@ class LeafyyDevice(LeafyyComponent):
 
         if (self.port.isOpen()): 
             self.logger.info(f'Порт {self.address} открыт, 9600 бод')
-            self.status = LeafyyStatus.Enabled
+            self.status = LeafyyStatus.Active
 
         else:
             self.logger.warning(f'Порт {self.address} открыть не удалось')
