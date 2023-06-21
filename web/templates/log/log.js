@@ -1,3 +1,18 @@
+function prepare() {
+    const selectTarget = $("#target")[0];
+    if (selectTarget.options.length > 1) {
+        selectTarget.selectedIndex = 1;
+    }
+
+    else { //доступен только сервер
+        selectTarget.selectedIndex = 0;
+    }
+
+    onConsoleTargetSelected();
+}
+
+window.onload = prepare;
+
 function setStatus(content) {
     const status = $("#status")[0];
     status.innerHTML = content;
@@ -7,13 +22,37 @@ function setStatus(content) {
 }
 
 function hideStatusBar() {
-    const statusBar = $("#statusBar")[0];
-    statusBar.style.display = "none";
+    $("#statusBar").hide();
 }
 
-function onToggleModal(modalId) {
-    $(".modal-field").toggle();
-    $(".modal#" + modalId).toggle();
+let consoleShouldUpdate = getCookie("X01", true)
+let minConsoleUpdatePeriod = getCookie("X02", 2);
+let maxConsoleUpdatePeriod = getCookie("X03", 3600);
+
+function onOpenSettings() {
+    const modal = ".modal#log-settings";
+    const modalId = "log-settings";
+
+    $("#consoleShouldUpdate", modal).prop("checked", consoleShouldUpdate);
+    $("#minConsoleUpdatePeriod", modal).val(minConsoleUpdatePeriod);
+    $("#maxConsoleUpdatePeriod", modal).val(maxConsoleUpdatePeriod);
+    
+    showModal(modalId);
+}
+
+function onSaveSettings() {
+    const modal = ".modal#log-settings";
+    const modalId = "log-settings";
+
+    consoleShouldUpdate = $("#consoleShouldUpdate", modal).prop("checked");
+    minConsoleUpdatePeriod = $("#minConsoleUpdatePeriod", modal).val();
+    maxConsoleUpdatePeriod = $("#maxConsoleUpdatePeriod", modal).val();
+
+    hideModal(modalId);
+
+    Cookies.set("X01", consoleShouldUpdate)
+    Cookies.set("X02", minConsoleUpdatePeriod);
+    Cookies.set("X03", maxConsoleUpdatePeriod);
 }
 
 /** 
@@ -34,21 +73,6 @@ function addConsoleMessageLine(content, index = 1) {
     divLine.innerHTML = content;
     view.appendChild(divLine);
 }
-
-function prepare() {
-    const selectTarget = $("#target")[0];
-    if (selectTarget.options.length > 1) {
-        selectTarget.selectedIndex = 1;
-    }
-
-    else { //доступен только сервер
-        selectTarget.selectedIndex = 0;
-    }
-
-    onConsoleTargetSelected();
-}
-
-window.onload = prepare;
 
 function dataTypeToRegex(type) {
     var expression = "";
@@ -140,8 +164,6 @@ function onUpdateConsoleData() {
     );
 }
 
-const minConsoleUpdatePeriod = 2;
-const maxConsoleUpdatePeriod = 3600;
 let consoleUpdatePeriod = 2;
 let consoleUpdateIntervalId = null;
 

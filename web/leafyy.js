@@ -6,27 +6,32 @@ if (typeof(String.prototype.trim) === "undefined")
     };
 }
 
-/**
-*
-* @param obj {object} объект со значениями перечисления
-*/
-function Enum(obj) {
-    // итоговый объект
-    const newObj = {};
+function getCookie(id, _default) {
+    c = Cookies.get(id);
+    if (typeof c === "undefined") 
+        return _default;
 
-    // проходимся по каждому свойству переданного в функцию объекта
-    for( const prop in obj )
-    {
-        // проверяем наличие собственного свойства у объекта
-        if (obj.hasOwnProperty(prop)) {
+    else return c;
+}
 
-            // помещаем в новый объект специальный примитивный тип JavaScript Symbol
-            newObj[prop] = Symbol(obj[prop]);
-        }
+function toggleModal(modalId) {
+    if ($(".modal#" + modalId).is(":visible")) {
+        hideModal(modalId);
     }
 
-    // делаем объект неизменяемым (свойства объекта нельзя будет изменить динамически)
-    return Object.freeze(newObj);
+    else {
+        showModal(modalId);
+    }
+}
+
+function showModal(modalId) {
+    $(".modal-field").css("display", "flex");
+    $(".modal#" + modalId).css("display", "flex");
+}
+
+function hideModal(modalId) {
+    $(".modal#" + modalId).css("display", "none"); 
+    $(".modal-field").css("display", "none");   
 }
 
 $.ajaxSetup({

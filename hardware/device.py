@@ -28,7 +28,7 @@ class LeafyyDevice(LeafyyComponent):
         self.tempSensorDef = kwargs['tempSensor']
         self.plantsDef = kwargs['plants']
 
-        self.logWindow = options().logWindowDevices(self.address)
+        self.visibleInConsole = options().logWindowDevices(self.address)
         self.decodeASCIIMode = options().logDecodeASCII(self.address)
 
         self.status = LeafyyStatus.Disabled
@@ -74,11 +74,11 @@ class LeafyyDevice(LeafyyComponent):
 
     @property
     def logWindowVisibility(self):
-        return self.logWindow
+        return self.visibleInConsole
     
     @logWindowVisibility.setter
     def logWindowVisibility(self, value: bool):
-        self.logWindow = value
+        self.visibleInConsole = value
         options().setLogWindowSources(self.name, value, 1)
 
     @property

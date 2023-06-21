@@ -3,6 +3,7 @@ from sys               import argv, exit
 from os                import makedirs
 from webbrowser        import open as url
 from enum              import Enum
+from packaging         import version as versioning
 
 
 from inspection        import LeafyyLogging
@@ -12,6 +13,9 @@ from options           import LeafyyOptions
 from hardware          import LeafyyHardware
 from web               import LeafyyWebServer
 from web.api           import LeafyyWebApi
+
+
+__version__ = '0.a3'
 
 
 #Интерфейс на основе Qt GUI отброшен за ненадобностью,
@@ -25,6 +29,8 @@ class LeafyyServiceMode(Enum):
 
 
 class Leafyy(QtWidgets.QApplication):
+    version = versioning.parse(__version__)
+
     def __init__(self, argv: list[str]) -> None:
         super().__init__(argv)
         assert QtWidgets.QApplication.instance() is self

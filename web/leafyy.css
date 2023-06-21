@@ -103,7 +103,7 @@
 
 .file-view {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(324px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(289px, 1fr));
     column-gap: 16px;
     row-gap: 8px;
 }
@@ -136,7 +136,6 @@
 
 /* Modal Header */
 .modal-header {
-    padding: 2px 16px;
     background-color: #5cb85c;
     color: white;
 }
@@ -158,9 +157,9 @@
     display: none;
     position: relative;
     margin: auto;
-    padding: 0;
-    width: 80%;
-    box-shadow: 0 4px 8px 0 #00000033, 0 6px 20px 0 #00000030;
+    align-items: stretch;
+    row-gap: 8px;
+    width: 90%;
     animation-name: animatetop;
     animation-duration: 0.4s
 }
@@ -207,7 +206,7 @@
 }
 
 /* Scrollable/log div */
-.log-view {
+.line-view {
     display: grid;
     grid-auto-rows: max-content;
     grid-template-columns: max-content max-content;
@@ -215,6 +214,10 @@
     width: -webkit-fill-available;
     overflow-y: auto;
     overflow-x: auto;
+}
+
+.line-view.evenly {
+    grid-template-columns: 1fr 1fr;
 }
 
 /* Log messages */

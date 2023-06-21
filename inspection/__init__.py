@@ -1,5 +1,5 @@
 from PySide6 import QtCore, QtWidgets
-from typing import Union, Iterator, List
+from typing import Iterator
 from time import strftime, localtime
 from glob import glob
 from os.path import getsize, sep
@@ -8,6 +8,7 @@ from collections import deque
 
 from leafyy import options
 from inspection.logger import LeafyyLogLevel, LeafyyLogger
+from models import Log, LogFile, LogSource
 
 
 class LeafyyLogging(QtCore.QObject):
@@ -27,7 +28,7 @@ class LeafyyLogging(QtCore.QObject):
         fwrite(self.updateBuffer, '')
         fwrite(self.errorBuffer, '')
 
-        self.loggers: List[LeafyyLogger] = []
+        self.loggers: list[LeafyyLogger] = []
         self.globalLevel = LeafyyLogLevel.DEBUG
         
     def __getitem__(self, name: str) -> LeafyyLogger:
@@ -42,13 +43,16 @@ class LeafyyLogging(QtCore.QObject):
     def add(self, logger: LeafyyLogger):
         self.loggers.append(logger)
 
-    def remove(self, logger: Union[LeafyyLogger, str]):
+    def remove(self, logger: LeafyyLogger | str):
         if (isinstance(logger, LeafyyLogger)):
             self.loggers.remove(logger)
 
         if (isinstance(logger, str)):
             self.loggers.remove(
                 [l for l in self if (l.name == logger)][0])
+            
+    def getLogSourcesSummary(self) -> list[LogSource]:
+        return [{'name': l.name, 'type': 'logger', 'mute': l.muteConsole} for l in self]
 
     def toStack(self, message: str):
         fwrite(self.completeBuffer, f'{message}\n', mode = 'a')
@@ -69,7 +73,7 @@ class LeafyyLogging(QtCore.QObject):
         self.flushUpdateStack()
         return d
 
-    def setGlobalLogLevel(self, level: Union[LeafyyLogLevel, str, int]):
+    def setGlobalLogLevel(self, level: LeafyyLogLevel | str | int):
         lvl = LeafyyLogLevel.DEBUG
 
         if (isinstance(level, str)):
@@ -83,7 +87,7 @@ class LeafyyLogging(QtCore.QObject):
         for logger in self:
             logger.setLogLevel(lvl)
 
-    def logFolderSummary(self, reversed) -> list[dict[str, str]]:
+    def getLogFolderSummary(self, reversed) -> list[dict[str, str]]:
         data = [
             {'name': fileName.split(sep)[-1],
              'size': getsize(fileName),
@@ -127,7 +131,6 @@ class LeafyyLogging(QtCore.QObject):
 
             sourceChunk = '['
 
-
             toFunctions = False
             for ix, token in enumerate(sourceTokens):
                 if (token.startswith('<')):
@@ -160,7 +163,7 @@ class LeafyyLogging(QtCore.QObject):
 
         return logs
 
-    def logFile(self, name: str, html: bool = False) -> dict[str, str | int | list[str]]:
+    def getLogFile(self, name: str, html: bool = False) -> Log:
         data = {
             'name': name,
             'size': getsize(f"logs/{name}")

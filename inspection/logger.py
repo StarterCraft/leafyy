@@ -88,8 +88,7 @@ class LeafyyLogger:
 
     def __init__(self, name: str, logLevel: LeafyyLogLevel = LeafyyLogLevel.DEBUG,
                                   disableStdPrint: bool = False,
-                                  disableLogWindow: bool = False,
-                                  useColorama = 1):
+                                  noConsole: bool = False):
         '''
         Инициализировать один канал журналирования.
 
@@ -112,20 +111,12 @@ class LeafyyLogger:
             По умолчанию, сообщения журнала выводятся в консоль.
             Если этот параметр истинен, то вывод в консоль не будет
             производиться
-
-        :param 'useColorama': int = 1
-            Использовать ли цветной текст Colorama, и если да, то
-            как. Имеются следующие варианты:
-            0 —— отключить использование цветного текста;
-            1 —— использовать цветной текст для вывода
-                 сообщений в консоль
         '''
         super(LeafyyLogger, self).__init__()
         self.name = name
         self.logLevel = logLevel
         self.printDsb = disableStdPrint
-        self.logWindow = not disableLogWindow
-        self.useColorama = useColorama
+        self.muteConsole = noConsole
 
         self.Logger = logging.getLogger(name)
         self.formatString = ''
@@ -140,11 +131,11 @@ class LeafyyLogger:
 
     @property
     def logWindowVisibility(self):
-        return self.logWindow
+        return self.muteConsole
     
     @logWindowVisibility.setter
     def logWindowVisibility(self, value: bool):
-        self.logWindow = value
+        self.muteConsole = value
         options().setlogWindowLoggers(self.name, value)
 
     def setLogLevel(self, logLevel: LeafyyLogLevel):
@@ -169,15 +160,9 @@ class LeafyyLogger:
         self.Logger.setLevel(logLevel.value)
 
     def toStack(self, message: str):
-        'Отправить сообщение куда-то'
-        if (self.logWindow):
-            try:
-                ui().logWindow.txtLogDisplay.append(message)
-                ui().logWindow.scrollDown()
-            except:
-                pass
-            
-        log().toStack(message)
+        'Отправить сообщение в стек'
+        if (not self.muteConsole):
+            log().toStack(message)
             
     def publish(self, value: LeafyyLogLevel | str, message: str):
         'Опубликовать сообщение с заданным уровнем.'

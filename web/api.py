@@ -3,7 +3,7 @@ from typing     import Annotated
 from glob       import glob
 from stdlib     import fread, fwrite
 from requests   import get
-from packaging  import version
+from packaging  import version as versioning
 from re         import findall
 
 from fastapi              import FastAPI, Request
@@ -17,7 +17,7 @@ from leafyy     import LeafyyComponent
 
 from .template  import Template
 from .responses import *
-from .models    import *
+from models     import *
 
 
 class LeafyyWebApi(LeafyyComponent):
@@ -64,7 +64,7 @@ class LeafyyWebApi(LeafyyComponent):
         def getJs(scriptId: str) -> str:
             return fread(f'web/templates/{scriptId}/{scriptId}.js')
 
-        @service.get('/site.webmanifest', response_class = JSONResponse,
+        @service.get('/site.webmanifest', response_class = Response,
             name = 'Получить веб манифест',
             description = 'Получает файл веб манифеста.')
         def getWebManifest() -> str:
@@ -76,34 +76,39 @@ class LeafyyWebApi(LeafyyComponent):
         def getResource(resourceId: str) -> FileResponse:
             return f'web/resources/{resourceId}'
 
+        def getWebLibraryVersion(libraryId: str) -> versioning.Version:
+            fetched = get(f'https://api.cdnjs.com/libraries/{libraryId}?fields=version').json()
+            _version = fetched['version']
+            return versioning.parse(_version)
+
+        def getCachedLibraryVersion(libraryId: str) -> versioning.Version:
+            code = fread(f'web/libraries/{libraryId}.js')
+            regexMatch = findall(r'(v([0-9A-Za-z][.]{0,1})+)|$', code)[0]
+            version = 'undefined'
+
+            if (regexMatch[0]):
+                version = regexMatch[0][1:]
+
+            return versioning.parse(version)
+
         @service.get('/libraries/web/{libraryId}.js', response_class = JsResponse,
             name = 'stub',
             description = 'stub')
         def getWebLibrary(libraryId: str, request: Request) -> str:
             fetched = get(f'https://api.cdnjs.com/libraries/{libraryId}?fields=latest,version').json()
-            _version = fetched['version']
-            uri = fetched['latest']
-            code = get(uri).text
+            code = get(fetched['latest']).text
+            version = fetched['version']
 
-            self.logger.debug(
-                f'Загружена актуальная библиотека {libraryId} (версия {version})'
-                f' для клиента {request.client.host}'
+            #Проверка версии локальной библиотеки уже проведена,
+            #поэтому здесь она не ведётся
+            fwrite(f'web/libraries/{libraryId}.js', code)
+
+            self.logger.info(
+                f'Загружена локальная библиотека {libraryId} (версия {version})'
+                f' для клиента {request.client.host}. Локальная библиотека обновлена'
             )
 
-            if (version.parse(_version) > version.parse(getCachedLibraryVersion(libraryId))):
-                fwrite(f'web/libraries/{libraryId}.js', code)
-
             return code
-
-        def getCachedLibraryVersion(libraryId: str) -> str:
-            code = fread(f'web/libraries/{libraryId}.js')
-            versions = findall(r'(v([0-9A-Za-z][.]{0,1})+)|$', code)
-            version = 'undefined'
-
-            if (versions[0]):
-                version = versions[0][1:]
-
-            return version
 
         @service.get('/libraries/cache/{libraryId}.js', response_class = JsResponse,
             name = 'stub',
@@ -117,18 +122,28 @@ class LeafyyWebApi(LeafyyComponent):
                 f' для клиента {request.client.host}'
             )
 
+            return code
+
         @service.get('/libraries/{libraryId}.js', response_class = JsResponse,
             name = 'stub',
             description = 'stub')
-        def getLibrary(libraryId: str, request: Request) -> str:
+        async def getLibrary(libraryId: str, request: Request) -> str:
             d = ''
 
             try: 
-                d = getWebLibrary(libraryId, request)
+                #Если на сервере хранится актуальная версия библиотеки,
+                #подключить её. Если вышла новая, скачать её и записать
+                #в файл.
+                if (getCachedLibraryVersion(libraryId) < getWebLibraryVersion(libraryId)):
+                    d = getWebLibrary(libraryId, request)
+
+                else:
+                    d = getCachedLibrary(libraryId, request)
+                
             except Exception as e:
                 self.logger.error(
                     f'Не удалось подключить актуальную версию библиотеки {libraryId} '
-                    f'для клиента {request.client.host}: {e}. Подключаю локальную '
+                    f'для клиента {request.client.host}: {type(e).__name__}: {e}. Подключаю локальную '
                     'библиотеку...'
                 ) 
                 d = getCachedLibrary(libraryId, request)
@@ -153,7 +168,7 @@ class LeafyyWebApi(LeafyyComponent):
         def index(request: Request) -> _TemplateResponse:
             return self['index'].render(
                 request,
-                hardware = _hardware().toDict()
+                hardware = _hardware().getDevices()
             )
 
         @service.get('/hardware', response_class = HTMLResponse,
@@ -162,7 +177,7 @@ class LeafyyWebApi(LeafyyComponent):
         def hardware(request: Request) -> _TemplateResponse:
             return self['hardware'].render(
                 request,
-                hardware = _hardware().toDict()
+                hardware = _hardware().getDevices()
             )
 
         @service.get('/rules', response_class = HTMLResponse,
@@ -177,8 +192,12 @@ class LeafyyWebApi(LeafyyComponent):
         def log(request: Request) -> _TemplateResponse:
             return self['log'].render(
                 request,
-                hardware = _hardware().toDict(),
-                console = logging().getCompleteStack()
+                hardware = _hardware().getDevices(),
+                console = logging().getCompleteStack(),
+                logSources = [
+                    *logging().getLogSourcesSummary(),
+                    *_hardware().getLogSourcesSummary()
+                    ]
             )
         
         @service.get('/log/update', 
@@ -193,23 +212,23 @@ class LeafyyWebApi(LeafyyComponent):
         def logList(request: Request, reversed = 0) -> _TemplateResponse:
             return self['logList'].render(
                 request,
-                logData = logging().logFolderSummary(reversed),
+                logData = logging().getLogFolderSummary(reversed),
                 reversed = reversed
             )
         
-        @service.get('/log/{name}',
+        @service.get('/log/{name}', response_class = FileStreamResponse,
             name = 'Скачивание файла журнала',
             description = 'Отправляет указанный файл журнала.')
         def logFile(request: Request, name: str) -> FileStreamResponse:
             return f'logs/{name}'
         
-        @service.get('/log/view/{name}', response_class = HTMLResponse,
+        @service.get('/log/view/{name}', response_class = HTMLResponse, response_model = LogFile,
             name = 'Просмотр файла журнала',
             description = 'Отрисовывает страницу просмотра указанного файла журнала.')
         def logFileView(request: Request, name: str) -> _TemplateResponse:
             return self['logView'].render(
                 request,
-                logFile = logging().logFile(name, html = True)
+                logFile = logging().getLogFile(name, html = True)
             )
 
         @service.post('/log',

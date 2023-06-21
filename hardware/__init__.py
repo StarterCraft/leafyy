@@ -7,6 +7,7 @@ from typing import Iterator, List, Any
 from leafyy import LeafyyComponent
 from leafyy import options
 from inspection import LeafyyLogger
+from models import LogSource
 
 
 class LeafyyStatus(Enum):
@@ -174,7 +175,7 @@ class LeafyyHardware(LeafyyComponent):
     def __len__(self) -> int:
         return len(self.devices)
     
-    def toDict(self) -> dict[str, Any]:
+    def getDevices(self) -> dict[str, Any]:
         return {
             'count': {
                 'total': len(self),
@@ -184,6 +185,10 @@ class LeafyyHardware(LeafyyComponent):
             },
             'devices': [d.toDict() for d in self]
         }
+    
+    def getLogSourcesSummary(self) -> list[LogSource]:
+        return [{'name': d.address, 'type': 'device', 'mute': d.visibleInConsole}
+            for d in self]
 
     def add(self, device: LeafyyDevice):
         self.devices.append(device)
