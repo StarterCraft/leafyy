@@ -54,6 +54,13 @@ class LeafyyLogging(QtCore.QObject):
     def getLogSourcesSummary(self) -> list[LogSource]:
         return [{'name': l.name, 'type': 'logger', 'mute': l.muteConsole} for l in self]
 
+    def configLogSources(self, config: list[LogSource]):
+        for c in config:
+            try:
+                self[c.name].visibleInConsole = c.mute
+            except KeyError:
+                continue
+
     def toStack(self, message: str):
         fwrite(self.completeBuffer, f'{message}\n', mode = 'a')
         fwrite(self.updateBuffer, f'{message}\n', mode = 'a')
