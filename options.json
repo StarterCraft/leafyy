@@ -1,13 +1,9 @@
 {
     "logLevel": "DEBUG",
     "logScrollMode": true,
-    "logLoggers": [
-        "All"
-    ],
-    "logDevices": [],
-    "logDecodeASCII": [
-        "COM3"
-    ],
+    "logLoggers": {
+        
+    },
     "webServerDebug": true,
     "serviceMode": 0,
     "serverPort": 38001

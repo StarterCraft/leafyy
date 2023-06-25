@@ -34,6 +34,10 @@ function hideModal(modalId) {
     $(".modal-field").css("display", "none");   
 }
 
+function toggleCheckbox(boxId) {
+    $("input#" + boxId).prop("checked", !$("input#" + boxId).prop("checked"));
+}
+
 $.ajaxSetup({
     processData: false,
     contentType: "application/json"

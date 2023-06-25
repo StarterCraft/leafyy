@@ -14,7 +14,7 @@ class LeafyyDevice(LeafyyComponent):
     def __init__(self, **kwargs):
         super().__init__(
             kwargs['name'],
-            loggerName = f'Device#{kwargs["address"]}',
+            loggerName = f'Device-{kwargs["address"]}',
             displayName = (
                 kwargs['displayName'] if 
                 ('displayName' in kwargs.keys()) else
@@ -25,11 +25,10 @@ class LeafyyDevice(LeafyyComponent):
         self.desc = kwargs['desc']
         self.isEnabled = kwargs['enabled']
         self.address = kwargs['address']
-        self.tempSensorDef = kwargs['tempSensor']
         self.plantsDef = kwargs['plants']
 
-        self.visibleInConsole = options().logWindowDevices(self.address)
-        self.decodeASCIIMode = options().logDecodeASCII(self.address)
+        self.decodeMode = kwargs['decodeMode']
+        self.visibleInConsole = kwargs['visibleInConsole']
 
         self.status = LeafyyStatus.Disabled
         self.logger.info(f'Инициализация устройства по адресу {self.address}')
@@ -68,7 +67,7 @@ class LeafyyDevice(LeafyyComponent):
             'name': self.name,
             'desc': self.desc,
             'status': self.status.value,
-            'tempSensor': self.tempSensorDef,
+            'decodeMode': self.decodeMode,
             'plants': [] #none
         }
 

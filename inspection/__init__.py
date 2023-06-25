@@ -3,7 +3,7 @@ from typing import Iterator
 from time import strftime, localtime
 from glob import glob
 from os.path import getsize, sep
-from stdlib import fread, fwrite
+from utillo import fread, fwrite
 from collections import deque
 
 from leafyy import options
@@ -21,8 +21,6 @@ class LeafyyLogging(QtCore.QObject):
         self.completeBuffer = 'logs/buffer/.log'
         self.updateBuffer = 'logs/buffer/update.log'
         self.errorBuffer = 'logs/buffer/error.log'
-        #self.completeStack = deque(maxlen = 1024)
-        #self.updateStack = deque(maxlen = 128)
 
         fwrite(self.completeBuffer, '')
         fwrite(self.updateBuffer, '')
@@ -51,13 +49,21 @@ class LeafyyLogging(QtCore.QObject):
             self.loggers.remove(
                 [l for l in self if (l.name == logger)][0])
             
-    def getLogSourcesSummary(self) -> list[LogSource]:
-        return [{'name': l.name, 'type': 'logger', 'mute': l.muteConsole} for l in self]
+    def getLogSources(self) -> list[LogSource]:
+        return [
+            {
+                'name': l.name,
+                'type': 'logger',
+                'mode': l.logLevel._name_,
+                'live': l.console
+            }
+             for l in self]
 
     def configLogSources(self, config: list[LogSource]):
         for c in config:
             try:
-                self[c.name].visibleInConsole = c.mute
+                self[c.name].console = c.live
+                self[c.name].setLogLevel(LeafyyLogLevel[c.mode])
             except KeyError:
                 continue
 
@@ -120,15 +126,16 @@ class LeafyyLogging(QtCore.QObject):
             dateTimeChunk = '{<span style="text-decoration: underline;">%s</span>}' % dateTimeChunk[1:-1]
 
             #Канал и уровень журналирования
-            loggerInfoChunk = f'[<span style="color: green;">{dataChunks[2][1:].split("@")[0]}</span>:'
+            loggerInfoChunk = f'[<span style="color: green;">{dataChunks[2][1:].split("@")[0]}</span>@'
             
             loggerLvl = dataChunks[2][:-1].split('@')[1]
             lvlColor = ''
             match loggerLvl:
-                case 'DEBUG': lvlColor = 'green'
+                case 'DEBUG': lvlColor = 'gray'
                 case 'INFO': lvlColor = 'blue'
                 case 'WARNING': lvlColor = 'orange'
-                case _: lvlColor = 'red'
+                case 'ERROR': lvlColor = 'red'
+                case _: lvlColor = 'darkred'
 
             loggerInfoChunk += f'<span style="color: {lvlColor};">{dataChunks[2][:-1].split("@")[1]}</span>]'
 

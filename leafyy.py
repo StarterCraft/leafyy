@@ -9,9 +9,9 @@ def deepget(self: dict, key: str, default: Any = None, sep: str = '.'):
     fetched = self
 
     for stepKey in steps:
-        fetched = fetched.get(stepKey, False)
+        fetched = fetched.get(stepKey, NotImplemented)
 
-        if (not fetched):
+        if (fetched is NotImplemented):
             return default
     
     return fetched
@@ -29,7 +29,10 @@ def tr(*args, **kwargs) -> str:
 def log():
     return app().log
 
-def options():
+def options(key: str = None, default: Any = None, sep: str = '.') -> dict | Any:
+    if (key):
+        return app().options(key, default, sep)
+    
     return app().options
 
 def ui():

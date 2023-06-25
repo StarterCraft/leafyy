@@ -12,7 +12,7 @@ from inspection.logger import LeafyyLogger
 from options           import LeafyyOptions
 from hardware          import LeafyyHardware
 from web               import LeafyyWebServer
-from web.api           import LeafyyWebApi
+from web.api           import LeafyyWebInterfaceApi
 
 
 __version__ = '0.a3'
@@ -41,12 +41,12 @@ class Leafyy(QtWidgets.QApplication):
         self.errors = LeafyyErrors()
 
         self.options = LeafyyOptions()
-        self.log.setGlobalLogLevel(self.options.logLevel)
+        self.log.setGlobalLogLevel(self.options.get('logLevel'))
 
         self.web = LeafyyWebServer()
         self.logger.info('Инициализировано ядро веб-сервера')
 
-        self.api = LeafyyWebApi()
+        self.api = LeafyyWebInterfaceApi()
         self.api.assign(self.web)
 
         self.hardware = LeafyyHardware()

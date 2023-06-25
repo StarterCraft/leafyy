@@ -1,7 +1,7 @@
 #coding=utf-8
 from typing     import Annotated
 from glob       import glob
-from stdlib     import fread, fwrite
+from utillo     import fread, fwrite
 from requests   import get
 from packaging  import version as versioning
 from re         import findall
@@ -20,7 +20,7 @@ from .responses import *
 from models     import *
 
 
-class LeafyyWebApi(LeafyyComponent):
+class LeafyyWebInterfaceApi(LeafyyComponent):
     def __init__(self) -> None:
         super().__init__('Web')
 
@@ -77,11 +77,17 @@ class LeafyyWebApi(LeafyyComponent):
             return f'web/resources/{resourceId}'
 
         def getWebLibraryVersion(libraryId: str) -> versioning.Version:
+            '''
+            Метод получает версию библиотеки из API и парсит её с помощью модуля versioning.
+            '''
             fetched = get(f'https://api.cdnjs.com/libraries/{libraryId}?fields=version').json()
             _version = fetched['version']
             return versioning.parse(_version)
 
         def getCachedLibraryVersion(libraryId: str) -> versioning.Version:
+            '''
+            Метод получает версию локальной копии библиотеки из файла, парсит её и возвращает.
+            '''
             code = fread(f'web/libraries/{libraryId}.js')
             regexMatch = findall(r'(v([0-9A-Za-z][.]{0,1})+)|$', code)[0]
             version = 'undefined'
@@ -92,9 +98,11 @@ class LeafyyWebApi(LeafyyComponent):
             return versioning.parse(version)
 
         @service.get('/libraries/web/{libraryId}.js', response_class = JsResponse,
-            name = 'stub',
-            description = 'stub')
+            name = 'Получить актуальную JS-библиотеку')
         def getWebLibrary(libraryId: str, request: Request) -> str:
+            '''
+            Метод получает новую версию библиотеки из API, сохраняет её в файл и возвращает её в виде строки.
+            '''
             fetched = get(f'https://api.cdnjs.com/libraries/{libraryId}?fields=latest,version').json()
             code = get(fetched['latest']).text
             version = fetched['version']
@@ -111,8 +119,7 @@ class LeafyyWebApi(LeafyyComponent):
             return code
 
         @service.get('/libraries/cache/{libraryId}.js', response_class = JsResponse,
-            name = 'stub',
-            description = 'stub')
+            name = 'Получить кэшированную JS-библиотеку')
         def getCachedLibrary(libraryId: str, request: Request) -> str:
             code = fread(f'web/libraries/{libraryId}.js')
             version = getCachedLibraryVersion(libraryId)
@@ -125,9 +132,14 @@ class LeafyyWebApi(LeafyyComponent):
             return code
 
         @service.get('/libraries/{libraryId}.js', response_class = JsResponse,
-            name = 'stub',
-            description = 'stub')
+            name = 'Получить JS-библиотеку')
         async def getLibrary(libraryId: str, request: Request) -> str:
+            '''
+            Метод получает библиотеку для клиента из API или из локальной копии
+            в зависимости от того, какая версия библиотеки актуальна. Если 
+            актуальность не удаётся проверить, метод подключит локальную копию и
+            вернёт её.
+            '''
             d = ''
 
             try: 
@@ -194,15 +206,11 @@ class LeafyyWebApi(LeafyyComponent):
                 request,
                 hardware = _hardware().getDevices(),
                 console = logging().getCompleteStack(),
-                logSources = [
-                    *logging().getLogSourcesSummary(),
-                    *_hardware().getLogSourcesSummary()
-                    ]
+                logConfig = logConfig(request)
             )
         
-        @service.get('/log/update', 
-            name = '',
-            description = 'hghfb')
+        @service.get('/log/update', response_model = list[str],
+            name = 'Получить стек новых сообщений консоли')
         def logUpdate():
             return logging().getUpdateStack()
         
@@ -241,6 +249,25 @@ class LeafyyWebApi(LeafyyComponent):
 
             response.status_code = 202
             return response
+        
+        @service.get('/log/config', response_model = LogConfig,
+            name = 'Получить настройки журналирования',
+            description = '')
+        def logConfig(request: Request):
+            c = {
+                'level': logging().globalLevel._name_,
+                'sources': logging().getLogSources()
+                }
+            
+            return c
+        
+        @service.put('/log/config',
+            name = 'Записать настройки журналирования',
+            description = '')
+        def setLogConfig(config: LogConfig, request: Request):
+            print(config)
+            logging().setGlobalLogLevel(config.level)
+            logging().configLogSources(config.sources)
 
         @service.get('/doc', response_class = HTMLResponse,
             name = 'Документация',

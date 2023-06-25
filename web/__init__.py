@@ -18,7 +18,7 @@ class LeafyyWebServer(
             loggerName = 'WebServer',
             title = 'Leafyy Web Interface', 
             description = 'Testing!',
-            debug = options().webServerDebug)
+            debug = options('webServerDebug', False))
 
     def uvicornate(self):
         urun(self, 

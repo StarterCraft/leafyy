@@ -113,6 +113,11 @@
     height: 16px;
 }
 
+.status-bar {
+    animation-name: animatetop;
+    animation-duration: 0.5s;
+}
+
 .modal-field {
     display: none;
     /* Hidden by default */
@@ -161,7 +166,7 @@
     row-gap: 8px;
     width: 90%;
     animation-name: animatetop;
-    animation-duration: 0.4s
+    animation-duration: 0.5s
 }
 
 /* Add Animation */
@@ -218,6 +223,14 @@
 
 .line-view.evenly {
     grid-template-columns: 1fr 1fr;
+}
+
+.line-view.column-gap {
+    column-gap: 8px;
+}
+
+.line-view.row-gap {
+    row-gap: 4px;
 }
 
 /* Log messages */

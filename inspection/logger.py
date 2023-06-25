@@ -87,8 +87,8 @@ class LeafyyLogger:
 
 
     def __init__(self, name: str, logLevel: LeafyyLogLevel = LeafyyLogLevel.DEBUG,
-                                  disableStdPrint: bool = False,
-                                  noConsole: bool = False):
+                                  stdPrint: bool = True,
+                                  console: bool = True):
         '''
         Инициализировать один канал журналирования.
 
@@ -115,8 +115,8 @@ class LeafyyLogger:
         super(LeafyyLogger, self).__init__()
         self.name = name
         self.logLevel = logLevel
-        self.printDsb = disableStdPrint
-        self.muteConsole = noConsole
+        self.printDsb = not stdPrint
+        self.console = console
 
         self.Logger = logging.getLogger(name)
         self.formatString = ''
@@ -131,11 +131,11 @@ class LeafyyLogger:
 
     @property
     def logWindowVisibility(self):
-        return self.muteConsole
+        return self.console
     
     @logWindowVisibility.setter
     def logWindowVisibility(self, value: bool):
-        self.muteConsole = value
+        self.console = value
         options().setlogWindowLoggers(self.name, value)
 
     def setLogLevel(self, logLevel: LeafyyLogLevel):
@@ -161,7 +161,7 @@ class LeafyyLogger:
 
     def toStack(self, message: str):
         'Отправить сообщение в стек'
-        if (not self.muteConsole):
+        if (self.console):
             log().toStack(message)
             
     def publish(self, value: LeafyyLogLevel | str, message: str):

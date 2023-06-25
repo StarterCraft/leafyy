@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 from PySide6 import QtCore, QtSerialPort, QtWidgets
-from json import load, dump
+from json import loads, dumps
 from enum import Enum
 from typing import Iterator, List, Any
+from utillo import fread, fwrite
 
 from leafyy import LeafyyComponent
 from leafyy import options
@@ -144,14 +145,15 @@ from .worker import LeafyyDeviceInitializationWorker
 
 
 class LeafyyHardware(LeafyyComponent):
+    FILENAME = 'device.json'
+
     def __init__(self):
         super().__init__('hardware')
 
         self.ports = QtSerialPort.QSerialPortInfo().availablePorts()
         self.logger.debug('Информация о портах получена')
 
-        with open('device.json', encoding='utf-8') as configFile:
-            self.config = load(configFile)
+        self.config = self.getConfig()
 
         self.logger.info('Загружены настройки устройств')
 
@@ -175,6 +177,12 @@ class LeafyyHardware(LeafyyComponent):
     def __len__(self) -> int:
         return len(self.devices)
     
+    def getConfig(self) -> list[dict]:
+        return loads(fread(self.FILENAME, encoding = 'utf-8'))
+    
+    def writeConfig(self, config: list[dict]):
+        fwrite(self.FILENAME, dumps(config))
+    
     def getDevices(self) -> dict[str, Any]:
         return {
             'count': {
@@ -185,10 +193,6 @@ class LeafyyHardware(LeafyyComponent):
             },
             'devices': [d.toDict() for d in self]
         }
-    
-    def getLogSourcesSummary(self) -> list[LogSource]:
-        return [{'name': d.address, 'type': 'device', 'mute': d.visibleInConsole}
-            for d in self]
 
     def add(self, device: LeafyyDevice):
         self.devices.append(device)

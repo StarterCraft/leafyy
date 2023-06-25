@@ -10,6 +10,7 @@
     <link rel="icon" type="image/png" href="/resources/favicon.png">
     <link rel="manifest" href="/site.webmanifest">
     <link rel="mask-icon" href="/resources/safari-pinned-tab.svg" color="#5bbad5">
+    <meta charset="utf-8">
     <meta name="msapplication-TileColor" content="#da532c">
     <meta name="theme-color" content="#fff3b4">
     <link rel="stylesheet" type="text/css" href="/leafyy.css">
@@ -51,25 +52,26 @@
                     <a class="action" href="#" onclick="toggleModal('log-settings')">отмена</a>
                 </nav>
             </div>
-            <div class="block vertical stretcher restricted">
-                <span class="bold grand">Уровень журнала</span>
-                <select class="formi code grand" id="log-level">
-                    <option value="DEBUG">DEBUG</option>
-                    <option value="INFO">INFO</option>
-                    <option value="WARNING">WARNING</option>
-                    <option value="ERROR">ERROR</option>
-                    <option value="EXCEPTION">EXCEPTION</option>
-                </select>
+            <div class="block vertical restricted">
+                <div class="stretcher">
+                    <span class="bold grand">Уровень журнала</span>
+                    <select class="formi code grand log-level" id="global" onchange="onLogLevelSelectChange('global')">
+                        <option value="DEBUG" style="color: gray;">DEBUG</option>
+                        <option value="INFO" style="color: blue;">INFO</option>
+                        <option value="WARNING" style="color: orange;">WARNING</option>
+                        <option value="ERROR" style="color: red;">ERROR</option>
+                        <option value="EXCEPTION" style="color: darkred;">EXCEPTION</option>
+                    </select>
+                </div>
+                <div class="stretcher" onclick="toggleCheckbox('consoleAutoScroll');">
+                    <div class="bold grand">Автопрокрутка</div>
+                    <input id="consoleAutoScroll" type="checkbox">
+                </div>
             </div>
             <div class="block vertical">
-                <div class="stretcher"
-                    onclick="$('#consoleShouldUpdate').prop('checked', !$('#consoleShouldUpdate').prop('checked'));">
-                    <div>
-                        <input id="consoleShouldUpdate" type="checkbox" onchange="">
-                        <span class="bold grand">
-                            Автобновление консоли
-                        </span>
-                    </div>
+                <div class="stretcher" onclick="toggleCheckbox('consoleShouldUpdate');">
+                    <div class="bold grand">Автообновление консоли</div>
+                    <input id="consoleShouldUpdate" type="checkbox">
                 </div>
                 <div class="stretcher">
                     <span>Минимальная частота:</span>
@@ -88,24 +90,35 @@
             </div>
             <div class="block vertical">
                 <div class="bold grand">
-                    Ограничения журнала
+                    Настройки журнала
                 </div>
-                <div class="line-view evenly">
+                <div class="line-view evenly row-gap column-gap">
                     <span class="bold">
-                        Заглушить каналы:
+                        Каналы журналирования:
                     </span>
                     <span class="bold">
-                        Заглушить устройства:
+                        Сообщения с устройств:
                     </span>
-                    <div class="line-view" id="loggersBlacklist">
-                        {% if logSources %}
-                        {% for source in logSources %}
+                    <div class="view vertical" id="loggersBlacklist">
+                        {% if logConfig.sources %}
+                        {% for source in logConfig.sources %}
                         {% if source.type == 'logger' %}
-                        <div>
-                            <input type="checkbox" id="muteLogger({{source.name}})" value="{{source.mute}}">
-                        </div>
-                        <div>
-                            {{source.name}}
+                        <div class="stretcher">
+                            <div>
+                                <input type="checkbox" id="{{source.name}}" checked="{{source.live}}">
+                                <label for="{{source.name}}">{{source.name}}</label>
+                            </div>
+                            <div>
+                            <span>Уровень логгера:</span>
+                            <select class="formi code log-level" id="{{source.name}}" 
+                                selected="{{source.mode}}" onchange="onLogLevelSelectChange('{{source.name}}')">
+                                <option value="DEBUG" style="color: gray;">DEBUG</option>
+                                <option value="INFO" style="color: blue;">INFO</option>
+                                <option value="WARNING" style="color: orange;">WARNING</option>
+                                <option value="ERROR" style="color: red;">ERROR</option>
+                                <option value="EXCEPTION" style="color: darkred;">EXCEPTION</option>
+                            </select>
+                            </div>
                         </div>
                         {% endif %}
                         {% endfor %}
@@ -114,17 +127,25 @@
                         <span>Нет каналов.</span>
                         {% endif %}
                     </div>
-                    <div class="line-view" id="devicesBlacklist">
-                        {% if logSources %}
-                        {% for source in logSources %}
-                        {% if source.type == 'device' %}
-                        <div>
-                            <input type="checkbox" id="muteLogger({{source.name}})" value="{{source.mute}}">
+                    <div class="view vertical" id="devicesBlacklist">
+                        {% if hardware.devices %}
+                        {% for device in hardware.devices %}
+                        <div class="stretcher">
+                            <div>
+                                <input type="checkbox" id="{{device.address}}" checked="{{device.visibleInConsole}}">
+                                <label for="{{device.address}}">{{device.address}}</label>
+                            </div>
+                            <div>
+                            <span>Режим декодирования:</span>
+                            <select class="formi code decode-mode" id="{{device.address}}" selected="{{device.decodeMode}}">
+                                <option value="ascii">ASCII</option>
+                                <option value="bin">BIN</option>
+                                <option value="oct">OCT</option>
+                                <option value="dec">DEC</option>
+                                <option value="hex">HEX</option>
+                            </select>
+                            </div>
                         </div>
-                        <div>
-                            {{source.name}}
-                        </div>
-                        {% endif %}
                         {% endfor %}
                         {% else %}
                         <div></div>
@@ -133,33 +154,8 @@
                     </div>
                 </div>
             </div>
-            <div class="block vertical">
-                <div class="bold grand">
-                    Отображение ответа устройств
-                </div>
-                {% if hardware %}
-                {% for device in hardware.devices %}
-                <div class="stretcher">
-                <div>
-                    {{device.address}}
-                </div>
-                <div>
-                    <select class="code formi" id="decodeMode({{device.address}})">
-                        <option value="ascii">ASCII</option>
-                        <option value="bin">BIN</option>
-                        <option value="oct">OCT</option>
-                        <option value="dec">DEC</option>
-                        <option value="hex">HEX</option>
-                    </select>
-                </div>
-                </div>
-                {% endfor %}
-                {% else %}
-                <div>Нет устройств.</div>
-                {% endif %}
-                </div>
-            </div>
         </div>
+    </div>
     </div>
     <!-- #endregion -->
     </div>
@@ -177,7 +173,7 @@
             {% endfor %}
         </div>
     </div>
-    <div class="block stretcher" style="display: none;" id="statusBar">
+    <div class="block stretcher status-bar" style="display: none;">
         <div id="status"></div>
         <div>
             <a class="action" href="#" onclick="hideStatusBar()">скрыть</a>
