@@ -191,6 +191,15 @@ class LeafyyWebInterfaceApi(LeafyyComponent):
                 request,
                 hardware = _hardware().getDevices()
             )
+        
+        @service.get('/hardware/config',
+            name = 'Страница оборудования',
+            description = 'Отрисовывает страницу оборудования с информацией о нем.')
+        def hardware(request: Request) -> _TemplateResponse:
+            return self['hardware'].render(
+                request,
+                hardware = _hardware().getDevices()
+            )
 
         @service.get('/rules', response_class = HTMLResponse,
             name = 'Правила',

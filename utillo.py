@@ -89,7 +89,7 @@ def pdt(arg: Iterable) -> SupportsInt:
     return p
 
 
-def fread(name: str, **kwargs) -> str | bytes | Any:
+def fread(name: str, encoding: str = 'utf-8', **kwargs) -> str | bytes | Any:
     '''
     Чтение данных из файла с заданным именем и параметрами открытия.
     '''
@@ -97,7 +97,7 @@ def fread(name: str, **kwargs) -> str | bytes | Any:
         return f.read()
 
 
-def fwrite(name: str, data, mode = 'w', **kwargs) -> None:
+def fwrite(name: str, data, encoding: str = 'utf-8', mode = 'w', **kwargs) -> None:
     '''
     Запись данных в файл с заданным именем и параметрами открытия.
     '''
