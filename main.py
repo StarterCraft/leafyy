@@ -53,6 +53,9 @@ class Leafyy(QtWidgets.QApplication):
         self.hardware.startDevices()
         self.logger.info('Инициализированы устройства')
 
+    def flush(self):
+        self.log.flushUpdateStack()
+
     @staticmethod
     def checkEnvironment():
         DIRS = [
@@ -61,6 +64,7 @@ class Leafyy(QtWidgets.QApplication):
 
         for dir in DIRS:
             makedirs(dir, exist_ok = True)
+
 
 
 def main():

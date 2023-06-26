@@ -18,11 +18,11 @@ class LeafyyLogging(QtCore.QObject):
         self.fileName = f'logs/Leafyy_{strftime("""%d.%m.%Y_%H%M%S""", localtime())}.log'
 
         #Вместо стеков попробуем использовать буферы
-        self.completeBuffer = 'logs/buffer/.log'
+        self.generalBuffer = 'logs/buffer/.log'
         self.updateBuffer = 'logs/buffer/update.log'
         self.errorBuffer = 'logs/buffer/error.log'
 
-        fwrite(self.completeBuffer, '')
+        fwrite(self.generalBuffer, '')
         fwrite(self.updateBuffer, '')
         fwrite(self.errorBuffer, '')
 
@@ -68,18 +68,23 @@ class LeafyyLogging(QtCore.QObject):
                 continue
 
     def toStack(self, message: str):
-        fwrite(self.completeBuffer, f'{message}\n', mode = 'a')
+        fwrite(self.generalBuffer, f'{message}\n', mode = 'a')
         fwrite(self.updateBuffer, f'{message}\n', mode = 'a')
+
+    def toErrorStack(self, message: str):
+        
 
     def toUpdateStack(self, message: str):
         fwrite(self.updateBuffer, f'{message}\n', mode = 'a')
+
+    
 
     def flushUpdateStack(self):
         fwrite(self.updateBuffer, '')
 
     def getCompleteStack(self) -> list[str]:
         self.flushUpdateStack()
-        return fread(self.completeBuffer).splitlines()
+        return fread(self.generalBuffer).splitlines()
     
     def getUpdateStack(self) -> list[str]:
         d = fread(self.updateBuffer).splitlines()
