@@ -92,9 +92,9 @@ class LeafyyDevice(LeafyyComponent):
     def start(self):
         self.logger.debug(f'Пытаюсь открыть порт {self.address}')
         self.port.readyRead.connect(self.receive)
-        self.port.open(QtSerialPort.QSerialPort.ReadWrite)
+        openingResult = self.port.open(QtSerialPort.QSerialPort.ReadWrite)
 
-        if (self.port.isOpen()): 
+        if (openingResult): 
             self.logger.info(f'Порт {self.address} открыт, 9600 бод')
             self.status = LeafyyStatus.Active
 
@@ -109,5 +109,7 @@ class LeafyyDevice(LeafyyComponent):
         return self.port.write(data)
 
     def receive(self):
-        msg = LeafyyDeviceMessage(self.address, self.port.readLine())
-        self.messages.append(msg)
+        if (self.port.canReadLine()):
+            msg = LeafyyDeviceMessage(self.address, self.port.read(128))
+            self.logger.info(repr(msg))
+            self.messages.append(msg)

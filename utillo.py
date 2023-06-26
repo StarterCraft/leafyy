@@ -93,7 +93,7 @@ def fread(name: str, encoding: str = 'utf-8', **kwargs) -> str | bytes | Any:
     '''
     Чтение данных из файла с заданным именем и параметрами открытия.
     '''
-    with open(name, **kwargs) as f:
+    with open(name, encoding = encoding, **kwargs) as f:
         return f.read()
 
 
@@ -101,5 +101,5 @@ def fwrite(name: str, data, encoding: str = 'utf-8', mode = 'w', **kwargs) -> No
     '''
     Запись данных в файл с заданным именем и параметрами открытия.
     '''
-    with open(name, mode, **kwargs) as f:
+    with open(name, mode, encoding = encoding, **kwargs) as f:
         f.write(data)

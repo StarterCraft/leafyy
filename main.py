@@ -41,7 +41,7 @@ class Leafyy(QtWidgets.QApplication):
         self.errors = LeafyyErrors()
 
         self.options = LeafyyOptions()
-        self.log.setGlobalLogLevel(self.options.get('logLevel'))
+        self.log.setGlobalLogLevel(self.options('logLevel'))
 
         self.web = LeafyyWebServer()
         self.logger.info('Инициализировано ядро веб-сервера')
@@ -50,7 +50,6 @@ class Leafyy(QtWidgets.QApplication):
         self.api.assign(self.web)
 
         self.hardware = LeafyyHardware()
-        self.hardware.startDevices()
         self.logger.info('Инициализированы устройства')
 
     def flush(self):
@@ -75,6 +74,9 @@ def main():
     app.web.startSeparately()
 
     app.logger.debug('Hi Ellie!')
+
+
+    app.hardware.startDevicesSingleThread()
 
     exit(app.exec())
 

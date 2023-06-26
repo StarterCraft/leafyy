@@ -67,29 +67,36 @@ class LeafyyLogging(QtCore.QObject):
             except KeyError:
                 continue
 
-    def toStack(self, message: str):
+    def toStack(self, message: str) -> None:
         fwrite(self.generalBuffer, f'{message}\n', mode = 'a')
         fwrite(self.updateBuffer, f'{message}\n', mode = 'a')
 
-    def toErrorStack(self, message: str):
-        
+    def toErrorStack(self, message: str) -> None:
+        fwrite(self.errorBuffer, f'{message}\n', mode = 'a')
 
-    def toUpdateStack(self, message: str):
+    def toUpdateStack(self, message: str) -> None:
         fwrite(self.updateBuffer, f'{message}\n', mode = 'a')
 
-    
-
-    def flushUpdateStack(self):
-        fwrite(self.updateBuffer, '')
-
-    def getCompleteStack(self) -> list[str]:
+    def getGeneralStack(self) -> list[str]:
         self.flushUpdateStack()
         return fread(self.generalBuffer).splitlines()
+    
+    def getErrorStack(self) -> list[str]:
+        return NotImplemented
     
     def getUpdateStack(self) -> list[str]:
         d = fread(self.updateBuffer).splitlines()
         self.flushUpdateStack()
         return d
+
+    def flushGeneralStack(self) -> None:
+        fwrite(self.generalBuffer, '')
+
+    def flushErrorStack(self) -> None:
+        fwrite(self.errorBuffer, '')
+
+    def flushUpdateStack(self) -> None:
+        fwrite(self.updateBuffer, '')
 
     def setGlobalLogLevel(self, level: LeafyyLogLevel | str | int):
         lvl = LeafyyLogLevel.DEBUG

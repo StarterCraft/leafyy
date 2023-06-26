@@ -250,6 +250,11 @@ function onUpdateConsoleData() {
 let consoleUpdatePeriod = minConsoleUpdatePeriod;
 let consoleUpdateIntervalId = null;
 
+function onManualUpdateConsoleData() {
+    onUpdateConsoleData();
+    consoleUpdatePeriod = minConsoleUpdatePeriod;
+}
+
 function keepConsoleUpdated() {
     onUpdateConsoleData();
 

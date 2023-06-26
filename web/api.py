@@ -133,7 +133,7 @@ class LeafyyWebInterfaceApi(LeafyyComponent):
 
         @service.get('/libraries/{libraryId}.js', response_class = JsResponse,
             name = 'Получить JS-библиотеку')
-        async def getLibrary(libraryId: str, request: Request) -> str:
+        def getLibrary(libraryId: str, request: Request) -> str:
             '''
             Метод получает библиотеку для клиента из API или из локальной копии
             в зависимости от того, какая версия библиотеки актуальна. Если 
@@ -214,7 +214,7 @@ class LeafyyWebInterfaceApi(LeafyyComponent):
             return self['log'].render(
                 request,
                 hardware = _hardware().getDevices(),
-                console = logging().getCompleteStack(),
+                console = logging().getGeneralStack(),
                 logConfig = logConfig(request)
             )
         
