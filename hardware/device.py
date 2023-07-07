@@ -1,13 +1,12 @@
 #coding=utf-8
-from PySide6 import QtCore, QtWidgets, QtSerialPort
-from collections import deque
-from typing import Any, Iterator
+from PySide6         import QtSerialPort
+from collections     import deque
+from typing          import Any, Iterator
 
-from leafyy  import LeafyyComponent
-from leafyy  import app, ui, options, hardware
-from inspection   import LeafyyLogger
-from hardware   import LeafyyStatus
-from .message import LeafyyDeviceMessage
+from leafyy.generic  import LeafyyComponent
+from leafyy          import options, hardware
+from hardware        import LeafyyStatus
+from .message        import LeafyyDeviceMessage
 
 
 class LeafyyDevice(LeafyyComponent):
@@ -38,10 +37,6 @@ class LeafyyDevice(LeafyyComponent):
         self.logger.debug(f'Инициализирован порт {self.address}, 9600 бод')
 
         self.messages = deque(maxlen = 64)
-        
-        if (self.isEnabled):
-            self.logger.debug('Пытаюсь запустить устройство в системе')
-            self.start()
 
         hardware().add(self)
 

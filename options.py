@@ -1,7 +1,7 @@
 #coding=utf-8
 from typing import List, Dict, Any
 from json   import loads, dumps
-from utillo import fread, fwrite
+from autils import fread, fwrite
 
 from leafyy import deepget
 

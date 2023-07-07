@@ -4,10 +4,10 @@ import os
 import time
 import inspect
 
-from leafyy      import ui, log, options
-from enum     import Enum
-from colorama import Fore, Style
-from datetime import datetime
+from leafyy         import log, options
+from enum           import Enum
+from colorama       import Fore, Style
+from datetime       import datetime
 
 
 class LeafyyLogLevel(Enum):

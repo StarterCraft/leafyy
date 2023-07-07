@@ -1,7 +1,7 @@
 #coding=utf-8
 from typing     import Annotated
 from glob       import glob
-from utillo     import fread, fwrite
+from autils     import fread, fwrite
 from requests   import get
 from packaging  import version as versioning
 from re         import findall
@@ -9,35 +9,36 @@ from re         import findall
 from fastapi              import FastAPI, Request
 from fastapi.templating   import Jinja2Templates
 from starlette.templating import _TemplateResponse
-from fastapi.responses    import Response, JSONResponse, HTMLResponse, FileResponse
+from fastapi.responses    import Response, HTMLResponse, FileResponse
 
-from leafyy     import hardware as _hardware
-from leafyy     import log as logging
-from leafyy     import LeafyyComponent
+from leafyy               import hardware as _hardware
+from leafyy               import log as logging
+from leafyy               import web
+from leafyy.generic       import LeafyyComponent
 
 from .template  import Template
-from .responses import *
-from models     import *
+from .responses import JsResponse, CssResponse, FileStreamResponse
 
 
-class LeafyyWebInterfaceApi(LeafyyComponent):
+class LeafyyWebInterface(LeafyyComponent):
     def __init__(self) -> None:
-        super().__init__('Web')
+        super().__init__('WebUi')
 
         self.jinja = Jinja2Templates('web/templates')
 
-        self.pages: dict[str, Template] = {}
-
-        self.loadWebPageTemplates()
+        self.pages= self.loadTemplates()
 
     def __getitem__(self, key: str) -> Template:
         return self.pages[key]
 
-    def loadWebPageTemplates(self):
+    def loadTemplates(self) -> dict[str, Template]:
+        td = {}        
         templateNames = [name.split('\\')[-1] for name in glob('web/templates/*')]
 
         for name in templateNames:
-            self.pages.update({name: Template(self.jinja, f'{name}/{name}.jinja')})
+            td.update({name: Template(self.jinja, f'{name}/{name}.jinja')})
+
+        return td
 
     def assign(self, service: FastAPI):
         @service.get('/leafyy.css', response_class = CssResponse,   
@@ -206,7 +207,7 @@ class LeafyyWebInterfaceApi(LeafyyComponent):
             description = 'Отрисовывает страницу с правилами.')
         def rules(request: Request) -> _TemplateResponse:
             return self['rules'].render(request)
-        
+
         @service.get('/log', response_class = HTMLResponse,
             name = 'Журнал',
             description = 'Отрисовывает страницу доступа к консоли и журналу.')
@@ -217,12 +218,7 @@ class LeafyyWebInterfaceApi(LeafyyComponent):
                 console = logging().getGeneralStack(),
                 logConfig = logConfig(request)
             )
-        
-        @service.get('/log/update', response_model = list[str],
-            name = 'Получить стек новых сообщений консоли')
-        def logUpdate():
-            return logging().getUpdateStack()
-        
+
         @service.get('/log/view', response_class = HTMLResponse,
             name = 'Просмотр файла журнала',
             description = 'Отрисовывает страницу со списком файлов журнала.')
@@ -232,13 +228,7 @@ class LeafyyWebInterfaceApi(LeafyyComponent):
                 logData = logging().getLogFolderSummary(reversed),
                 reversed = reversed
             )
-        
-        @service.get('/log/{name}', response_class = FileStreamResponse,
-            name = 'Скачивание файла журнала',
-            description = 'Отправляет указанный файл журнала.')
-        def logFile(request: Request, name: str) -> FileStreamResponse:
-            return f'logs/{name}'
-        
+
         @service.get('/log/view/{name}', response_class = HTMLResponse, response_model = LogFile,
             name = 'Просмотр файла журнала',
             description = 'Отрисовывает страницу просмотра указанного файла журнала.')
@@ -247,37 +237,7 @@ class LeafyyWebInterfaceApi(LeafyyComponent):
                 request,
                 logFile = logging().getLogFile(name, html = True)
             )
-
-        @service.post('/log',
-            name = 'Опубликовать сообщение журнала сервера',
-            description = 'Приказывает серверу опубликовать сообщение журнала от логгера Web.')
-        def logReport(message: LogReport, request: Request, response: Response):
-            self.logger.publish(message.level, message.message.replace(
-                'USER_IP', f'{request.client.host}:{request.client.port}'
-            ))
-
-            response.status_code = 202
-            return response
         
-        @service.get('/log/config', response_model = LogConfig,
-            name = 'Получить настройки журналирования',
-            description = '')
-        def logConfig(request: Request):
-            c = {
-                'level': logging().globalLevel._name_,
-                'sources': logging().getLogSources()
-                }
-            
-            return c
-        
-        @service.put('/log/config',
-            name = 'Записать настройки журналирования',
-            description = '')
-        def setLogConfig(config: LogConfig, request: Request):
-            print(config)
-            logging().setGlobalLogLevel(config.level)
-            logging().configLogSources(config.sources)
-
         @service.get('/doc', response_class = HTMLResponse,
             name = 'Документация',
             description = 'Отрисовывает страницу с документацией.')
