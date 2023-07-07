@@ -1,8 +1,6 @@
-from PySide6           import QtCore, QtWidgets
+from PySide6           import QtWidgets
 from sys               import argv, exit
 from os                import makedirs
-from webbrowser        import open as url
-from enum              import Enum
 from packaging         import version as versioning
 
 
@@ -11,8 +9,8 @@ from inspection.errors import LeafyyErrors
 from inspection.logger import LeafyyLogger
 from options           import LeafyyOptions
 from hardware          import LeafyyHardware
-from web               import LeafyyWebServer
-from web.api           import LeafyyWebInterfaceApi
+from web               import LeafyyWebService
+from web.api           import LeafyyWebInterface
 
 
 __version__ = '0.a3'
@@ -22,18 +20,16 @@ __version__ = '0.a3'
 #связанный с ним код закомментирован или удалён
 
 
-class LeafyyServiceMode(Enum):
-    WebOnly = 0
-    QtGuiOnly = 1
-    Combined = 2
-
-
 class Leafyy(QtWidgets.QApplication):
     version = versioning.parse(__version__)
 
     def __init__(self, argv: list[str]) -> None:
         super().__init__(argv)
         assert QtWidgets.QApplication.instance() is self
+        self.aboutToQuit.connect(self.flush)
+
+        print(f'Starting Leafyy v.{self.version}, uncopyrighted')
+        print(f'Запуск "Листочка" версии {self.version}, авторские права не защищены')
 
         self.log = LeafyyLogging()
         self.logger = LeafyyLogger('App')
@@ -43,16 +39,18 @@ class Leafyy(QtWidgets.QApplication):
         self.options = LeafyyOptions()
         self.log.setGlobalLogLevel(self.options('logLevel'))
 
-        self.web = LeafyyWebServer()
+        self.web = LeafyyWebService()
         self.logger.info('Инициализировано ядро веб-сервера')
 
-        self.api = LeafyyWebInterfaceApi()
-        self.api.assign(self.web)
+        self.ui = LeafyyWebInterface()
+        self.ui.assign(self.web)
 
         self.hardware = LeafyyHardware()
         self.logger.info('Инициализированы устройства')
 
     def flush(self):
+        self.log.flushGeneralStack()
+        self.log.flushErrorStack()
         self.log.flushUpdateStack()
 
     @staticmethod
@@ -65,18 +63,13 @@ class Leafyy(QtWidgets.QApplication):
             makedirs(dir, exist_ok = True)
 
 
-
 def main():
     Leafyy.checkEnvironment()
-
     app = Leafyy(argv)
     
-    app.web.startSeparately()
-
+    app.web.start()
     app.logger.debug('Hi Ellie!')
-
-
-    app.hardware.startDevicesSingleThread()
+    app.hardware.initDevices()
 
     exit(app.exec())
 

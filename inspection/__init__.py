@@ -3,12 +3,12 @@ from typing import Iterator
 from time import strftime, localtime
 from glob import glob
 from os.path import getsize, sep
-from utillo import fread, fwrite
+from autils import fread, fwrite
 from collections import deque
 
-from leafyy import options
+from leafyy            import options
 from inspection.logger import LeafyyLogLevel, LeafyyLogger
-from models import Log, LogFile, LogSource
+from .models           import Log, LogSource
 
 
 class LeafyyLogging(QtCore.QObject):
