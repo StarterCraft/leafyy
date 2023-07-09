@@ -1,10 +1,9 @@
 {
     "logLevel": "DEBUG",
-    "logScrollMode": true,
     "logLoggers": {
         
     },
-    "webServerDebug": true,
+    "webServiceDebug": true,
     "serviceMode": 0,
     "serverPort": 38001
 }

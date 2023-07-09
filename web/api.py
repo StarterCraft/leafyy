@@ -40,38 +40,38 @@ class LeafyyWebInterface(LeafyyComponent):
 
         return td
 
-    def assign(self, service: FastAPI):
-        @service.get('/leafyy.css', response_class = CssResponse,   
+    def assignApi(self):
+        @web().get('/leafyy.css', response_class = CssResponse,   
             name = 'Получить глобальный CSS',
             description = 'Получает глобальный CSS-файл, необходимый для работы веб-сервиса.')
         def getGlobalCss() -> str:
             return fread('web/leafyy.css')
 
-        @service.get('/{cssId}.css', response_class = CssResponse,
+        @web().get('/{cssId}.css', response_class = CssResponse,
             name = 'Получить CSS по ID',
             description = 'Получает указанный CSS-файл на основе предоставленного ID.')
         def getCss(cssId: str) -> str:
             return fread(f'web/templates/{cssId}/{cssId}.css')
 
-        @service.get('/leafyy.js', response_class = JsResponse,
+        @web().get('/leafyy.js', response_class = JsResponse,
             name = 'Получить глобальный JS',
             description = 'Получает глобальный JS-файл, необходимый для работы веб-сервиса.')
         def getGlobalJs() -> str:
             return fread('web/leafyy.js')
 
-        @service.get('/{scriptId}.js', response_class = JsResponse,
+        @web().get('/{scriptId}.js', response_class = JsResponse,
             name = 'Получить JS по ID',
             description = 'Получает указанный JS-файл на основе предоставленного ID.')
         def getJs(scriptId: str) -> str:
             return fread(f'web/templates/{scriptId}/{scriptId}.js')
 
-        @service.get('/site.webmanifest', response_class = Response,
+        @web().get('/site.webmanifest', response_class = Response,
             name = 'Получить веб манифест',
             description = 'Получает файл веб манифеста.')
         def getWebManifest() -> str:
             return fread('web/site.webmanifest')
 
-        @service.get('/resources/{resourceId}', response_class = FileResponse,
+        @web().get('/resources/{resourceId}', response_class = FileResponse,
             name = 'Получить ресурс по ID',
             description = 'Получает указанный ресурс на основе предоставленного ID.')
         def getResource(resourceId: str) -> FileResponse:
@@ -98,7 +98,7 @@ class LeafyyWebInterface(LeafyyComponent):
 
             return versioning.parse(version)
 
-        @service.get('/libraries/web/{libraryId}.js', response_class = JsResponse,
+        @web().get('/libraries/web/{libraryId}.js', response_class = JsResponse,
             name = 'Получить актуальную JS-библиотеку')
         def getWebLibrary(libraryId: str, request: Request) -> str:
             '''
@@ -119,7 +119,7 @@ class LeafyyWebInterface(LeafyyComponent):
 
             return code
 
-        @service.get('/libraries/cache/{libraryId}.js', response_class = JsResponse,
+        @web().get('/libraries/cache/{libraryId}.js', response_class = JsResponse,
             name = 'Получить кэшированную JS-библиотеку')
         def getCachedLibrary(libraryId: str, request: Request) -> str:
             code = fread(f'web/libraries/{libraryId}.js')
@@ -132,7 +132,7 @@ class LeafyyWebInterface(LeafyyComponent):
 
             return code
 
-        @service.get('/libraries/{libraryId}.js', response_class = JsResponse,
+        @web().get('/libraries/{libraryId}.js', response_class = JsResponse,
             name = 'Получить JS-библиотеку')
         def getLibrary(libraryId: str, request: Request) -> str:
             '''
@@ -163,19 +163,19 @@ class LeafyyWebInterface(LeafyyComponent):
 
             return d
 
-        @service.get('/favicon.ico', response_class = FileResponse,
+        @web().get('/favicon.ico', response_class = FileResponse,
             name = 'Получить favicon',
             description = 'Получает favicon.')
         def getFavicon() -> FileResponse:
             return f'web/resources/favicon.svg'
 
-        @service.get('/auth', response_class = HTMLResponse,
+        @web().get('/auth', response_class = HTMLResponse,
             name = 'Авторизация',
             description = 'Отрисовывает страницу авторизации.')
         def auth(request: Request) -> _TemplateResponse:
             return self['auth'].render(request)
 
-        @service.get('/', response_class = HTMLResponse, 
+        @web().get('/', response_class = HTMLResponse, 
             name = 'Главная страница',
             description = 'Отрисовывает главную страницу с информацией о грядках.')
         def index(request: Request) -> _TemplateResponse:
@@ -184,7 +184,7 @@ class LeafyyWebInterface(LeafyyComponent):
                 hardware = _hardware().getDevices()
             )
 
-        @service.get('/hardware', response_class = HTMLResponse,
+        @web().get('/hardware', response_class = HTMLResponse,
             name = 'Страница оборудования',
             description = 'Отрисовывает страницу оборудования с информацией о нем.')
         def hardware(request: Request) -> _TemplateResponse:
@@ -193,7 +193,7 @@ class LeafyyWebInterface(LeafyyComponent):
                 hardware = _hardware().getDevices()
             )
         
-        @service.get('/hardware/config',
+        @web().get('/hardware/config',
             name = 'Страница оборудования',
             description = 'Отрисовывает страницу оборудования с информацией о нем.')
         def hardware(request: Request) -> _TemplateResponse:
@@ -202,13 +202,13 @@ class LeafyyWebInterface(LeafyyComponent):
                 hardware = _hardware().getDevices()
             )
 
-        @service.get('/rules', response_class = HTMLResponse,
+        @web().get('/rules', response_class = HTMLResponse,
             name = 'Правила',
             description = 'Отрисовывает страницу с правилами.')
         def rules(request: Request) -> _TemplateResponse:
             return self['rules'].render(request)
 
-        @service.get('/log', response_class = HTMLResponse,
+        @web().get('/log', response_class = HTMLResponse,
             name = 'Журнал',
             description = 'Отрисовывает страницу доступа к консоли и журналу.')
         def log(request: Request) -> _TemplateResponse:
@@ -216,10 +216,10 @@ class LeafyyWebInterface(LeafyyComponent):
                 request,
                 hardware = _hardware().getDevices(),
                 console = logging().getGeneralStack(),
-                logConfig = logConfig(request)
+                logConfig = logging().getConfig()
             )
 
-        @service.get('/log/view', response_class = HTMLResponse,
+        @web().get('/log/view', response_class = HTMLResponse,
             name = 'Просмотр файла журнала',
             description = 'Отрисовывает страницу со списком файлов журнала.')
         def logList(request: Request, reversed = 0) -> _TemplateResponse:
@@ -229,7 +229,7 @@ class LeafyyWebInterface(LeafyyComponent):
                 reversed = reversed
             )
 
-        @service.get('/log/view/{name}', response_class = HTMLResponse, response_model = LogFile,
+        @web().get('/log/view/{name}', response_class = HTMLResponse,
             name = 'Просмотр файла журнала',
             description = 'Отрисовывает страницу просмотра указанного файла журнала.')
         def logFileView(request: Request, name: str) -> _TemplateResponse:
@@ -238,13 +238,13 @@ class LeafyyWebInterface(LeafyyComponent):
                 logFile = logging().getLogFile(name, html = True)
             )
         
-        @service.get('/doc', response_class = HTMLResponse,
+        @web().get('/doc', response_class = HTMLResponse,
             name = 'Документация',
             description = 'Отрисовывает страницу с документацией.')
         def doc(request: Request) -> _TemplateResponse:
             return self['doc'].render(request)
 
-        @service.post('/console')
+        @web().post('/console')
         def testConsole(
             command: ConsoleCommand,
             response: Response):

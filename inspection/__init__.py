@@ -12,6 +12,8 @@ from .models           import Log, LogSource
 
 
 class LeafyyLogging(QtCore.QObject):
+    loggers: list[LeafyyLogger] = []
+
     def __init__(self) -> None:
         super().__init__()
 
@@ -26,17 +28,23 @@ class LeafyyLogging(QtCore.QObject):
         fwrite(self.updateBuffer, '')
         fwrite(self.errorBuffer, '')
 
-        self.loggers: list[LeafyyLogger] = []
         self.globalLevel = LeafyyLogLevel.DEBUG
         
-    def __getitem__(self, name: str) -> LeafyyLogger:
-        try:
-            return [l for l in self.loggers if (l.name == name)][0]
-        except IndexError:
-            raise KeyError(f'Канала журналирования {name} не найдено', name)
+    def __getitem__(self, key: int | str) -> LeafyyLogger:
+        if (isinstance(key, str)):
+            try:
+                return [l for l in self.loggers if (l.name == key)][0]
+            except IndexError as e:
+                raise KeyError(f'Канала журналирования {key} не найдено', key) from e
+            
+        else:
+            return self.loggers[key]
         
     def __iter__(self) -> Iterator[LeafyyLogger]:
         return iter(self.loggers)
+    
+    def __len__(self) -> int:
+        return len(self.loggers)
 
     def add(self, logger: LeafyyLogger):
         self.loggers.append(logger)
@@ -49,17 +57,10 @@ class LeafyyLogging(QtCore.QObject):
             self.loggers.remove(
                 [l for l in self if (l.name == logger)][0])
             
-    def getLogSources(self) -> list[LogSource]:
-        return [
-            {
-                'name': l.name,
-                'type': 'logger',
-                'mode': l.logLevel._name_,
-                'live': l.console
-            }
-             for l in self]
+    def getConfig(self) -> list[LogSource]:
+        return L
 
-    def configLogSources(self, config: list[LogSource]):
+    def setConfig(self, config: list[LogSource]):
         for c in config:
             try:
                 self[c.name].console = c.live
@@ -88,6 +89,11 @@ class LeafyyLogging(QtCore.QObject):
         d = fread(self.updateBuffer).splitlines()
         self.flushUpdateStack()
         return d
+    
+    def flush(self):
+        self.flushGeneralStack()
+        self.flushErrorStack()
+        self.flushUpdateStack()
 
     def flushGeneralStack(self) -> None:
         fwrite(self.generalBuffer, '')

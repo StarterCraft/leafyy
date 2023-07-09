@@ -1,9 +1,11 @@
 from PySide6           import QtWidgets
-from sys               import argv, exit
+from sys               import argv, iexit
 from os                import makedirs
+from typing            import Iterator
 from packaging         import version as versioning
 
 
+from leafyy.generic    import LeafyyComponent
 from inspection        import LeafyyLogging
 from inspection.errors import LeafyyErrors
 from inspection.logger import LeafyyLogger
@@ -22,11 +24,11 @@ __version__ = '0.a3'
 
 class Leafyy(QtWidgets.QApplication):
     version = versioning.parse(__version__)
+    components: list[LeafyyComponent] = []
 
     def __init__(self, argv: list[str]) -> None:
         super().__init__(argv)
         assert QtWidgets.QApplication.instance() is self
-        self.aboutToQuit.connect(self.flush)
 
         print(f'Starting Leafyy v.{self.version}, uncopyrighted')
         print(f'Запуск "Листочка" версии {self.version}, авторские права не защищены')
@@ -42,16 +44,31 @@ class Leafyy(QtWidgets.QApplication):
         self.web = LeafyyWebService()
         self.logger.info('Инициализировано ядро веб-сервера')
 
-        self.ui = LeafyyWebInterface()
-        self.ui.assign(self.web)
-
         self.hardware = LeafyyHardware()
         self.logger.info('Инициализированы устройства')
 
-    def flush(self):
-        self.log.flushGeneralStack()
-        self.log.flushErrorStack()
-        self.log.flushUpdateStack()
+        self.ui = LeafyyWebInterface()
+
+        self.assignApis()
+
+    def __getitem__(self, key: int | str) -> LeafyyComponent:
+        if (isinstance(key, str)):
+            try:
+                return [c for c in self.components if (c.name == key)][0]
+            except IndexError as e:
+                raise KeyError(f'Компонента {key} не найдено') from e
+            
+        else:
+            return self.components[key]
+        
+    def __iter__(self) -> Iterator[LeafyyComponent]:
+        return iter(self.loggers)
+    
+    def __len__(self) -> int:
+        return len(self.components)
+
+    def add(self, logger: LeafyyComponent):
+        self.components.append(logger)
 
     @staticmethod
     def checkEnvironment():
@@ -62,6 +79,11 @@ class Leafyy(QtWidgets.QApplication):
         for dir in DIRS:
             makedirs(dir, exist_ok = True)
 
+    def assignApis(self):
+        for component in self:
+            if (hasattr(component, 'assignApi')):
+                component.assignApi(component)
+
 
 def main():
     Leafyy.checkEnvironment()
@@ -71,7 +93,7 @@ def main():
     app.logger.debug('Hi Ellie!')
     app.hardware.initDevices()
 
-    exit(app.exec())
+    iexit(app.exec())
 
 
 if (__name__ == '__main__'):

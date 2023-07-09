@@ -10,11 +10,11 @@ class LeafyyWebService(
     FastAPI):
     def __init__(self) -> None:
         super().__init__(
-            'WebServer',
-            loggerName = 'WebServer',
+            'WebService',
+            loggerName = 'WebService',
             title = 'Leafyy Web Service', 
             description = 'Testing!',
-            debug = options('webServerDebug', False))
+            debug = options('webServiceDebug', False))
 
     def uvicornate(self):
         urun(self, 

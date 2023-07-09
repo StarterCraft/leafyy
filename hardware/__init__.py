@@ -13,7 +13,8 @@ from .device  import LeafyyDevice
 
 
 class LeafyyHardware(LeafyyComponent):
-    FILENAME = 'device.json'
+    configFileName = 'device.json'
+    devices: List[LeafyyDevice] = []
 
     def __init__(self):
         super().__init__('hardware')
@@ -25,7 +26,6 @@ class LeafyyHardware(LeafyyComponent):
 
         self.logger.info('Загружены настройки устройств')
 
-        self.devices: List[LeafyyDevice] = []
         self.threads = []
         self.pool = QtCore.QThreadPool()
 
@@ -33,11 +33,15 @@ class LeafyyHardware(LeafyyComponent):
         #self.startDevices()
         #INITIALIZER не работает. Пока без многопотокового решения
 
-    def __getitem__(self, address: str) -> LeafyyDevice:
-        try:
-            return [d for d in self.devices if (d.address == address)][0]
-        except IndexError:
-            raise KeyError(f'Устройства по адресу {address} не найдено')
+    def __getitem__(self, key: int | str) -> LeafyyDevice:
+        if (isinstance(key, str)):
+            try:
+                return [d for d in self.devices if (d.address == key)][0]
+            except IndexError as e:
+                raise KeyError(f'Устройства по адресу {key} не найдено') from e
+            
+        else:
+            return self.devices[key]
         
     def __iter__(self) -> Iterator[LeafyyDevice]:
         return iter(self.devices)
@@ -46,10 +50,10 @@ class LeafyyHardware(LeafyyComponent):
         return len(self.devices)
     
     def getConfig(self) -> list[dict]:
-        return loads(fread(self.FILENAME, encoding = 'utf-8'))
+        return loads(fread(self.configFileName, encoding = 'utf-8'))
     
     def writeConfig(self, config: list[dict]):
-        fwrite(self.FILENAME, dumps(config))
+        fwrite(self.configFileName, dumps(config))
     
     def getDevices(self) -> dict[str, Any]:
         return {
