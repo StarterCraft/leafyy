@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from typing import Any
 from fastapi import Request
 from starlette.templating import Jinja2Templates, _TemplateResponse

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from PySide6           import QtCore
 from inspection.logger import LeafyyLogger
 

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from starlette.responses import Response
 
 

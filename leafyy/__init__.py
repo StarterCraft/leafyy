@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from PySide6         import QtCore, QtWidgets
 from fastapi         import FastAPI
 from typing          import Any, overload
