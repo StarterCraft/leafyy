@@ -1,27 +1,23 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, PositiveInt
 from typing   import Optional
 
 
-class LogSource(BaseModel):
-    name:  str
-    type:  str
-    mode:  str
-    live:  bool
+class Logger(BaseModel):
+    name:   str
+    level:  str
+    live:   bool
 
 class LogConfig(BaseModel):
     level:   str
-    sources: list[LogSource]
-
-class LogFile(BaseModel):
-    name: str
-    size: int
+    loggers: list[Logger]
 
 class Log(BaseModel):
     name:  str
-    size:  int
-    lines: list[str]
+    size:  PositiveInt
+    lines: Optional[list[str]]
 
 class LogReport(BaseModel):
+    time:    PositiveInt
     level:   str
     message: str
     

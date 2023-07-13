@@ -5,7 +5,7 @@ from logging  import getLevelName
 from enum     import Enum
 
 from leafyy  import log
-from leafyy  import ui, options, hardware
+from leafyy  import ui, options, devices
 from inspection   import LeafyyLogger, LeafyyLogLevel
 
 from ui       import LeafyyUiComponent, LeafyyUiComponentType
@@ -148,10 +148,10 @@ class LeafyyLogWindow(
                 continue
 
             if (text.startswith('Все')):
-                action.setChecked(all(d.logWindow for d in hardware()))
+                action.setChecked(all(d.logWindow for d in devices()))
                 continue
                 
-            action.setChecked(hardware()[text].logWindow)
+            action.setChecked(devices()[text].logWindow)
 
     def show(self, force: bool = False):
         if (force or not self.isVisible()):
@@ -211,13 +211,13 @@ class LeafyyLogWindow(
             for a in [ac for ac in self.setLoggingSourceActions.actions()
                       if (ac != self.allASCIIAction)]:
                 a.setChecked(isChecked)
-                hardware()[a.text()].logDecodeASCIIMode = isChecked
+                devices()[a.text()].logDecodeASCIIMode = isChecked
 
             options().setLogDecodeASCII('All', isChecked)
             return
 
-        self.allASCIIAction.setChecked(all(d.decodeASCIIMode for d in hardware()))
-        hardware()[text].decodeASCII = isChecked
+        self.allASCIIAction.setChecked(all(d.decodeASCIIMode for d in devices()))
+        devices()[text].decodeASCII = isChecked
 
     def setLoggerVisibility(self, triggered: QtGui.QAction):
         text = triggered.text()
@@ -226,7 +226,7 @@ class LeafyyLogWindow(
 
         vendor = (log() 
                   if (data == 'logger') 
-                  else hardware())
+                  else devices())
         
         config = (options().setLogWindowLoggers  
                   if (data == 'logger') else 
@@ -288,7 +288,7 @@ class LeafyyLogWindow(
 
         self.logger.debug(f'Пытаюсь отправить сообщение на порт {port}')
 
-        if (hardware()[port].send(text) != -1):
+        if (devices()[port].send(text) != -1):
             self.txtLogDisplay.append(
                 f'<span style="color:gray">{datetime.now()}</span> '
                 f'[Вы к <span style="color:lime">{port}</span>]: {text}')

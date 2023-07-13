@@ -1,8 +1,8 @@
 [
     {
         "address": "COM3",
-        "name": "канал полива для тестирования",
-        "desc": "необходимо для тестирования системы",
+        "displayName": "канал полива для тестирования",
+        "description": "необходимо для тестирования системы",
         "enabled": true,
         "visibleInConsole": true,
         "decodeMode": "ascii",

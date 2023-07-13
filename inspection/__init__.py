@@ -1,18 +1,26 @@
-from PySide6 import QtCore, QtWidgets
+from PySide6 import QtCore
 from typing import Iterator
 from time import strftime, localtime
 from glob import glob
-from os.path import getsize, sep
+from os.path import getsize, getmtime, sep
 from autils import fread, fwrite
-from collections import deque
 
-from leafyy            import options
+from fastapi           import FastAPI
+
+from leafyy            import web
 from inspection.logger import LeafyyLogLevel, LeafyyLogger
-from .models           import Log, LogSource
+from .api              import LeafyyLoggingApi
+from .models           import Log, LogConfig
 
 
-class LeafyyLogging(QtCore.QObject):
+class LeafyyLogging(
+    QtCore.QObject,
+    LeafyyLoggingApi
+    ):
     loggers: list[LeafyyLogger] = []
+    api = FastAPI(
+        title = 'API Листочка: подсистема журнала'
+    )
 
     def __init__(self) -> None:
         super().__init__()
@@ -57,14 +65,25 @@ class LeafyyLogging(QtCore.QObject):
             self.loggers.remove(
                 [l for l in self if (l.name == logger)][0])
             
-    def getConfig(self) -> list[LogSource]:
-        return L
+    def model(self) -> LogConfig:
+        return {
+            'level': self.globalLevel.name,
+            'loggers': [l.model() for l in self]}
 
-    def setConfig(self, config: list[LogSource]):
+    def assignApi(self):
+        self.assign()
+        web().mount('/log', self.api)
+            
+    def getConfig(self) -> LogConfig:
+        return self.model()
+
+    def setConfig(self, config: LogConfig):
+        self.setGlobalLogLevel()
+
         for c in config:
             try:
                 self[c.name].console = c.live
-                self[c.name].setLogLevel(LeafyyLogLevel[c.mode])
+                self[c.name].setLogLevel(LeafyyLogLevel[c.level])
             except KeyError:
                 continue
 
@@ -118,17 +137,15 @@ class LeafyyLogging(QtCore.QObject):
         for logger in self:
             logger.setLogLevel(lvl)
 
-    def getLogFolderSummary(self, reversed) -> list[dict[str, str]]:
+    def getLogFolderSummary(self, reversed = False) -> list[Log]:
         data = [
             {'name': fileName.split(sep)[-1],
+             'time': int(getmtime(fileName)),
              'size': getsize(fileName),
             } 
             for fileName in glob('logs/*.log')]
         
-        if (reversed):
-            return data
-
-        return data[::-1]
+        return sorted(data, key = lambda t: t['time'], reverse = not bool(reversed))
     
     def formatLog(self, log: list[str]) -> list[str]:
         logs = []
@@ -209,7 +226,6 @@ class LeafyyLogging(QtCore.QObject):
         else:
             data.update(lines = fread(f'logs/{name}', encoding = 'utf-8').splitlines())
                 
-        print(data['size'])
 
         return data
         

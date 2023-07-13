@@ -44,11 +44,14 @@ def options(key: str = None, default: Any = None, sep: str = '.') -> dict | Any:
 def web() -> FastAPI:
     return app().web
 
-def hardware():
-    return app().hardware
+def devices():
+    return app().devices
 
 def rules():
     return app().rules
+
+def ui():
+    return app().ui
 
 def cli(cmd = None):
     if (cmd):

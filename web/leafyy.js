@@ -60,20 +60,22 @@ function report(level, message, callback = reportStdCallback) {
     level = level.toUpperCase();
     if (!levels.includes(level)){
         throw SyntaxError("Unsupported level: " + level);
-}
-    var xmlHttp = new XMLHttpRequest();
-
-    xmlHttp.onreadystatechange = () => callback(xmlHttp);
-
-    xmlHttp.open("POST", "/log", true); // true for asynchronous
-
-    // Send the proper header information along with the request
-    xmlHttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-
-    const d = {
-        "level": level, 
-        "message": message
-    };
-
-    xmlHttp.send(JSON.stringify(d));
+    }
+    
+    $.ajax({
+        url: "/log",
+        type: "POST",
+        contentType: "application/json;charset=UTF-8",
+        data: JSON.stringify({
+            "time": Date.now(),
+            "level": level,
+            "message": message
+        }),
+        success: data => {
+            callback(data);
+        },
+        error: request => {
+            console.warn(request.responseText);
+        }
+    });
 }

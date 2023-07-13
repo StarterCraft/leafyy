@@ -23,7 +23,7 @@
         <nav class="actionblock">
             <a class="action" href="/">домой</a>
             <a class="action" href="/rules">правила</a>
-            <a class="action" href="/hardware">устройства</a>
+            <a class="action" href="/devices">устройства</a>
             <a class="action" href="/log">консоль</a>
             <a class="action" href="/doc">справка</a>
         </nav>
@@ -41,26 +41,26 @@
             Устройства:
         </span>
         <span class="code">
-            {% if hardware %}
-            всего: {{hardware.count.total}},
-            {% if hardware.count.active %}
+            {% if devices %}
+            всего: {{devices.count.total}},
+            {% if devices.count.active %}
             <span class="positive">
             {% else %}
             <span>
             {% endif %}
-            активны: {{hardware.count.active}}</span>,
-            {% if hardware.count.failed %}
+            активны: {{devices.count.active}}</span>,
+            {% if devices.count.failed %}
             <span class="negative">
             {% else %}
             <span>
             {% endif %}
-            ошибка: {{hardware.count.failed}}</span>,
-            {% if hardware.count.disabled %}
+            ошибка: {{devices.count.failed}}</span>,
+            {% if devices.count.disabled %}
             <span class="inactive">
             {% else %}
             <span>
             {% endif %}
-            отключены: {{hardware.count.disabled}}</span>
+            отключены: {{devices.count.disabled}}</span>
             {% else %}
             Устройства не инициализированы.
             {% endif %}

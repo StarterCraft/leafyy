@@ -11,13 +11,13 @@ from fastapi.templating   import Jinja2Templates
 from starlette.templating import _TemplateResponse
 from fastapi.responses    import Response, HTMLResponse, FileResponse
 
-from leafyy               import hardware as _hardware
+from leafyy               import devices as _devices
 from leafyy               import log as logging
 from leafyy               import web
 from leafyy.generic       import LeafyyComponent
+from webutils             import JsResponse, CssResponse
 
-from .template  import Template
-from .responses import JsResponse, CssResponse, FileStreamResponse
+from .template import Template
 
 
 class LeafyyWebInterface(LeafyyComponent):
@@ -26,7 +26,7 @@ class LeafyyWebInterface(LeafyyComponent):
 
         self.jinja = Jinja2Templates('web/templates')
 
-        self.pages= self.loadTemplates()
+        self.pages = self.loadTemplates()
 
     def __getitem__(self, key: str) -> Template:
         return self.pages[key]
@@ -39,8 +39,11 @@ class LeafyyWebInterface(LeafyyComponent):
             td.update({name: Template(self.jinja, f'{name}/{name}.jinja')})
 
         return td
-
+    
     def assignApi(self):
+        self.assign()
+
+    def assign(self):
         @web().get('/leafyy.css', response_class = CssResponse,   
             name = 'Получить глобальный CSS',
             description = 'Получает глобальный CSS-файл, необходимый для работы веб-сервиса.')
@@ -181,25 +184,16 @@ class LeafyyWebInterface(LeafyyComponent):
         def index(request: Request) -> _TemplateResponse:
             return self['index'].render(
                 request,
-                hardware = _hardware().getDevices()
+                devices = _devices().model()
             )
 
-        @web().get('/hardware', response_class = HTMLResponse,
+        @web().get('/devices', response_class = HTMLResponse,
             name = 'Страница оборудования',
             description = 'Отрисовывает страницу оборудования с информацией о нем.')
-        def hardware(request: Request) -> _TemplateResponse:
-            return self['hardware'].render(
+        def devices(request: Request) -> _TemplateResponse:
+            return self['devices'].render(
                 request,
-                hardware = _hardware().getDevices()
-            )
-        
-        @web().get('/hardware/config',
-            name = 'Страница оборудования',
-            description = 'Отрисовывает страницу оборудования с информацией о нем.')
-        def hardware(request: Request) -> _TemplateResponse:
-            return self['hardware'].render(
-                request,
-                hardware = _hardware().getDevices()
+                devices = _devices().model()
             )
 
         @web().get('/rules', response_class = HTMLResponse,
@@ -214,7 +208,7 @@ class LeafyyWebInterface(LeafyyComponent):
         def log(request: Request) -> _TemplateResponse:
             return self['log'].render(
                 request,
-                hardware = _hardware().getDevices(),
+                devices = _devices().model(),
                 console = logging().getGeneralStack(),
                 logConfig = logging().getConfig()
             )
@@ -243,11 +237,3 @@ class LeafyyWebInterface(LeafyyComponent):
             description = 'Отрисовывает страницу с документацией.')
         def doc(request: Request) -> _TemplateResponse:
             return self['doc'].render(request)
-
-        @web().post('/console')
-        def testConsole(
-            command: ConsoleCommand,
-            response: Response):
-            response.status_code = 202
-            return response
-

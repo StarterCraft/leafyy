@@ -24,7 +24,7 @@
         <nav class="actionblock">
             <a class="action" href="/">домой</a>
             <a class="action" href="/rules">правила</a>
-            <a class="action" href="/hardware">устройства</a>
+            <a class="action" href="/devices">устройства</a>
             <a class="action" href="/log">консоль</a>
             <a class="action" href="/doc">справка</a>
         </nav>
@@ -33,8 +33,8 @@
         <div class="bold grand">
             Устройства
             <span class="code">
-                {% if hardware %}
-                {{hardware.devices|length}}
+                {% if devices %}
+                {{devices.devices|length}}
                 {% else %}
                 0
                 {% endif %}
@@ -43,8 +43,8 @@
         <a class="action" href="#">добавить</a>
     </div>
     <div class="view horizontal">
-        {% if hardware.devices %}
-        {% for device in hardware.devices %}
+        {% if devices.devices %}
+        {% for device in devices.devices %}
         <div class="block card">
             <div class="stretcher">
                 <div>
@@ -65,7 +65,7 @@
                 </div>
             </div>
             <div class="vertical">
-                <p>{{device.desc}}</p>
+                <p>{{device.description}}</p>
                 <span class="bold"></span>
             </div>
         </div>
@@ -74,7 +74,7 @@
         Нет устройств для отображения.
         {% endif %}
     </div>
-    <script src="hardware.js"></script>
+    <script src="devices.js"></script>
 </body>
 
 </html>

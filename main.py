@@ -1,5 +1,5 @@
 from PySide6           import QtWidgets
-from sys               import argv, iexit
+from sys               import argv, exit as iexit
 from os                import makedirs
 from typing            import Iterator
 from packaging         import version as versioning
@@ -10,7 +10,7 @@ from inspection        import LeafyyLogging
 from inspection.errors import LeafyyErrors
 from inspection.logger import LeafyyLogger
 from options           import LeafyyOptions
-from hardware          import LeafyyHardware
+from devices           import LeafyyDevices
 from web               import LeafyyWebService
 from web.api           import LeafyyWebInterface
 
@@ -24,7 +24,6 @@ __version__ = '0.a3'
 
 class Leafyy(QtWidgets.QApplication):
     version = versioning.parse(__version__)
-    components: list[LeafyyComponent] = []
 
     def __init__(self, argv: list[str]) -> None:
         super().__init__(argv)
@@ -44,31 +43,12 @@ class Leafyy(QtWidgets.QApplication):
         self.web = LeafyyWebService()
         self.logger.info('Инициализировано ядро веб-сервера')
 
-        self.hardware = LeafyyHardware()
+        self.devices = LeafyyDevices()
         self.logger.info('Инициализированы устройства')
 
         self.ui = LeafyyWebInterface()
 
-        self.assignApis()
-
-    def __getitem__(self, key: int | str) -> LeafyyComponent:
-        if (isinstance(key, str)):
-            try:
-                return [c for c in self.components if (c.name == key)][0]
-            except IndexError as e:
-                raise KeyError(f'Компонента {key} не найдено') from e
-            
-        else:
-            return self.components[key]
-        
-    def __iter__(self) -> Iterator[LeafyyComponent]:
-        return iter(self.loggers)
-    
-    def __len__(self) -> int:
-        return len(self.components)
-
-    def add(self, logger: LeafyyComponent):
-        self.components.append(logger)
+        self.web.assignApis()
 
     @staticmethod
     def checkEnvironment():
@@ -91,7 +71,7 @@ def main():
     
     app.web.start()
     app.logger.debug('Hi Ellie!')
-    app.hardware.initDevices()
+    app.devices.initDevices()
 
     iexit(app.exec())
 

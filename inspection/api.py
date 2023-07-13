@@ -1,12 +1,13 @@
-from fastapi             import FastAPI, Request, Response
+from fastapi  import FastAPI, Request, Response
 
-from leafyy.generic    import LeafyyComponent
+from .models  import * 
+from webutils import FileStreamResponse
 
-from .models import LogReport
+class LeafyyLoggingApi:
+    api: FastAPI
 
-class LeafyyLoggingApi(LeafyyComponent):
-    def assign(self, logging, service: FastAPI):
-        @service.post('/log',
+    def assign(self):
+        @self.api.post('/log',
             name = 'Опубликовать сообщение журнала сервера',
             description = 'Приказывает серверу опубликовать сообщение журнала от логгера Web.')
         def logReport(message: LogReport, request: Request, response: Response):
@@ -17,33 +18,32 @@ class LeafyyLoggingApi(LeafyyComponent):
             response.status_code = 202
             return response
         
-        @service.get('/log/update', response_model = list[str],
+        @self.api.get('/update', response_model = list[str],
             name = 'Получить стек новых сообщений консоли')
         def logUpdate():
-            return logging().getUpdateStack()
+            return self.getUpdateStack()
                 
-        @service.get('/log/{name}', response_class = FileStreamResponse,
+        @self.api.get('/{name}', response_class = FileStreamResponse,
             name = 'Скачивание файла журнала',
             description = 'Отправляет указанный файл журнала.')
         def logFile(request: Request, name: str) -> FileStreamResponse:
             return f'logs/{name}'
         
         
-        @service.get('/log/config', response_model = LogConfig,
+        @self.api.get('/config', response_model = LogConfig,
             name = 'Получить настройки журналирования',
             description = '')
         def logConfig(request: Request):
             c = {
-                'level': logging().globalLevel._name_,
-                'sources': logging().getLogSources()
+                'level': self.globalLevel.name,
+                'sources': self.getLogSources()
                 }
             
             return c
         
-        @service.put('/log/config',
+        @self.api.put('/config',
             name = 'Записать настройки журналирования',
             description = '')
         def putLogConfig(config: LogConfig, request: Request):
-            print(config)
-            logging().setGlobalLogLevel(config.level)
-            logging().configLogSources(config.sources)
+            self.setGlobalLogLevel(config.level)
+            self.configLogSources(config.sources)

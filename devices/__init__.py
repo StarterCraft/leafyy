@@ -1,23 +1,31 @@
 # -*- coding: utf-8 -*-
 from PySide6 import QtCore, QtSerialPort
 from json import loads, dumps
-from enum import Enum
-from typing import Iterator, List, Any
+from fastapi import FastAPI
+from typing import Iterator, List
 from autils import fread, fwrite
 
 from leafyy.generic import LeafyyComponent
-from leafyy         import app, options
+from leafyy         import web
 
 from .generic import LeafyyStatus, LeafyyByteOperations
 from .device  import LeafyyDevice
+from .api     import LeafyyDevicesApi
+from .models  import Devices
 
 
-class LeafyyHardware(LeafyyComponent):
+class LeafyyDevices(
+    LeafyyComponent,
+    LeafyyDevicesApi
+    ):
     configFileName = 'device.json'
     devices: List[LeafyyDevice] = []
+    api = FastAPI(
+        name = 'API Листочка: подсистема оборудования'
+    )
 
     def __init__(self):
-        super().__init__('hardware')
+        super().__init__('devices')
 
         self.ports = QtSerialPort.QSerialPortInfo().availablePorts()
         self.logger.debug('Информация о портах получена')
@@ -25,13 +33,6 @@ class LeafyyHardware(LeafyyComponent):
         self.config = self.getConfig()
 
         self.logger.info('Загружены настройки устройств')
-
-        self.threads = []
-        self.pool = QtCore.QThreadPool()
-
-        #self.threads = []
-        #self.startDevices()
-        #INITIALIZER не работает. Пока без многопотокового решения
 
     def __getitem__(self, key: int | str) -> LeafyyDevice:
         if (isinstance(key, str)):
@@ -49,13 +50,7 @@ class LeafyyHardware(LeafyyComponent):
     def __len__(self) -> int:
         return len(self.devices)
     
-    def getConfig(self) -> list[dict]:
-        return loads(fread(self.configFileName, encoding = 'utf-8'))
-    
-    def writeConfig(self, config: list[dict]):
-        fwrite(self.configFileName, dumps(config))
-    
-    def getDevices(self) -> dict[str, Any]:
+    def model(self) -> Devices:
         return {
             'count': {
                 'total': len(self),
@@ -63,9 +58,19 @@ class LeafyyHardware(LeafyyComponent):
                 'disabled': len([1 for d in self if d.status == LeafyyStatus.Disabled]),
                 'failed': len([1 for d in self if d.status == LeafyyStatus.Failed])
             },
-            'devices': [d.toDict() for d in self]
+            'devices': [d.model() for d in self]
         }
+    
+    def assignApi(self):
+        self.assign()
+        web().mount('/devices', self.api)
 
+    def getConfig(self) -> list[dict]:
+        return loads(fread(self.configFileName, encoding = 'utf-8'))
+    
+    def writeConfig(self, config: list[dict]):
+        fwrite(self.configFileName, dumps(config))
+    
     def add(self, device: LeafyyDevice):
         self.devices.append(device)
 

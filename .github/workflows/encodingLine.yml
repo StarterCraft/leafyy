@@ -1,0 +1,35 @@
+name: Add coding line to Python files
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  add_coding_line:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.x
+
+      - name: Add coding line to Python files
+        run: |
+          find . -type f -name "*.py" -not -path "./.deprecated/*" \
+          | while read file; do
+            if ! head -n 1 "$file" | grep -q 'coding: utf-8'; then
+              sed -i '1i # -*- coding: utf-8 -*-' "$file"
+            fi
+          done
+
+      - name: Commit changes
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
+          git commit -am "Добавление объявления кодировки" || true
+          git push

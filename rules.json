@@ -2,7 +2,7 @@
    {
       "id": 0,
       "name": "rule-test 1",
-      "desc": "sample sample sample sample sample sample sample sample sample sample sample sample sample sample sample",
+      "description": "sample sample sample sample sample sample sample sample sample sample sample sample sample sample sample",
       "enabled": true,
       "repeated": true,
       "triggers": [

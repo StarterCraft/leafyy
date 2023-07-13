@@ -7,7 +7,7 @@ from glob     import glob
 
 from leafyy      import LeafyyComponent, LeafyyDirectDict
 from leafyy      import deepget
-from leafyy      import app, ui, options, hardware
+from leafyy      import app, ui, options, devices
 
 
 class LeafyyUiTheme(LeafyyDirectDict):
@@ -221,16 +221,16 @@ class LeafyyUi(LeafyyComponent):
         'todo: убрать'
         self.logWindow.allDevicesAction = QtGui.QAction('Все устройства', self.logWindow)
         self.logWindow.allDevicesAction.setCheckable(True)
-        self.logWindow.allDevicesAction.setChecked(all(d.logWindow for d in hardware()))
+        self.logWindow.allDevicesAction.setChecked(all(d.logWindow for d in devices()))
         self.logWindow.allDevicesAction.setData('device')
         self.logWindow.setLoggingSourceActions.addAction(self.logWindow.allDevicesAction)
 
         self.logWindow.allASCIIAction = QtGui.QAction('Все', self.logWindow)
         self.logWindow.allASCIIAction.setCheckable(True)
-        self.logWindow.allASCIIAction.setChecked(all(d.decodeASCIIMode for d in hardware()))
+        self.logWindow.allASCIIAction.setChecked(all(d.decodeASCIIMode for d in devices()))
         self.logWindow.setASCIIModeActions.addAction(self.logWindow.allASCIIAction)
 
-        for d in hardware():
+        for d in devices():
             self.logWindow.cbbPort.addItem(d.address)
             self.logWindow.cbbPort.setCurrentText(d.address)
 

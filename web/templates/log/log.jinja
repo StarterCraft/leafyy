@@ -24,7 +24,7 @@
         <nav class="actionblock">
             <a class="action" href="/">домой</a>
             <a class="action" href="/rules">правила</a>
-            <a class="action" href="/hardware">устройства</a>
+            <a class="action" href="/devices">устройства</a>
             <a class="action" href="/log">консоль</a>
             <a class="action" href="/doc">справка</a>
         </nav>
@@ -128,8 +128,8 @@
                         {% endif %}
                     </div>
                     <div class="view vertical" id="devicesBlacklist">
-                        {% if hardware.devices %}
-                        {% for device in hardware.devices %}
+                        {% if devices.devices %}
+                        {% for device in devices.devices %}
                         <div class="stretcher">
                             <div>
                                 <input type="checkbox" id="{{device.address}}" checked="{{device.visibleInConsole}}">
@@ -183,7 +183,7 @@
         <div id="console" style="display: contents;">
             <select class="code formi" id="target" onchange="onConsoleTargetSelected()">
                 <option value="server">Сервер</option>
-                {% for device in hardware.devices %}
+                {% for device in devices.devices %}
                 {% if device.status == 1 %}
                 <option value="{{device.address}}">{{device.address}}</option>
                 {% endif %}

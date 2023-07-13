@@ -4,30 +4,29 @@ from collections     import deque
 from typing          import Any, Iterator
 
 from leafyy.generic  import LeafyyComponent
-from leafyy          import options, hardware
-from hardware        import LeafyyStatus
+from leafyy          import options, devices
+from devices        import LeafyyStatus
 from .message        import LeafyyDeviceMessage
+from .models         import Device
 
 
 class LeafyyDevice(LeafyyComponent):
     def __init__(self, **kwargs):
         super().__init__(
-            kwargs['name'],
-            loggerName = f'Device-{kwargs["address"]}',
-            displayName = (
-                kwargs['displayName'] if 
-                ('displayName' in kwargs.keys()) else
-                'Устройство без названия'
-            )
+            f'Device-{kwargs.get("address")}',
+            displayName = kwargs.get('displayName', 'Устройство без названия')
         )
-        
-        self.desc = kwargs['desc']
-        self.isEnabled = kwargs['enabled']
-        self.address = kwargs['address']
-        self.plantsDef = kwargs['plants']
 
-        self.decodeMode = kwargs['decodeMode']
-        self.visibleInConsole = kwargs['visibleInConsole']
+        if (not kwargs.get('address', None)):
+            raise AttributeError('Устройство не может не иметь адреса')
+        
+        self.description = kwargs.get('description', '')
+        self.isEnabled = kwargs.get('enabled', False)
+        self.address = kwargs.get('address')
+        self.plantsDef = kwargs.get('plants', [])
+
+        self.decodeMode = kwargs.get('decodeMode', 'ascii')
+        self.visibleInConsole = kwargs.get('visibleInConsole', True)
 
         self.status = LeafyyStatus.Disabled
         self.logger.info(f'Инициализация устройства по адресу {self.address}')
@@ -38,9 +37,9 @@ class LeafyyDevice(LeafyyComponent):
 
         self.messages = deque(maxlen = 64)
 
-        hardware().add(self)
+        devices().add(self)
 
-    def __getitem__(self, _id):
+    def __getitem__(self, _id: int | str) -> NotImplemented:
         if (isinstance(_id, int)):
             return self.plants[_id]
         
@@ -56,14 +55,13 @@ class LeafyyDevice(LeafyyComponent):
     def __repr__(self) -> str:
         return f'Arduino at {self.address}, baud {self.port.baudRate()}, {self.port.isOpen()}'
     
-    def toDict(self) -> dict[str, Any]:
+    def model(self) -> Device:
         return {
             'address': self.address,
             'name': self.name,
-            'desc': self.desc,
+            'description': self.description,
             'status': self.status.value,
-            'decodeMode': self.decodeMode,
-            'plants': [] #none
+            'decodeMode': self.decodeMode
         }
 
     @property

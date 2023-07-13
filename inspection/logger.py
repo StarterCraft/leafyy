@@ -9,6 +9,8 @@ from enum           import Enum
 from colorama       import Fore, Style
 from datetime       import datetime
 
+from .models import Logger
+
 
 class LeafyyLogLevel(Enum):
     'Объект для представления уровня журналирования'
@@ -128,6 +130,13 @@ class LeafyyLogger:
         self.Logger.addHandler(self.handler)
 
         log().add(self)
+
+    def model(self) -> Logger:
+        return {
+            'name': self.name,
+            'level': self.logLevel,
+            'live': self.console
+        }
 
     @property
     def logWindowVisibility(self):

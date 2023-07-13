@@ -1,4 +1,4 @@
-from leafyy         import options
+from leafyy         import app, options
 from leafyy.generic import LeafyyComponent, LeafyyWorker
 
 from fastapi import FastAPI
@@ -15,6 +15,12 @@ class LeafyyWebService(
             title = 'Leafyy Web Service', 
             description = 'Testing!',
             debug = options('webServiceDebug', False))
+        
+    def assignApis(self):
+        app().ui.assignApi()
+        app().log.assignApi()
+        app().devices.assignApi()
+        
 
     def uvicornate(self):
         urun(self, 
