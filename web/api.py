@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 #coding=utf-8
 from pydantic             import PositiveFloat
 from glob                 import glob

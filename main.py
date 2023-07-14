@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from PySide6           import QtWidgets
 from sys               import argv, exit as iexit
 from os                import makedirs

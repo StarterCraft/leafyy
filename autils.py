@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 #coding=utf-8
 from typing import overload
 from typing import Iterable, Any, Hashable, SupportsInt

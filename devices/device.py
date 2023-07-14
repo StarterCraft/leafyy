@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 #coding=utf-8
 from PySide6         import QtSerialPort
 from collections     import deque

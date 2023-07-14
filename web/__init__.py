@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from leafyy         import app, options
 from leafyy.generic import LeafyyComponent, LeafyyWorker
 
