@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from pydantic import BaseModel, PositiveInt, PositiveFloat
 from typing   import Optional
 
