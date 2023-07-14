@@ -3,7 +3,7 @@ name: Add coding line to Python files
 on:
   push:
     branches:
-      - main
+      - master
 
 jobs:
   add_coding_line:
