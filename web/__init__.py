@@ -20,7 +20,6 @@ class LeafyyWebService(
         app().ui.assignApi()
         app().log.assignApi()
         app().devices.assignApi()
-        
 
     def uvicornate(self):
         urun(self, 

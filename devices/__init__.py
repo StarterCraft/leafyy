@@ -20,9 +20,6 @@ class LeafyyDevices(
     ):
     configFileName = 'device.json'
     devices: List[LeafyyDevice] = []
-    api = FastAPI(
-        name = 'API Листочка: подсистема оборудования'
-    )
 
     def __init__(self):
         super().__init__('devices')
@@ -39,7 +36,7 @@ class LeafyyDevices(
             try:
                 return [d for d in self.devices if (d.address == key)][0]
             except IndexError as e:
-                raise KeyError(f'Устройства по адресу {key} не найдено') from e
+                raise KeyError(f'Устройства с таким адресом не найдено', key) from e
             
         else:
             return self.devices[key]

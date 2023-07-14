@@ -72,7 +72,7 @@
             {% if errors %}
             {% for error in errors %}
             <div class="log-message">
-                {{error}}
+                {{error.time|ctime}} [{{error.origin}}]: {{error.message}}
             </div>
             {% endfor %}
             {% else %}

@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>
+        Листочек: ошибка {{exception.status_code}}
+    </title>
+    <link rel="apple-touch-icon" sizes="180x180" href="/resources/apple-touch-icon.png">
+    <link rel="icon" type="image/svg+xml" href="/resources/favicon.svg">
+    <link rel="icon" type="image/png" href="/resources/favicon.png">
+    <link rel="manifest" href="/site.webmanifest">
+    <link rel="mask-icon" href="/resources/safari-pinned-tab.svg" color="#5bbad5">
+    <meta name="msapplication-TileColor" content="#da532c">
+    <meta name="theme-color" content="#fff3b4">
+    <link rel="stylesheet" type="text/css" href="/leafyy.css">
+</head>
+
+<body>
+    <header class="block stretcher">
+        <div class="bold grand" onclick="window.location = '/';">
+            Листочек
+        </div>
+        <nav class="actionblock">
+            <a class="action" href="/">домой</a>
+            <a class="action" href="/rules">правила</a>
+            <a class="action" href="/devices">устройства</a>
+            <a class="action" href="/log">консоль</a>
+            <a class="action" href="/doc">справка</a>
+        </nav>
+    </header class="block stretcher">
+    <div class="block stretcher">
+        <div class="bold grand">
+            Ошибка {{exception.status_code}}:
+            {% if exception.status_code == 400 %}
+            неполноценный запрос
+            {% elif exception.status_code == 401 %}
+            доступ без авторизации запрещен
+            {% elif exception.status_code == 403 %}
+            доступ запрещен
+            {% elif exception.status_code == 404 %}
+            ой, страница не найдена
+            {% elif exception.status_code == 500 %}
+            внутренняя ошибка сервера
+            {% elif exception.status_code == 503 %}
+            служба недоступна
+            {% else %}
+            {{exception.detail}}
+            {% endif %}
+        </div>
+    </div>
+    <div class="block stretcher">
+    {% if exception.status_code == 400 %}
+    Увы, уважаемый фрукт, ваш запрос был неправильно составлен и сервер не смог его понять. 
+    Пожалуйста, проверьте правильность данных, которые вы отправили, и попробуйте еще раз. 
+    Если вы не уверены, что пошло не так, обратитесь к журналу. Если всё совсем плохо,
+    попробуйте позвать разработчиков и попросить их о помощи. Эта ошибка, вероятно, возникла
+    не по вашей вине, а именно по вине разработчиков.
+    {% elif exception.status_code == 401 %}
+    Эй, вы, уважаемый фрукт, вам воспрещён доступ к этой странице без предварительной авторизации. 
+    Пожалуйста, введите свои учетные данные или пройдите процесс регистрации, обратившись к
+    надзирателю системы, чтобы получить доступ к вашим плантациям. Если у вас возникли проблемы
+    с доступом, обратитесь к журналу, или, если всё совсем плохо, к разработчикам.
+    {% elif exception.status_code == 403 %}
+    Стоп, уважаемый фрукт, вам стоит прекратить лезть туда, куда не следует. Вам воспрещён доступ к
+    этой странице. Похоже, у вас недостаточно прав для доступа к ней. Убедитесь, что вы вошли в
+    правильную учетную запись или свяжитесь с надзирателем системы для получения необходимых 
+    разрешений.
+    {% elif exception.status_code == 404 %}
+    Ку-ку, уважаемый фрукт, серверу не удалось найти страницу, которую вы ищете. Вероятно, она была 
+    удалена или перемещена в другое место. Рекомендуется проверить правильность ссылки, или,
+    если всё совсем плохо, обратиться к разработчикам.
+    {% elif exception.status_code == 500 %}
+    Эх, уважаемый фрукт, на этот раз вы не виноваты в этой ошибке. На сервере что-то произошло. Откройте
+    журнал и попытайтесь выяснить, в чём проблема. Причиной такой ошибки обычно является проблема с головой
+    у одного из разработчиков или что-то в этом роде.
+    {% elif exception.status_code == 503 %}
+    К сожалению, уважаемый фрукт, на сервере, кажется, проводятся какие-то работы. Потребуйте объяснений
+    от надзирателя системы или от разработчиков.
+    {% else %}
+    Мне очень жаль, уважаемый фрукт, но похоже, что разработчик этой страницы оказался слищком ленив, чтобы
+    создать описание для этой ошибки. Вот всё, что о ней известно:
+    <span class="code bold">{{exception.detail}}</span>
+    Обратитесь к журналу. Потребуйте объяснений от надзирателя системы или от разработчиков.
+    {% endif %}
+    </div>
+</body>
+
+</html>

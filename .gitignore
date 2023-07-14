@@ -55,5 +55,7 @@ compile_commands.json
 *.pyc
 
 # log
-logs/
+logs/*.log
+
+#vscode
 .vscode/*

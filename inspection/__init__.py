@@ -2,12 +2,12 @@ from PySide6 import QtCore
 from typing import Iterator
 from time import strftime, localtime
 from glob import glob
-from os.path import getsize, getmtime, sep
+from os.path import getsize, getmtime, sep as psep
 from autils import fread, fwrite
 
 from fastapi           import FastAPI
 
-from leafyy            import web
+from leafyy            import app, web
 from inspection.logger import LeafyyLogLevel, LeafyyLogger
 from .api              import LeafyyLoggingApi
 from .models           import Log, LogConfig
@@ -18,23 +18,18 @@ class LeafyyLogging(
     LeafyyLoggingApi
     ):
     loggers: list[LeafyyLogger] = []
-    api = FastAPI(
-        title = 'API Листочка: подсистема журнала'
-    )
 
     def __init__(self) -> None:
         super().__init__()
 
-        self.fileName = f'logs/Leafyy_{strftime("""%d.%m.%Y_%H%M%S""", localtime())}.log'
+        self.fileName = f'logs/Leafyy_{strftime("%d.%m.%Y_%H%M%S", localtime(app().startup))}.log'
 
         #Вместо стеков попробуем использовать буферы
         self.generalBuffer = 'logs/buffer/.log'
         self.updateBuffer = 'logs/buffer/update.log'
-        self.errorBuffer = 'logs/buffer/error.log'
 
         fwrite(self.generalBuffer, '')
         fwrite(self.updateBuffer, '')
-        fwrite(self.errorBuffer, '')
 
         self.globalLevel = LeafyyLogLevel.DEBUG
         
@@ -43,7 +38,7 @@ class LeafyyLogging(
             try:
                 return [l for l in self.loggers if (l.name == key)][0]
             except IndexError as e:
-                raise KeyError(f'Канала журналирования {key} не найдено', key) from e
+                raise KeyError(f'Канала журналирования не найдено', key) from e
             
         else:
             return self.loggers[key]
@@ -78,49 +73,39 @@ class LeafyyLogging(
         return self.model()
 
     def setConfig(self, config: LogConfig):
-        self.setGlobalLogLevel()
+        self.setGlobalLogLevel(config.level)
 
-        for c in config:
+        for c in config.loggers:
             try:
                 self[c.name].console = c.live
                 self[c.name].setLogLevel(LeafyyLogLevel[c.level])
             except KeyError:
                 continue
 
-    def toStack(self, message: str) -> None:
+    def toBuffer(self, message: str) -> None:
         fwrite(self.generalBuffer, f'{message}\n', mode = 'a')
         fwrite(self.updateBuffer, f'{message}\n', mode = 'a')
 
-    def toErrorStack(self, message: str) -> None:
-        fwrite(self.errorBuffer, f'{message}\n', mode = 'a')
-
-    def toUpdateStack(self, message: str) -> None:
+    def toUpdateBuffer(self, message: str) -> None:
         fwrite(self.updateBuffer, f'{message}\n', mode = 'a')
 
-    def getGeneralStack(self) -> list[str]:
-        self.flushUpdateStack()
+    def getGeneralBuffer(self) -> list[str]:
+        self.flushUpdateBuffer()
         return fread(self.generalBuffer).splitlines()
     
-    def getErrorStack(self) -> list[str]:
-        return NotImplemented
-    
-    def getUpdateStack(self) -> list[str]:
+    def getUpdateBuffer(self) -> list[str]:
         d = fread(self.updateBuffer).splitlines()
-        self.flushUpdateStack()
+        self.flushUpdateBuffer()
         return d
     
     def flush(self):
-        self.flushGeneralStack()
-        self.flushErrorStack()
-        self.flushUpdateStack()
+        self.flushGeneralBuffer()
+        self.flushUpdateBuffer()
 
-    def flushGeneralStack(self) -> None:
+    def flushGeneralBuffer(self) -> None:
         fwrite(self.generalBuffer, '')
 
-    def flushErrorStack(self) -> None:
-        fwrite(self.errorBuffer, '')
-
-    def flushUpdateStack(self) -> None:
+    def flushUpdateBuffer(self) -> None:
         fwrite(self.updateBuffer, '')
 
     def setGlobalLogLevel(self, level: LeafyyLogLevel | str | int):
@@ -139,8 +124,8 @@ class LeafyyLogging(
 
     def getLogFolderSummary(self, reversed = False) -> list[Log]:
         data = [
-            {'name': fileName.split(sep)[-1],
-             'time': int(getmtime(fileName)),
+            {'name': fileName.split(psep)[-1],
+             'time': getmtime(fileName),
              'size': getsize(fileName),
             } 
             for fileName in glob('logs/*.log')]
@@ -158,7 +143,7 @@ class LeafyyLogging(
             #Для обычного сообщения журнала разделители ниже:
             #Дата и время сообщения журнала
             dateTimeChunk = f'{dataChunks[0]} {dataChunks[1]}'
-            dateTimeChunk = '{<span style="text-decoration: underline;">%s</span>}' % dateTimeChunk[1:-1]
+            dateTimeChunk = f'<span style="color: gray;">{dateTimeChunk[1:-1]}</span>'
 
             #Канал и уровень журналирования
             loggerInfoChunk = f'[<span style="color: green;">{dataChunks[2][1:].split("@")[0]}</span>@'
@@ -225,7 +210,6 @@ class LeafyyLogging(
 
         else:
             data.update(lines = fread(f'logs/{name}', encoding = 'utf-8').splitlines())
-                
 
         return data
         

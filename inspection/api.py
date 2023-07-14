@@ -3,8 +3,11 @@ from fastapi  import FastAPI, Request, Response
 from .models  import * 
 from webutils import FileStreamResponse
 
+
 class LeafyyLoggingApi:
-    api: FastAPI
+    api = FastAPI(
+        title = 'API Листочка: подсистема журнала'
+    )
 
     def assign(self):
         @self.api.post('/log',
@@ -21,7 +24,7 @@ class LeafyyLoggingApi:
         @self.api.get('/update', response_model = list[str],
             name = 'Получить стек новых сообщений консоли')
         def logUpdate():
-            return self.getUpdateStack()
+            return self.getUpdateBuffer()
                 
         @self.api.get('/{name}', response_class = FileStreamResponse,
             name = 'Скачивание файла журнала',

@@ -1,18 +1,21 @@
 #coding=utf-8
-from typing     import Annotated
-from glob       import glob
-from autils     import fread, fwrite
-from requests   import get
-from packaging  import version as versioning
-from re         import findall
+from pydantic             import PositiveFloat
+from glob                 import glob
+from autils               import fread, fwrite
+from requests             import get
+from packaging            import version as versioning
+from re                   import findall
+from datetime             import datetime
 
 from fastapi              import FastAPI, Request
 from fastapi.templating   import Jinja2Templates
 from starlette.templating import _TemplateResponse
+from starlette.exceptions import HTTPException
 from fastapi.responses    import Response, HTMLResponse, FileResponse
 
 from leafyy               import devices as _devices
 from leafyy               import log as logging
+from leafyy               import errors
 from leafyy               import web
 from leafyy.generic       import LeafyyComponent
 from webutils             import JsResponse, CssResponse
@@ -25,6 +28,11 @@ class LeafyyWebInterface(LeafyyComponent):
         super().__init__('WebUi')
 
         self.jinja = Jinja2Templates('web/templates')
+
+        def timectime(timestamp: PositiveFloat) -> str: #https://stackoverflow.com/a/28673279/13677671
+            return datetime.fromtimestamp(timestamp).strftime('%m.%d %H:%M:%S.%f')
+        
+        self.jinja.env.filters['ctime'] = timectime
 
         self.pages = self.loadTemplates()
 
@@ -117,7 +125,7 @@ class LeafyyWebInterface(LeafyyComponent):
 
             self.logger.info(
                 f'Загружена локальная библиотека {libraryId} (версия {version})'
-                f' для клиента {request.client.host}. Локальная библиотека обновлена'
+                f' для клиента {request.client.host}:{request.client.port}. Локальная библиотека обновлена'
             )
 
             return code
@@ -130,7 +138,7 @@ class LeafyyWebInterface(LeafyyComponent):
 
             self.logger.debug(
                 f'Загружена локальная библиотека {libraryId} (версия {version})'
-                f' для клиента {request.client.host}'
+                f' для клиента {request.client.host}:{request.client.port}'
             )
 
             return code
@@ -184,7 +192,8 @@ class LeafyyWebInterface(LeafyyComponent):
         def index(request: Request) -> _TemplateResponse:
             return self['index'].render(
                 request,
-                devices = _devices().model()
+                devices = _devices().model(),
+                errors = errors().model()
             )
 
         @web().get('/devices', response_class = HTMLResponse,
@@ -203,14 +212,14 @@ class LeafyyWebInterface(LeafyyComponent):
             return self['rules'].render(request)
 
         @web().get('/log', response_class = HTMLResponse,
-            name = 'Журнал',
+            name = 'Журнал и консоль',
             description = 'Отрисовывает страницу доступа к консоли и журналу.')
-        def log(request: Request) -> _TemplateResponse:
-            return self['log'].render(
+        def console(request: Request) -> _TemplateResponse:
+            return self['console'].render(
                 request,
                 devices = _devices().model(),
-                console = logging().getGeneralStack(),
-                logConfig = logging().getConfig()
+                console = logging().getGeneralBuffer(),
+                logConfig = logging().model()
             )
 
         @web().get('/log/view', response_class = HTMLResponse,
@@ -226,7 +235,7 @@ class LeafyyWebInterface(LeafyyComponent):
         @web().get('/log/view/{name}', response_class = HTMLResponse,
             name = 'Просмотр файла журнала',
             description = 'Отрисовывает страницу просмотра указанного файла журнала.')
-        def logFileView(request: Request, name: str) -> _TemplateResponse:
+        def logView(request: Request, name: str) -> _TemplateResponse:
             return self['logView'].render(
                 request,
                 logFile = logging().getLogFile(name, html = True)
@@ -237,3 +246,11 @@ class LeafyyWebInterface(LeafyyComponent):
             description = 'Отрисовывает страницу с документацией.')
         def doc(request: Request) -> _TemplateResponse:
             return self['doc'].render(request)
+        
+        @web().exception_handler(HTTPException)
+        def error(request: Request, exception: HTTPException) -> _TemplateResponse:
+            return self['error'].render(
+                request, 
+                statusCode = exception.status_code,
+                exception = exception
+                )

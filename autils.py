@@ -57,7 +57,10 @@ def convert(intr: int, base: int) -> str:
 
 
 def lto(targetType, seq: Iterable) -> Iterable:
-    return type(seq)(targetType(i) for i in seq)
+    try: 
+        return type(seq)(targetType(i) for i in seq)
+    except TypeError:
+        return list(targetType(i) for i in seq)
 
 @overload
 def printl(arg: Iterable): ...

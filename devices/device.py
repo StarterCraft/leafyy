@@ -1,11 +1,12 @@
 #coding=utf-8
 from PySide6         import QtSerialPort
 from collections     import deque
+from time            import time
 from typing          import Any, Iterator
 
 from leafyy.generic  import LeafyyComponent
-from leafyy          import options, devices
-from devices        import LeafyyStatus
+from leafyy          import options, devices, errors
+from devices         import LeafyyStatus
 from .message        import LeafyyDeviceMessage
 from .models         import Device
 
@@ -59,6 +60,7 @@ class LeafyyDevice(LeafyyComponent):
         return {
             'address': self.address,
             'name': self.name,
+            'displayName': self.displayName,
             'description': self.description,
             'status': self.status.value,
             'decodeMode': self.decodeMode
@@ -92,7 +94,12 @@ class LeafyyDevice(LeafyyComponent):
             self.status = LeafyyStatus.Active
 
         else:
-            self.logger.warning(f'Порт {self.address} открыть не удалось')
+            self.logger.error(f'Порт {self.address} открыть не удалось')
+            self.logger.error(f'Порт {self.address} сообщил об ошибке: {self.port.error()}')
+            errors().record(
+                time(), 
+                self.name, 
+                f'Порт {self.address} открыть не удалось: {self.port.error()}')
             self.status = LeafyyStatus.Failed
 
     def send(self, data: str | bytearray) -> int:

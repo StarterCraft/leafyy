@@ -2,8 +2,11 @@ from fastapi import FastAPI, Request
 
 from .models import Devices
 
+
 class LeafyyDevicesApi:
-    api: FastAPI
+    api = FastAPI(
+        name = 'API Листочка: подсистема оборудования'
+    )
 
     def assign(self):
         @self.api.get('/', response_model = Devices,

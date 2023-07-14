@@ -1,4 +1,4 @@
-from pydantic import BaseModel, PositiveInt
+from pydantic import BaseModel, PositiveInt, PositiveFloat
 from typing   import Optional
 
 
@@ -17,7 +17,12 @@ class Log(BaseModel):
     lines: Optional[list[str]]
 
 class LogReport(BaseModel):
-    time:    PositiveInt
+    time:    PositiveFloat
     level:   str
+    message: str
+
+class ErrorRecord(BaseModel):
+    time:    PositiveFloat
+    origin:  str
     message: str
     

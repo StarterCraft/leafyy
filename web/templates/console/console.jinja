@@ -3,13 +3,13 @@
 
 <head>
     <title>
-        Листочек: правила
+        Листочек: журнал и консоль
     </title>
-    <link rel="apple-touch-icon" sizes="180x180" href="/resources/apple-touch-icon.png">
-    <link rel="icon" type="image/svg+xml" href="/resources/favicon.svg">
-    <link rel="icon" type="image/png" href="/resources/favicon.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/reloggers/apple-touch-icon.png">
+    <link rel="icon" type="image/svg+xml" href="/reloggers/favicon.svg">
+    <link rel="icon" type="image/png" href="/reloggers/favicon.png">
     <link rel="manifest" href="/site.webmanifest">
-    <link rel="mask-icon" href="/resources/safari-pinned-tab.svg" color="#5bbad5">
+    <link rel="mask-icon" href="/reloggers/safari-pinned-tab.svg" color="#5bbad5">
     <meta charset="utf-8">
     <meta name="msapplication-TileColor" content="#da532c">
     <meta name="theme-color" content="#fff3b4">
@@ -100,18 +100,17 @@
                         Сообщения с устройств:
                     </span>
                     <div class="view vertical" id="loggersBlacklist">
-                        {% if logConfig.sources %}
-                        {% for source in logConfig.sources %}
-                        {% if source.type == 'logger' %}
+                        {% if logConfig.loggers %}
+                        {% for logger in logConfig.loggers %}
                         <div class="stretcher">
                             <div>
-                                <input type="checkbox" id="{{source.name}}" checked="{{source.live}}">
-                                <label for="{{source.name}}">{{source.name}}</label>
+                                <input type="checkbox" id="{{logger.name}}" checked="{{logger.live}}">
+                                <label for="{{logger.name}}">{{logger.name}}</label>
                             </div>
                             <div>
                             <span>Уровень логгера:</span>
-                            <select class="formi code log-level" id="{{source.name}}" 
-                                selected="{{source.mode}}" onchange="onLogLevelSelectChange('{{source.name}}')">
+                            <select class="formi code log-level" id="{{logger.name}}" 
+                                selected="{{logger.level}}" onchange="onLogLevelSelectChange('{{logger.name}}')">
                                 <option value="DEBUG" style="color: gray;">DEBUG</option>
                                 <option value="INFO" style="color: blue;">INFO</option>
                                 <option value="WARNING" style="color: orange;">WARNING</option>
@@ -120,7 +119,6 @@
                             </select>
                             </div>
                         </div>
-                        {% endif %}
                         {% endfor %}
                         {% else %}
                         <div></div>
@@ -133,7 +131,8 @@
                         <div class="stretcher">
                             <div>
                                 <input type="checkbox" id="{{device.address}}" checked="{{device.visibleInConsole}}">
-                                <label for="{{device.address}}">{{device.address}}</label>
+                                <label for="{{device.address}}">{{device.displayName}}
+                            <span class="bold code"> @{{device.address}} </span></label>
                             </div>
                             <div>
                             <span>Режим декодирования:</span>
@@ -204,7 +203,7 @@
     <script src="/libraries/jquery.js"></script>
     <script src="/libraries/js-cookie.js"></script>
     <script src="/leafyy.js"></script>
-    <script src="/log.js"></script>
+    <script src="/console.js"></script>
 </body>
 
 </html>

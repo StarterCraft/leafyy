@@ -3,7 +3,7 @@ name: Add coding line to Python files
 on:
   push:
     branches:
-      - master
+      - main
 
 jobs:
   add_coding_line:
@@ -17,7 +17,7 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: 3.x
-
+          
       - name: Add coding line to Python files
         run: |
           find . -type f -name "*.py" -not -path "./.deprecated/*" \
@@ -31,5 +31,12 @@ jobs:
         run: |
           git config --global user.name "GitHub Actions"
           git config --global user.email "actions@github.com"
-          git commit -am "Добавление объявления кодировки" || true
-          git push
+
+          # Check if any changes were made
+          if [[ -n $(git status -s) ]]; then
+            git commit -am "Add coding line to Python files"
+            git push
+          else
+            echo "No changes were made to the files."
+          fi
+          

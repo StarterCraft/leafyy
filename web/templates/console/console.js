@@ -39,10 +39,10 @@ function onLogLevelSelectChange(sel) {
     )
 }
 
-let consoleAutoScroll = getCookie("X10", true)
-let consoleShouldUpdate = getCookie("X11", true)
-let minConsoleUpdatePeriod = getCookie("X12", 2);
-let maxConsoleUpdatePeriod = getCookie("X13", 3600);
+let consoleAutoScroll = Boolean(getCookie("X10", true));
+let consoleShouldUpdate = Boolean(getCookie("X11", true))
+let minConsoleUpdatePeriod = Number(getCookie("X12", 2));
+let maxConsoleUpdatePeriod = Number(getCookie("X13", 3600));
 
 function onReceivedLogConfig(data) {
     const modal = ".modal#log-settings";
@@ -240,17 +240,16 @@ function onReceivedUpdatedConsoleData(data) {
 }
 
 function onUpdateConsoleData() {
-    $.get("/log/update",
-        function (data, textStatus, jqXHR) {
-            onReceivedUpdatedConsoleData(data);
-        },
-    );
+    $.get("/log/update", data => {
+        onReceivedUpdatedConsoleData(data);
+    });
 }
 
 let consoleUpdatePeriod = minConsoleUpdatePeriod;
 let consoleUpdateIntervalId = null;
 
 function onManualUpdateConsoleData() {
+    console.debug('Conssole updated manually, setting period to minimum period', minConsoleUpdatePeriod);
     consoleUpdatePeriod = minConsoleUpdatePeriod;
     onUpdateConsoleData();
 }
@@ -279,7 +278,8 @@ function keepConsoleUpdated() {
     }
 }
 
-consoleUpdateIntervalId = window.setInterval(keepConsoleUpdated, consoleUpdatePeriod * 1000)
+onUpdateConsoleData();
+consoleUpdateIntervalId = window.setInterval(keepConsoleUpdated, consoleUpdatePeriod * 1000);
 
 function onConsoleSendResult(status, responseText, message) {
     if (status == 202) {

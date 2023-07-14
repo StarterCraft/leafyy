@@ -1,21 +1,21 @@
 from PySide6           import QtWidgets
 from sys               import argv, exit as iexit
 from os                import makedirs
-from typing            import Iterator
 from packaging         import version as versioning
+from time              import time
 
 
-from leafyy.generic    import LeafyyComponent
 from inspection        import LeafyyLogging
-from inspection.errors import LeafyyErrors
 from inspection.logger import LeafyyLogger
+from inspection.errors import LeafyyErrors
 from options           import LeafyyOptions
+from console           import LeafyyConsole
 from devices           import LeafyyDevices
 from web               import LeafyyWebService
 from web.api           import LeafyyWebInterface
 
 
-__version__ = '0.a3'
+__version__ = '0.1a3'
 
 
 #Интерфейс на основе Qt GUI отброшен за ненадобностью,
@@ -24,6 +24,7 @@ __version__ = '0.a3'
 
 class Leafyy(QtWidgets.QApplication):
     version = versioning.parse(__version__)
+    startup = int(time())
 
     def __init__(self, argv: list[str]) -> None:
         super().__init__(argv)
@@ -33,20 +34,26 @@ class Leafyy(QtWidgets.QApplication):
         print(f'Запуск "Листочка" версии {self.version}, авторские права не защищены')
 
         self.log = LeafyyLogging()
-        self.logger = LeafyyLogger('App')
-
         self.errors = LeafyyErrors()
+        self.logger = LeafyyLogger('App')
+        self.logger.info(
+            'Инициализирована подсистема журналирования '
+            f'(установлен уровень {self.log.globalLevel.name})')
 
         self.options = LeafyyOptions()
         self.log.setGlobalLogLevel(self.options('logLevel'))
 
+        self.cli = LeafyyConsole()
+        self.logger.info('Инициализирована подсистема консоли')
+
         self.web = LeafyyWebService()
-        self.logger.info('Инициализировано ядро веб-сервера')
+        self.logger.info('Инициализирована подсистема веб-сервера')
 
         self.devices = LeafyyDevices()
-        self.logger.info('Инициализированы устройства')
+        self.logger.info('Инициализирована подсистема устройств')
 
         self.ui = LeafyyWebInterface()
+        self.logger.info('Инициализирован веб-интерфейс')
 
         self.web.assignApis()
 
@@ -70,8 +77,12 @@ def main():
     app = Leafyy(argv)
     
     app.web.start()
-    app.logger.debug('Hi Ellie!')
+    app.logger.debug('Привет, ребят!')
+
     app.devices.initDevices()
+    app.devices.start()
+
+    app.cli.start()
 
     iexit(app.exec())
 

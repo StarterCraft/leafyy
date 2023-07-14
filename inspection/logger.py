@@ -168,10 +168,10 @@ class LeafyyLogger:
         self.logLevel = logLevel
         self.Logger.setLevel(logLevel.value)
 
-    def toStack(self, message: str):
+    def toBuffer(self, message: str):
         'Отправить сообщение в стек'
         if (self.console):
-            log().toStack(message)
+            log().toBuffer(message)
             
     def publish(self, value: LeafyyLogLevel | str, message: str):
         'Опубликовать сообщение с заданным уровнем.'
@@ -211,11 +211,11 @@ class LeafyyLogger:
         callSource += f'.{funcName}'
 
         if self.logLevel == LeafyyLogLevel.DEBUG:
-            self.formatString = ('{%(asctime)s} [%(name)s@%(levelname)s] '
+            self.formatString = ('%(asctime)s [%(name)s@%(levelname)s] '
                                  f'[{callSource} <{lineNo}>]: '
                                  '%(message)s')
         else:
-            self.formatString = '{%(asctime)s} [%(name)s@%(levelname)s] %(message)s'
+            self.formatString = '%(asctime)s [%(name)s@%(levelname)s] %(message)s'
 
         self.handler.setFormatter(logging.Formatter(self.formatString))
 
@@ -223,7 +223,7 @@ class LeafyyLogger:
         if self.logLevel == LeafyyLogLevel.DEBUG and not self.printDsb:
             print(f'[{Fore.GREEN}{self.name}{Style.RESET_ALL}@{Fore.YELLOW}DEBUG{Style.RESET_ALL}]: {message}')
 
-        self.toStack(
+        self.toBuffer(
             f'<span style="color:gray">{datetime.now().strftime(f"%m.%d %H:%M:%S.%f")}</span> '
             f'[<span style="color:green">{self.name}</span>'
             f'@<span style="color:darkgray">DEBUG</span>]: {message}')
@@ -255,11 +255,11 @@ class LeafyyLogger:
         callSource += f'.{funcName}'
 
         if self.logLevel == LeafyyLogLevel.DEBUG:
-            self.formatString = ('{%(asctime)s} [%(name)s@%(levelname)s] '
+            self.formatString = ('%(asctime)s [%(name)s@%(levelname)s] '
                                  f'[{callSource} <{lineNo}>]: '
                                  '%(message)s')
         else:
-            self.formatString = '{%(asctime)s} [%(name)s@%(levelname)s] %(message)s'
+            self.formatString = '%(asctime)s [%(name)s@%(levelname)s] %(message)s'
 
         self.handler.setFormatter(logging.Formatter(self.formatString))
 
@@ -267,7 +267,7 @@ class LeafyyLogger:
         if self.logLevel <= LeafyyLogLevel.INFO and not self.printDsb:
             print(f'[{Fore.GREEN}{self.name}{Style.RESET_ALL}@{Fore.YELLOW}INFO{Style.RESET_ALL}]: {message}')
 
-        self.toStack(
+        self.toBuffer(
             f'<span style="color:gray">{datetime.now().strftime(f"%m.%d %H:%M:%S.%f")}</span> '
             f'[<span style="color:green">{self.name}</span>'
             f'@<span style="color:blue">INFO</span>]: {message}')
@@ -299,11 +299,11 @@ class LeafyyLogger:
         callSource += f'.{funcName}'
 
         if self.logLevel == LeafyyLogLevel.DEBUG:
-            self.formatString = ('{%(asctime)s} [%(name)s@%(levelname)s] '
+            self.formatString = ('%(asctime)s [%(name)s@%(levelname)s] '
                                  f'[{callSource} <{lineNo}>]: '
                                  '%(message)s')
         else:
-            self.formatString = '{%(asctime)s} [%(name)s@%(levelname)s] %(message)s'
+            self.formatString = '%(asctime)s [%(name)s@%(levelname)s] %(message)s'
 
         self.handler.setFormatter(logging.Formatter(self.formatString))
 
@@ -311,7 +311,7 @@ class LeafyyLogger:
         if self.logLevel <= LeafyyLogLevel.WARNING and not self.printDsb:
             print(f'[{Fore.GREEN}{self.name}{Style.RESET_ALL}@{Fore.YELLOW}WARN{Style.RESET_ALL}]: {message}')
 
-        self.toStack(
+        self.toBuffer(
             f'<span style="color:gray">{datetime.now().strftime(f"%m.%d %H:%M:%S.%f")}</span> '
             f'[<span style="color:green">{self.name}</span>'
             f'@<span style="color:orange">WARN</span>]: {message}')
@@ -343,18 +343,18 @@ class LeafyyLogger:
         callSource += f'.{funcName}'
 
         if self.logLevel == LeafyyLogLevel.DEBUG:
-            self.formatString = ('{%(asctime)s} [%(name)s@%(levelname)s] '
+            self.formatString = ('%(asctime)s [%(name)s@%(levelname)s] '
                                  f'[{callSource} <{lineNo}>]: '
                                  '%(message)s')
         else:
-            self.formatString = '{%(asctime)s} [%(name)s@%(levelname)s] %(message)s'
+            self.formatString = '%(asctime)s [%(name)s@%(levelname)s] %(message)s'
         self.handler.setFormatter(logging.Formatter(self.formatString))
 
         self.Logger.error(message)
         if self.logLevel <= LeafyyLogLevel.ERROR and not self.printDsb:
             print(f'[{Fore.GREEN}{self.name}{Style.RESET_ALL}@{Fore.YELLOW}ERROR{Style.RESET_ALL}]: {message}')
 
-        self.toStack(
+        self.toBuffer(
             f'<span style="color:gray">{datetime.now().strftime(f"%m.%d %H:%M:%S.%f")}</span> '
             f'[<span style="color:green">{self.name}</span>'
             f'@<span style="color:red">ERROR</span>]: {message}')
@@ -386,11 +386,11 @@ class LeafyyLogger:
         callSource += f'.{funcName}'
 
         if self.logLevel == LeafyyLogLevel.DEBUG:
-            self.formatString = ('{%(asctime)s} [%(name)s@%(levelname)s] '
+            self.formatString = ('%(asctime)s [%(name)s@%(levelname)s] '
                                  f'[{callSource} <{lineNo}>]: '
                                  '%(message)s')
         else:
-            self.formatString = '{%(asctime)s} [%(name)s@%(levelname)s] %(message)s'
+            self.formatString = '%(asctime)s [%(name)s@%(levelname)s] %(message)s'
 
         self.handler.setFormatter(logging.Formatter(self.formatString))
         
@@ -398,7 +398,7 @@ class LeafyyLogger:
         if self.logLevel <= LeafyyLogLevel.CRITICAL and not self.printDsb:
             print(f'[{Fore.GREEN}{self.name}{Style.RESET_ALL}@{Fore.YELLOW}CRITICAL{Style.RESET_ALL}]: {message}')
 
-        self.toStack(
+        self.toBuffer(
             f'<span style="color:gray">{datetime.now().strftime(f"%m.%d %H:%M:%S.%f")}</span> '
             f'[<span style="color:green">{self.name}</span>'
             f'@<span style="color:magenta">CRITICAL</span>]: {message}')
@@ -417,7 +417,7 @@ class LeafyyLogger:
         self.Logger.exception(f'Программа аварийно завершила работу из-за исклоючения {type(_exception)}:',
                                 exc_info = _exception)
         
-        self.toStack(
+        self.toBuffer(
             f'<span style="color:gray">{datetime.now().strftime(f"%m.%d %H:%M:%S.%f")}</span> '
             f'[<span style="color:green">{self.name}</span>'
             f'@<span style="color:brown">EXCEPTION</span>]: '

@@ -1,6 +1,6 @@
 from PySide6         import QtCore, QtWidgets
 from fastapi         import FastAPI
-from typing          import Any, overload
+from typing          import Any
 
 
 #Утилитарные функции
@@ -34,6 +34,9 @@ def tr(*args, **kwargs) -> str:
 
 def log():
     return app().log
+
+def errors():
+    return app().errors
 
 def options(key: str = None, default: Any = None, sep: str = '.') -> dict | Any:
     if (key):
