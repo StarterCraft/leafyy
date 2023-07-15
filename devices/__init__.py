@@ -5,7 +5,7 @@ from fastapi import FastAPI
 from typing import Iterator, List
 from autils import fread, fwrite
 
-from leafyy.generic import LeafyyComponent
+from leafyy.generic import LeafyyIterableComponent
 from leafyy         import web
 
 from .generic import LeafyyStatus, LeafyyByteOperations
@@ -15,7 +15,7 @@ from .models  import Devices
 
 
 class LeafyyDevices(
-    LeafyyComponent,
+    LeafyyIterableComponent,
     LeafyyDevicesApi
     ):
     configFileName = 'device.json'
@@ -68,7 +68,7 @@ class LeafyyDevices(
     def writeConfig(self, config: list[dict]):
         fwrite(self.configFileName, dumps(config))
     
-    def add(self, device: LeafyyDevice):
+    def append(self, device: LeafyyDevice):
         self.devices.append(device)
 
         self.logger.debug(

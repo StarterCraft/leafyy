@@ -130,7 +130,7 @@ class LeafyyLogger:
         
         self.Logger.addHandler(self.handler)
 
-        log().add(self)
+        log().append(self)
 
     def model(self) -> Logger:
         return {

@@ -67,21 +67,20 @@ class Leafyy(QtWidgets.QApplication):
         for dir in DIRS:
             makedirs(dir, exist_ok = True)
 
-    def assignApis(self):
-        for component in self:
-            if (hasattr(component, 'assignApi')):
-                component.assignApi(component)
+    def _exit(self):
+        self.web.stop()
+        self.exit()
 
 
 def main():
     Leafyy.checkEnvironment()
     app = Leafyy(argv)
-    
-    app.web.start()
-    app.logger.debug('Привет, ребят!')
 
     app.devices.initDevices()
     app.devices.start()
+    
+    app.web.start()
+    app.logger.debug('Привет, ребят!')
 
     app.cli.start()
 

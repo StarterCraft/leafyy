@@ -35,4 +35,7 @@ class LeafyyWebService(
         self.run()
 
         self.logger.info('Веб-сервер запущен')
+
+    def stop(self):
+        self.w.exit()
         

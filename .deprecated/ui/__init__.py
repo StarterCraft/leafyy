@@ -71,7 +71,7 @@ class LeafyyUiComponent(LeafyyComponent):
 
         self.cmType = cmType
 
-        ui().add(self)
+        ui().append(self)
 
         self.setupUi(self)
         self.defaultSize = QtCore.QSize(
@@ -196,7 +196,7 @@ class LeafyyUi(LeafyyComponent):
                 f'Компонент {component.name} отображён согласно настройкам'
             )
 
-    def add(self, component: LeafyyUiComponent):
+    def append(self, component: LeafyyUiComponent):
         self.components.append(component)
         setattr(self, component.name, component)
 

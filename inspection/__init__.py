@@ -50,7 +50,7 @@ class LeafyyLogging(
     def __len__(self) -> int:
         return len(self.loggers)
 
-    def add(self, logger: LeafyyLogger):
+    def append(self, logger: LeafyyLogger):
         self.loggers.append(logger)
 
     def remove(self, logger: LeafyyLogger | str):

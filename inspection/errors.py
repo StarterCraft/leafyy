@@ -34,7 +34,7 @@ class LeafyyErrors(
     def __len__(self) -> int:
         return len(fread(self.errorBuffer).splitlines()[1:])
 
-    def add(self, error: ErrorRecord):
+    def append(self, error: ErrorRecord):
         fwrite(self.errorBuffer, ';'.join(lto(str, error.dict().values())) + '\n', mode = 'a')
 
     def remove(self, key: int | str):
@@ -67,6 +67,6 @@ class LeafyyErrors(
              for ld in fread(self.errorBuffer).splitlines()[1:]]
     
     def record(self, time: PositiveFloat, origin: str, message: str):
-        self.add(ErrorRecord(time = time, origin = origin, message = message))
+        self.append(ErrorRecord(time = time, origin = origin, message = message))
 
         self.logger.error(f'{origin} сообщил об ошибке: {message}', back = 2)

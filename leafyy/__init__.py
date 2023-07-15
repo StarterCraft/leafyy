@@ -26,6 +26,7 @@ def deepupdate(self: dict, key: str, value: Any, sep: str = '.'):
 
     container.update({steps[-1]: value})
 
+
 #Доступ к компонентам
 def app() -> QtWidgets.QApplication:
     return QtWidgets.QApplication.instance()

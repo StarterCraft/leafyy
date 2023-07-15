@@ -5,14 +5,14 @@ from collections     import deque
 from time            import time
 from typing          import Any, Iterator
 
-from leafyy.generic  import LeafyyComponent
+from leafyy.generic  import LeafyyIterableComponent
 from leafyy          import options, devices, errors
 from devices         import LeafyyStatus
 from .message        import LeafyyDeviceMessage
 from .models         import Device
 
 
-class LeafyyDevice(LeafyyComponent):
+class LeafyyDevice(LeafyyIterableComponent):
     def __init__(self, **kwargs):
         super().__init__(
             f'Device-{kwargs.get("address")}',
@@ -39,7 +39,7 @@ class LeafyyDevice(LeafyyComponent):
 
         self.messages = deque(maxlen = 64)
 
-        devices().add(self)
+        devices().append(self)
 
     def __getitem__(self, _id: int | str) -> NotImplemented:
         if (isinstance(_id, int)):

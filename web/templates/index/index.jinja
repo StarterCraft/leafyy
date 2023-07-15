@@ -69,15 +69,22 @@
             Ошибки:
         </span>
         <div class="code log">
+            <div class="line-view vertical">
             {% if errors %}
             {% for error in errors %}
+            <div class="log-lineno">
+                {{loop.index}}
+            </div>
             <div class="log-message">
-                {{error.time|ctime}} [{{error.origin}}]: {{error.message}}
+                <span style="text-decoration: underline;">{{error.time|ctime}}</span>
+                [<span class="bold" style="color: darkorange;">{{error.origin}}</span>]: 
+                {{error.message}}
             </div>
             {% endfor %}
             {% else %}
             Ошибок в системе не выявлялось.
             {% endif %}
+            </div>
         </div>
     </div>
     <div class="block stretcher">

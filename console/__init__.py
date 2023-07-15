@@ -1,21 +1,23 @@
 from PySide6 import QtCore
-from cmd2    import Cmd
+from typing  import Callable
 
-from leafyy.generic import LeafyyComponent, LeafyyWorker
+from leafyy         import app
+from leafyy.generic import LeafyyIterableComponent
+from .api           import LeafyyConsoleApi
+from .models        import Command
 
 
 class LeafyyConsole(
-    LeafyyComponent,
+    LeafyyIterableComponent,
     QtCore.QObject,
-    Cmd
+    LeafyyConsoleApi
     ):
-    prompt = '(Leafyy Console)'
+    commands: dict[str, Command] = {}
 
     def __init__(self):
         super().__init__('Console')
 
-    def do_test(self, args):
-        print('Test 18')
+    def command(self, f: Callable):
+        self.append(f)
 
-    def start(self):
-        self.cmdloop()
+        return f

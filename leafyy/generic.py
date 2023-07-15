@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
-from PySide6           import QtCore
+from PySide6 import QtCore
+from typing  import Iterator, Any
+
 from inspection.logger import LeafyyLogger
 
 
@@ -23,6 +25,26 @@ class LeafyyComponent(object):
             loggerName if loggerName else
             f'{name[0].capitalize()}{name[1:]}'
         )
+
+
+class LeafyyIterableComponent(LeafyyComponent):
+    def __getitem__(self, key) -> Any:
+        ...
+
+    def __iter__(self) -> Iterator[Any]:
+        ...
+
+    def __len__(self) -> int:
+        ...
+
+    def model(self) -> Any:
+        ...
+
+    def append(self, obj):
+        ...
+
+    def remove(self, obj):
+        ...
 
 
 class LeafyyWorker(QtCore.QThread):
