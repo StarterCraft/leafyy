@@ -59,7 +59,7 @@ class LeafyyDevices(
         }
     
     def assignApi(self):
-        self.assign()
+        super().assignApi()
         web().mount('/devices', self.api)
 
     def getConfig(self) -> list[dict]:

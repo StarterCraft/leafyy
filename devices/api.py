@@ -9,7 +9,7 @@ class LeafyyDevicesApi:
         name = 'API Листочка: подсистема оборудования'
     )
 
-    def assign(self):
+    def assignApi(self):
         @self.api.get('/', response_model = Devices,
             name = 'Получить информацию о устройствах',
             description = 'Получает информацию о устройствах.')

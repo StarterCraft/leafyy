@@ -4,6 +4,6 @@ from typing   import Optional, Callable
 
 class Command(BaseModel):
     key:         str
-    call:        Callable[[str], list[str]]
+    call:        Callable[[list[str]], list[str]]
     displayName: Optional[str]
-    decription:  Optional[str]
+    description: Optional[str]

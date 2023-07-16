@@ -10,7 +10,7 @@ class LeafyyLoggingApi:
         title = 'API Листочка: подсистема журнала'
     )
 
-    def assign(self):
+    def assignApi(self):
         @self.api.post('/log',
             name = 'Опубликовать сообщение журнала сервера',
             description = 'Приказывает серверу опубликовать сообщение журнала от логгера Web.')
@@ -32,8 +32,7 @@ class LeafyyLoggingApi:
             description = 'Отправляет указанный файл журнала.')
         def logFile(request: Request, name: str) -> FileStreamResponse:
             return f'logs/{name}'
-        
-        
+                
         @self.api.get('/config', response_model = LogConfig,
             name = 'Получить настройки журналирования',
             description = '')

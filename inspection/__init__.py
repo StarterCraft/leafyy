@@ -64,10 +64,11 @@ class LeafyyLogging(
     def model(self) -> LogConfig:
         return {
             'level': self.globalLevel.name,
-            'loggers': [l.model() for l in self]}
+            'loggers': [l.model() for l in self]
+            }
 
     def assignApi(self):
-        self.assign()
+        super().assignApi()
         web().mount('/log', self.api)
             
     def getConfig(self) -> LogConfig:

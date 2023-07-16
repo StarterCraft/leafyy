@@ -1,73 +1,16 @@
 # -*- coding: utf-8 -*-
-#coding=utf-8
 import logging
 import os
-import time
 import inspect
 
-from leafyy         import log, options
-from enum           import Enum
-from colorama       import Fore, Style
-from datetime       import datetime
+from pydantic import PositiveFloat
+from colorama import Fore, Style
+from datetime import datetime
 
-from .models import Logger
+from leafyy   import log, errors, options
 
-
-class LeafyyLogLevel(Enum):
-    'Объект для представления уровня журналирования'
-
-    #Возможные уровни журналирования:
-    DEBUG = logging.DEBUG       #Уровень ОТЛАДКА (все сообщения, по умолчанию)
-    INFO = logging.INFO         #Уровень ИНФОРМАЦИЯ (важные сообщения)
-    WARNING = logging.WARNING   #Уровень ПРЕДУПРЕЖДЕНИЯ (сообщения важностью
-                                #ПРЕДУПРЕЖДЕНИЕ и выше)
-    ERROR = logging.ERROR       #Уровень ОШИБКИ (только сообщения об ошибках и
-                                #критические сообщения)
-    CRITICAL = logging.CRITICAL #Уровень ТОЛЬКО КРИТИЧЕСКИЕ (только критические
-                                #сообщения)
-
-    #Спасибо ChatGPT
-    def __lt__(self, other):
-        if isinstance(other, LeafyyLogLevel):
-            return self.value < other.value
-        elif isinstance(other, int):
-            return self.value < other
-        return NotImplemented
-    
-    def __le__(self, other):
-        if isinstance(other, LeafyyLogLevel):
-            return self.value <= other.value
-        elif isinstance(other, int):
-            return self.value <= other
-        return NotImplemented
-    
-    def __eq__(self, other):
-        if isinstance(other, LeafyyLogLevel):
-            return self.value == other.value
-        elif isinstance(other, int):
-            return self.value == other
-        return NotImplemented
-    
-    def __ne__(self, other):
-        if isinstance(other, LeafyyLogLevel):
-            return self.value != other.value
-        elif isinstance(other, int):
-            return self.value != other
-        return NotImplemented
-    
-    def __gt__(self, other):
-        if isinstance(other, LeafyyLogLevel):
-            return self.value > other.value
-        elif isinstance(other, int):
-            return self.value > other
-        return NotImplemented
-    
-    def __ge__(self, other):
-        if isinstance(other, LeafyyLogLevel):
-            return self.value >= other.value
-        elif isinstance(other, int):
-            return self.value >= other
-        return NotImplemented
+from .models  import Logger
+from .generic import LeafyyLogLevel
 
 
 class LeafyyLogger:
@@ -95,10 +38,10 @@ class LeafyyLogger:
         '''
         Инициализировать один канал журналирования.
 
-        :param 'name': str
+        :param `name`: `str`
             Имя канала журналирования
 
-        :param 'logLevel': LeafyyLogger.LogLevel = DEBUG
+        :param `logLevel`: `LeafyyLogger.LogLevel` = `DEBUG`
             Необходимый уровень журналирования.
 
             Возможные уровни журналирования:
@@ -110,7 +53,7 @@ class LeafyyLogger:
                 критические сообщения);
              —— CRITICAL (только критические сообщения)
 
-        :param 'disableStdPrint': bool = False
+        :param `disableStdPrint`: `bool` = `False`
             По умолчанию, сообщения журнала выводятся в консоль.
             Если этот параметр истинен, то вывод в консоль не будет
             производиться
@@ -152,7 +95,7 @@ class LeafyyLogger:
         '''
         Установить уровень журналирования.
 
-        :param 'logLevel': LeafyyLogger.LogLevel
+        :param `logLevel`: `LeafyyLogger.LogLevel`
             Необходимый уровень журналирования.
 
             Возможные уровни журналирования:
@@ -164,7 +107,7 @@ class LeafyyLogger:
                 критические сообщения);
              —— CRITICAL (только критические сообщения)
 
-        :returns: None
+        :returns: `None`
         '''
         self.logLevel = logLevel
         self.Logger.setLevel(logLevel.value)
@@ -173,6 +116,9 @@ class LeafyyLogger:
         'Отправить сообщение в стек'
         if (self.console):
             log().toBuffer(message)
+
+    def asError(self, time: PositiveFloat, origin: str, message: str):
+        errors().record(time, origin, message)
             
     def publish(self, value: LeafyyLogLevel | str, message: str):
         'Опубликовать сообщение с заданным уровнем.'
@@ -187,12 +133,12 @@ class LeafyyLogger:
 
     def debug(self, message: str, back: int = 1):
         '''
-        Опубликовать сообщение с уровнем DEBUG (ОТЛАДКА).
+        Опубликовать сообщение с уровнем `DEBUG` (ОТЛАДКА).
 
-        :param 'message': str
+        :param `message`: `str`
             Текст сообщения
 
-        :returns: None
+        :returns: `None`
         '''
         callerFrame = inspect.currentframe()
 
@@ -211,7 +157,9 @@ class LeafyyLogger:
         callSource = '.'.join(fileName.split(os.path.sep)[indexFrom:])[:-3]
         callSource += f'.{funcName}'
 
-        if self.logLevel == LeafyyLogLevel.DEBUG:
+        ctime = datetime.now()
+
+        if (self.logLevel == LeafyyLogLevel.DEBUG):
             self.formatString = ('%(asctime)s [%(name)s@%(levelname)s] '
                                  f'[{callSource} <{lineNo}>]: '
                                  '%(message)s')
@@ -221,22 +169,23 @@ class LeafyyLogger:
         self.handler.setFormatter(logging.Formatter(self.formatString))
 
         self.Logger.debug(message)
-        if self.logLevel == LeafyyLogLevel.DEBUG and not self.printDsb:
+        if (self.logLevel == LeafyyLogLevel.DEBUG) and not self.printDsb:
             print(f'[{Fore.GREEN}{self.name}{Style.RESET_ALL}@{Fore.YELLOW}DEBUG{Style.RESET_ALL}]: {message}')
 
         self.toBuffer(
-            f'<span style="color:gray">{datetime.now().strftime(f"%m.%d %H:%M:%S.%f")}</span> '
+            f'<span style="color:gray">{ctime.strftime(f"%m.%d %H:%M:%S.%f")}</span> '
             f'[<span style="color:green">{self.name}</span>'
-            f'@<span style="color:darkgray">DEBUG</span>]: {message}')
+            f'@<span style="color:darkgray">DEBUG</span>]: {message}'
+            )
 
     def info(self, message: str, back: int = 1):
         '''
-        Опубликовать сообщение с уровнем INFO (ИНФОРМАЦИЯ).
+        Опубликовать сообщение с уровнем `INFO` (ИНФОРМАЦИЯ).
 
-        :param 'message': str
+        :param `message`: `str`
             Текст сообщения
 
-        :returns: None
+        :returns: `None`
         '''
         callerFrame = inspect.currentframe()
 
@@ -255,7 +204,9 @@ class LeafyyLogger:
         callSource = '.'.join(fileName.split(os.path.sep)[indexFrom:])[:-3]
         callSource += f'.{funcName}'
 
-        if self.logLevel == LeafyyLogLevel.DEBUG:
+        ctime = datetime.now()
+
+        if (self.logLevel == LeafyyLogLevel.DEBUG):
             self.formatString = ('%(asctime)s [%(name)s@%(levelname)s] '
                                  f'[{callSource} <{lineNo}>]: '
                                  '%(message)s')
@@ -265,22 +216,32 @@ class LeafyyLogger:
         self.handler.setFormatter(logging.Formatter(self.formatString))
 
         self.Logger.info(message)
-        if self.logLevel <= LeafyyLogLevel.INFO and not self.printDsb:
+        if (self.logLevel <= LeafyyLogLevel.INFO and not self.printDsb):
             print(f'[{Fore.GREEN}{self.name}{Style.RESET_ALL}@{Fore.YELLOW}INFO{Style.RESET_ALL}]: {message}')
 
         self.toBuffer(
-            f'<span style="color:gray">{datetime.now().strftime(f"%m.%d %H:%M:%S.%f")}</span> '
+            f'<span style="color:gray">{ctime.strftime(f"%m.%d %H:%M:%S.%f")}</span> '
             f'[<span style="color:green">{self.name}</span>'
-            f'@<span style="color:blue">INFO</span>]: {message}')
+            f'@<span style="color:blue">INFO</span>]: {message}'
+            )
         
-    def warning(self, message: str, back: int = 1):
+    def warning(self, message: str, back: int = 1, asError: bool = False, origin: str = ''):
         '''
         Опубликовать сообщение с уровнем WARNING (ПРЕДУПРЕЖДЕНИE).
 
-        :param 'message': str
+        :param `message`: `str`
             Текст сообщения
 
-        :returns: None
+        :kwparam `back`: `int` = `1`
+            Количество вызовов функций, которые нужно пропустить при определении источника вызова.
+
+        :kwparam `asError`: `bool` = `False`
+            Флаг, указывающий, нужно ли опубликовать сообщение как ошибку.
+
+        :param `origin`: `str` = `''`
+            Источник вызова сообщения об ошибке, если `asError` = `True`.
+
+        :returns: `None`
         '''
         callerFrame = inspect.currentframe()
 
@@ -299,7 +260,9 @@ class LeafyyLogger:
         callSource = '.'.join(fileName.split(os.path.sep)[indexFrom:])[:-3]
         callSource += f'.{funcName}'
 
-        if self.logLevel == LeafyyLogLevel.DEBUG:
+        ctime = datetime.now()
+
+        if (self.logLevel == LeafyyLogLevel.DEBUG):
             self.formatString = ('%(asctime)s [%(name)s@%(levelname)s] '
                                  f'[{callSource} <{lineNo}>]: '
                                  '%(message)s')
@@ -309,22 +272,35 @@ class LeafyyLogger:
         self.handler.setFormatter(logging.Formatter(self.formatString))
 
         self.Logger.warning(message)
-        if self.logLevel <= LeafyyLogLevel.WARNING and not self.printDsb:
+        if (self.logLevel <= LeafyyLogLevel.WARNING and not self.printDsb):
             print(f'[{Fore.GREEN}{self.name}{Style.RESET_ALL}@{Fore.YELLOW}WARN{Style.RESET_ALL}]: {message}')
 
         self.toBuffer(
-            f'<span style="color:gray">{datetime.now().strftime(f"%m.%d %H:%M:%S.%f")}</span> '
+            f'<span style="color:gray">{ctime.strftime(f"%m.%d %H:%M:%S.%f")}</span> '
             f'[<span style="color:green">{self.name}</span>'
-            f'@<span style="color:orange">WARN</span>]: {message}')
+            f'@<span style="color:orange">WARN</span>]: {message}'
+            )
         
-    def error(self, message: str, back: int = 1):
+        if (asError):
+            self.asError(ctime.timestamp(), f'{funcName} {origin}', message)
+        
+    def error(self, message: str, back: int = 1, asError: bool = True, origin: str = ''):
         '''
         Опубликовать сообщение с уровнем ERROR (ОШИБКА).
 
-        :param 'message': str
+        :param `message`: `str`
             Текст сообщения
 
-        :returns: None
+        :kwparam `back`: `int` = `1`
+            Количество вызовов функций, которые нужно пропустить при определении источника вызова.
+
+        :kwparam `asError`: `bool` = `True`
+            Флаг, указывающий, нужно ли опубликовать сообщение как ошибку.
+
+        :param `origin`: `str` = `''`
+            Источник вызова сообщения об ошибке, если `asError` = `True`.
+
+        :returns: `None`
         '''
         callerFrame = inspect.currentframe()
 
@@ -343,7 +319,9 @@ class LeafyyLogger:
         callSource = '.'.join(fileName.split(os.path.sep)[indexFrom:])[:-3]
         callSource += f'.{funcName}'
 
-        if self.logLevel == LeafyyLogLevel.DEBUG:
+        ctime = datetime.now()
+
+        if (self.logLevel == LeafyyLogLevel.DEBUG):
             self.formatString = ('%(asctime)s [%(name)s@%(levelname)s] '
                                  f'[{callSource} <{lineNo}>]: '
                                  '%(message)s')
@@ -352,22 +330,35 @@ class LeafyyLogger:
         self.handler.setFormatter(logging.Formatter(self.formatString))
 
         self.Logger.error(message)
-        if self.logLevel <= LeafyyLogLevel.ERROR and not self.printDsb:
+        if (self.logLevel <= LeafyyLogLevel.ERROR and not self.printDsb):
             print(f'[{Fore.GREEN}{self.name}{Style.RESET_ALL}@{Fore.YELLOW}ERROR{Style.RESET_ALL}]: {message}')
 
         self.toBuffer(
-            f'<span style="color:gray">{datetime.now().strftime(f"%m.%d %H:%M:%S.%f")}</span> '
+            f'<span style="color:gray">{ctime.strftime(f"%m.%d %H:%M:%S.%f")}</span> '
             f'[<span style="color:green">{self.name}</span>'
-            f'@<span style="color:red">ERROR</span>]: {message}')
+            f'@<span style="color:red">ERROR</span>]: {message}'
+            )
         
-    def critical(self, message: str, back: int = 1):
+        if (asError):
+            self.asError(ctime.timestamp(), f'{funcName} {origin}', message)
+          
+    def critical(self, message: str, back: int = 1, asError: bool = True, origin: str = ''):
         '''
         Опубликовать сообщение с уровнем CRITICAL (КРИТИЧЕСКИЙ).
 
-        :param 'message': str
+        :param `message`: `str`
             Текст сообщения
 
-        :returns: None
+        :kwparam `back`: `int` = `1`
+            Количество вызовов функций, которые нужно пропустить при определении источника вызова.
+
+        :kwparam `asError`: `bool` = `False`
+            Флаг, указывающий, нужно ли опубликовать сообщение как ошибку.
+
+        :param `origin`: `str` = `''`
+            Источник вызова сообщения об ошибке, если `asError` = `True`.
+
+        :returns: `None`
         '''
         callerFrame = inspect.currentframe()
 
@@ -386,7 +377,9 @@ class LeafyyLogger:
         callSource = '.'.join(fileName.split(os.path.sep)[indexFrom:])[:-3]
         callSource += f'.{funcName}'
 
-        if self.logLevel == LeafyyLogLevel.DEBUG:
+        ctime = datetime.now()
+
+        if (self.logLevel == LeafyyLogLevel.DEBUG):
             self.formatString = ('%(asctime)s [%(name)s@%(levelname)s] '
                                  f'[{callSource} <{lineNo}>]: '
                                  '%(message)s')
@@ -396,39 +389,15 @@ class LeafyyLogger:
         self.handler.setFormatter(logging.Formatter(self.formatString))
         
         self.Logger.critical(message)
-        if self.logLevel <= LeafyyLogLevel.CRITICAL and not self.printDsb:
+        if (self.logLevel <= LeafyyLogLevel.CRITICAL and not self.printDsb):
             print(f'[{Fore.GREEN}{self.name}{Style.RESET_ALL}@{Fore.YELLOW}CRITICAL{Style.RESET_ALL}]: {message}')
 
         self.toBuffer(
-            f'<span style="color:gray">{datetime.now().strftime(f"%m.%d %H:%M:%S.%f")}</span> '
+            f'<span style="color:gray">{ctime.strftime(f"%m.%d %H:%M:%S.%f")}</span> '
             f'[<span style="color:green">{self.name}</span>'
-            f'@<span style="color:magenta">CRITICAL</span>]: {message}')
+            f'@<span style="color:magenta">CRITICAL</span>]: {message}'
+            )
         
-    def exception(self, _exception: Exception):
-        '''
-        Опубликовать сообщение о возникновении исключения
-
-        :param '_exception': Exception
-            Объект исключения.
-
-        :returns: None
-        '''
-        print(f'[{Fore.GREEN}{self.name}{Style.RESET_ALL}@{Fore.YELLOW}CRITICAL{Style.RESET_ALL}]: '
-              f'Программа аварийно завершила работу из-за исключения {type(_exception)}:')
-        self.Logger.exception(f'Программа аварийно завершила работу из-за исклоючения {type(_exception)}:',
-                                exc_info = _exception)
+        if (asError):
+            self.asError(ctime.timestamp(), f'{funcName} {origin}', message)
         
-        self.toBuffer(
-            f'<span style="color:gray">{datetime.now().strftime(f"%m.%d %H:%M:%S.%f")}</span> '
-            f'[<span style="color:green">{self.name}</span>'
-            f'@<span style="color:brown">EXCEPTION</span>]: '
-            f'Программа аварийно завершила работу из-за исключения {type(_exception)}:')
-
-    @staticmethod
-    def openLogFolder():
-        '''
-        Открыть папку с файлами журналов.
-
-        :returns: None
-        '''
-        os.system('explorer logs')
