@@ -15,6 +15,7 @@ class LogConfig(BaseModel):
 class Log(BaseModel):
     name:  str
     size:  PositiveInt
+    time:  PositiveFloat
     lines: Optional[list[str]]
 
 class LogReport(BaseModel):
@@ -24,6 +25,7 @@ class LogReport(BaseModel):
 
 class ErrorRecord(BaseModel):
     time:    PositiveFloat
-    origin:  str
+    origin:  Optional[str]
+    caller:  str
     message: str
     

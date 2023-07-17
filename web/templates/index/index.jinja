@@ -76,9 +76,7 @@
                 {{loop.index}}
             </div>
             <div class="log-message">
-                <span style="text-decoration: underline;">{{error.time|ctime}}</span>
-                [<span class="bold" style="color: darkorange;">{{error.origin}}</span>]: 
-                {{error.message}}
+                {{error|safe}}
             </div>
             {% endfor %}
             {% else %}

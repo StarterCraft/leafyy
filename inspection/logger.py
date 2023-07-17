@@ -2,7 +2,9 @@
 import logging
 import os
 import inspect
+import traceback
 
+from autils   import strl
 from pydantic import PositiveFloat
 from colorama import Fore, Style
 from datetime import datetime
@@ -117,8 +119,8 @@ class LeafyyLogger:
         if (self.console):
             log().toBuffer(message)
 
-    def asError(self, time: PositiveFloat, origin: str, message: str):
-        errors().record(time, origin, message)
+    def asError(self, time: PositiveFloat, origin: str, caller: str, message: str):
+        errors().record(time, origin, caller, message)
             
     def publish(self, value: LeafyyLogLevel | str, message: str):
         'Опубликовать сообщение с заданным уровнем.'
@@ -225,7 +227,7 @@ class LeafyyLogger:
             f'@<span style="color:blue">INFO</span>]: {message}'
             )
         
-    def warning(self, message: str, back: int = 1, asError: bool = False, origin: str = ''):
+    def warning(self, message: str, back: int = 1, origin: str = '', exc: Exception = None):
         '''
         Опубликовать сообщение с уровнем WARNING (ПРЕДУПРЕЖДЕНИE).
 
@@ -235,11 +237,8 @@ class LeafyyLogger:
         :kwparam `back`: `int` = `1`
             Количество вызовов функций, которые нужно пропустить при определении источника вызова.
 
-        :kwparam `asError`: `bool` = `False`
-            Флаг, указывающий, нужно ли опубликовать сообщение как ошибку.
-
-        :param `origin`: `str` = `''`
-            Источник вызова сообщения об ошибке, если `asError` = `True`.
+        :kwparam `origin`: `str` = `''`
+            Источник вызова сообщения об ошибке, если нужно опубликовать сообщение как ошибку.
 
         :returns: `None`
         '''
@@ -271,20 +270,25 @@ class LeafyyLogger:
 
         self.handler.setFormatter(logging.Formatter(self.formatString))
 
-        self.Logger.warning(message)
+        self.Logger.warning(message + ('\n' + strl(traceback.format_exception(exc), '\n') if (exc) else ''))
         if (self.logLevel <= LeafyyLogLevel.WARNING and not self.printDsb):
             print(f'[{Fore.GREEN}{self.name}{Style.RESET_ALL}@{Fore.YELLOW}WARN{Style.RESET_ALL}]: {message}')
 
         self.toBuffer(
             f'<span style="color:gray">{ctime.strftime(f"%m.%d %H:%M:%S.%f")}</span> '
             f'[<span style="color:green">{self.name}</span>'
-            f'@<span style="color:orange">WARN</span>]: {message}'
+            '@<span style="color:orange">WARN</span>]: ' + message + ('\n' + strl(traceback.format_exception(exc), '\n') if (exc) else '')
             )
         
-        if (asError):
-            self.asError(ctime.timestamp(), f'{funcName} {origin}', message)
+        if (origin):
+            self.asError(
+                ctime.timestamp(),
+                origin,
+                funcName,
+                message + ('\n' + strl(traceback.format_exception(exc), '\n') if (exc) else '')
+                )
         
-    def error(self, message: str, back: int = 1, asError: bool = True, origin: str = ''):
+    def error(self, message: str, back: int = 1, origin: str = '', exc: Exception = None):
         '''
         Опубликовать сообщение с уровнем ERROR (ОШИБКА).
 
@@ -294,11 +298,8 @@ class LeafyyLogger:
         :kwparam `back`: `int` = `1`
             Количество вызовов функций, которые нужно пропустить при определении источника вызова.
 
-        :kwparam `asError`: `bool` = `True`
-            Флаг, указывающий, нужно ли опубликовать сообщение как ошибку.
-
-        :param `origin`: `str` = `''`
-            Источник вызова сообщения об ошибке, если `asError` = `True`.
+        :kwparam `origin`: `str` = `''`
+            Источник вызова сообщения об ошибке, если нужно опубликовать сообщение как ошибку.
 
         :returns: `None`
         '''
@@ -329,20 +330,25 @@ class LeafyyLogger:
             self.formatString = '%(asctime)s [%(name)s@%(levelname)s] %(message)s'
         self.handler.setFormatter(logging.Formatter(self.formatString))
 
-        self.Logger.error(message)
+        self.Logger.error(message + ('\n' + strl(traceback.format_exception(exc), '\n') if (exc) else ''))
         if (self.logLevel <= LeafyyLogLevel.ERROR and not self.printDsb):
             print(f'[{Fore.GREEN}{self.name}{Style.RESET_ALL}@{Fore.YELLOW}ERROR{Style.RESET_ALL}]: {message}')
 
         self.toBuffer(
             f'<span style="color:gray">{ctime.strftime(f"%m.%d %H:%M:%S.%f")}</span> '
             f'[<span style="color:green">{self.name}</span>'
-            f'@<span style="color:red">ERROR</span>]: {message}'
+            '@<span style="color:red">ERROR</span>]: ' + message + ('\n' + strl(traceback.format_exception(exc), '\n') if (exc) else '')
             )
         
-        if (asError):
-            self.asError(ctime.timestamp(), f'{funcName} {origin}', message)
+        if (origin):
+            self.asError(
+                ctime.timestamp(),
+                origin, 
+                funcName,
+                message + ('\n' + strl(traceback.format_exception(exc), '\n') if (exc) else '')
+                )
           
-    def critical(self, message: str, back: int = 1, asError: bool = True, origin: str = ''):
+    def critical(self, message: str, back: int = 1, origin: str = '', exc: Exception = None):
         '''
         Опубликовать сообщение с уровнем CRITICAL (КРИТИЧЕСКИЙ).
 
@@ -352,11 +358,8 @@ class LeafyyLogger:
         :kwparam `back`: `int` = `1`
             Количество вызовов функций, которые нужно пропустить при определении источника вызова.
 
-        :kwparam `asError`: `bool` = `False`
-            Флаг, указывающий, нужно ли опубликовать сообщение как ошибку.
-
-        :param `origin`: `str` = `''`
-            Источник вызова сообщения об ошибке, если `asError` = `True`.
+        :kwparam `origin`: `str` = `''`
+            Источник вызова сообщения об ошибке, если нужно опубликовать сообщение как ошибку.
 
         :returns: `None`
         '''
@@ -388,16 +391,21 @@ class LeafyyLogger:
 
         self.handler.setFormatter(logging.Formatter(self.formatString))
         
-        self.Logger.critical(message)
+        self.Logger.critical(message + ('\n' + strl(traceback.format_exception(exc), '\n') if (exc) else ''))
         if (self.logLevel <= LeafyyLogLevel.CRITICAL and not self.printDsb):
             print(f'[{Fore.GREEN}{self.name}{Style.RESET_ALL}@{Fore.YELLOW}CRITICAL{Style.RESET_ALL}]: {message}')
 
         self.toBuffer(
             f'<span style="color:gray">{ctime.strftime(f"%m.%d %H:%M:%S.%f")}</span> '
             f'[<span style="color:green">{self.name}</span>'
-            f'@<span style="color:magenta">CRITICAL</span>]: {message}'
+            '@<span style="color:magenta">CRITICAL</span>]: ' + message + ('\n' + strl(traceback.format_exception(exc), '\n') if (exc) else '')
             )
         
-        if (asError):
-            self.asError(ctime.timestamp(), f'{funcName} {origin}', message)
+        if (origin):
+            self.asError(
+                ctime.timestamp(),
+                origin,
+                funcName,
+                message + ('\n' + strl(traceback.format_exception(exc), '\n') if (exc) else '')
+                )
         

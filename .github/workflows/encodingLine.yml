@@ -34,7 +34,7 @@ jobs:
 
           # Check if any changes were made
           if [[ -n $(git status -s) ]]; then
-            git commit -am "Add coding line to Python files"
+            git commit -am "Добавление строки с кодировкой"
             git push
           else
             echo "No changes were made to the files."

@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from PySide6        import QtCore
 from typing         import Iterator
+from datetime       import datetime
 from pydantic       import PositiveFloat
 from autils         import fread, fwrite, lto
 
@@ -17,7 +18,7 @@ class LeafyyErrors(
 
         self.errorBuffer = 'logs/buffer/.error'
 
-        fwrite(self.errorBuffer, 'time;origin;message;\n') #csv стиль
+        fwrite(self.errorBuffer, 'time;origin;caller;message\n') #csv стиль
 
     def __getitem__(self, key: int | str) -> list[ErrorRecord] | ErrorRecord:
         if (isinstance(key, str)):
@@ -63,11 +64,35 @@ class LeafyyErrors(
             ErrorRecord(
                 time = ld.split(';')[0],
                 origin = ld.split(';')[1],
-                message = ld.split(';')[2]
+                caller = ld.split(';')[2],
+                message = ld.split(';')[3]
                 )
              for ld in fread(self.errorBuffer).splitlines()[1:]]
     
-    def record(self, time: PositiveFloat, origin: str, message: str):
-        self.append(ErrorRecord(time = time, origin = origin, message = message))
+    def record(self, time: PositiveFloat, origin: str, caller: str, message: str):
+        self.append(ErrorRecord(time = time, origin = origin, caller = caller, message = message))
 
-        self.logger.error(f'{origin} сообщил об ошибке: {message}', back = 2)
+    def format(self, errors: list[ErrorRecord] = None) -> list[str]:
+        output = []
+
+        if (not errors):
+            errors = self.model()
+
+        for error in errors:
+            timeChunk = '<span style="color: gray; text-decoration: underlined;">'
+            timeChunk += datetime.fromtimestamp(error.time).strftime('%m.%d %H:%M:%S.%f')
+            timeChunk += '</span>'
+
+            sourceChunk = f'[<span class="bold" style="color:darkorange;">{error.caller.split(".")[0]}</span>.'
+            sourceChunk += f'<span style="color:blue;">{error.caller.split(".")[1]}</span>'
+
+            if (error.origin):
+                sourceChunk += f' (<span style="color: green;">{error.origin}</span>)'
+
+            sourceChunk += ']:'
+
+            line = ' '.join((timeChunk, sourceChunk, error.message))
+
+            output.append(line)
+
+        return output

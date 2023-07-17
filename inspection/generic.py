@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 import logging
-from enum import Enum
+import enum
 
 
-class LeafyyLogLevel(Enum):
+class LeafyyLogLevel(enum.Enum):
     'Объект для представления уровня журналирования'
 
     #Возможные уровни журналирования:

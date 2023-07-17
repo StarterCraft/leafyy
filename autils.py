@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-#coding=utf-8
 from typing import overload
 from typing import Iterable, Any, Hashable, SupportsInt
 from cmd import Cmd
@@ -18,10 +17,10 @@ def cls() -> None:
     system('cls')
 
 @overload
-def strl(arg: Iterable) -> str: ...
+def strl(arg: Iterable, sep = '') -> str: ...
 @overload
-def strl(*arg: Any) -> str: ...
-def strl(*arg) -> str:
+def strl(*arg: Any, sep = '') -> str: ...
+def strl(*arg, sep = '') -> str:
     if (len(arg) == 1):
         return ''.join(arg[0])
     

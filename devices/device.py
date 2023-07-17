@@ -91,16 +91,14 @@ class LeafyyDevice(LeafyyIterableComponent):
         openingResult = self.port.open(QtSerialPort.QSerialPort.ReadWrite)
 
         if (openingResult): 
-            self.logger.info(f'Порт {self.address} открыт, 9600 бод')
+            self.logger.info(f'Последовательный порт {self.address} открыт, 9600 бод')
             self.status = LeafyyStatus.Active
 
         else:
-            self.logger.error(f'Порт {self.address} открыть не удалось')
-            self.logger.error(f'Порт {self.address} сообщил об ошибке: {self.port.error()}')
-            errors().record(
-                time(), 
-                self.name, 
-                f'Порт {self.address} открыть не удалось: {self.port.error()}')
+            self.logger.error(
+                f'Последовательный порт {self.address} не '
+                f'удалось открыть: {self.port.error()}',
+                origin = self.name)
             self.status = LeafyyStatus.Failed
 
     def send(self, data: str | bytearray) -> int:

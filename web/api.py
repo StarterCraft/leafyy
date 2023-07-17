@@ -1,12 +1,10 @@
 # -*- coding: utf-8 -*-
-#coding=utf-8
-from pydantic             import PositiveFloat
 from glob                 import glob
+from os                   import sep
 from autils               import fread, fwrite
 from requests             import get
 from packaging            import version as versioning
 from re                   import findall
-from datetime             import datetime
 
 from fastapi              import FastAPI, Request
 from fastapi.templating   import Jinja2Templates
@@ -21,7 +19,7 @@ from leafyy               import web
 from leafyy.generic       import LeafyyComponent
 from webutils             import JsResponse, CssResponse
 
-from .template import Template
+from .template            import Template
 
 
 class LeafyyWebInterface(LeafyyComponent):
@@ -30,11 +28,6 @@ class LeafyyWebInterface(LeafyyComponent):
 
         self.jinja = Jinja2Templates('web/templates')
 
-        def timectime(timestamp: PositiveFloat) -> str: #https://stackoverflow.com/a/28673279/13677671
-            return datetime.fromtimestamp(timestamp).strftime('%m.%d %H:%M:%S.%f')
-        
-        self.jinja.env.filters['ctime'] = timectime
-
         self.pages = self.loadTemplates()
 
     def __getitem__(self, key: str) -> Template:
@@ -42,17 +35,14 @@ class LeafyyWebInterface(LeafyyComponent):
 
     def loadTemplates(self) -> dict[str, Template]:
         td = {}        
-        templateNames = [name.split('\\')[-1] for name in glob('web/templates/*')]
+        templateNames = [name.split(sep)[-1] for name in glob('web/templates/*')]
 
         for name in templateNames:
             td.update({name: Template(self.jinja, f'{name}/{name}.jinja')})
 
         return td
-    
-    def assignApi(self):
-        self.assign()
 
-    def assign(self):
+    def assignApi(self):
         @web().get('/leafyy.css', response_class = CssResponse,   
             name = 'Получить глобальный CSS',
             description = 'Получает глобальный CSS-файл, необходимый для работы веб-сервиса.')
@@ -191,10 +181,12 @@ class LeafyyWebInterface(LeafyyComponent):
             name = 'Главная страница',
             description = 'Отрисовывает главную страницу с информацией о грядках.')
         def index(request: Request) -> _TemplateResponse:
+            print(errors().format())
+
             return self['index'].render(
                 request,
                 devices = _devices().model(),
-                errors = errors().model()
+                errors = errors().format()
             )
 
         @web().get('/devices', response_class = HTMLResponse,

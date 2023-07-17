@@ -49,6 +49,15 @@ class Leafyy(QtWidgets.QApplication):
         self.ui = LeafyyWebInterface()
         self.logger.info('Инициализирован веб-интерфейс')
 
+    def start(self):
+        self.devices.initDevices()
+        self.devices.start()
+        
+        self.web.start()
+        self.logger.debug('Привет, ребят!')
+
+        self.web.assignApis()
+
     @staticmethod
     def checkEnvironment():
         DIRS = [

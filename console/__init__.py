@@ -16,6 +16,9 @@ class LeafyyConsole(
     LeafyyConsoleCommands,
     LeafyyConsoleApi
     ):
+    def __init__(self):
+        super().__init__('Console')
+
     def assignApi(self):
         super().assignApi()
         web().mount('/console', self.api)

@@ -134,18 +134,17 @@ class LeafyyLogging(
         
         return sorted(data, key = lambda t: t['time'], reverse = not bool(reversed))
     
-    def formatLog(self, log: list[str]) -> list[str]:
-        logs = []
+    def format(self, log: list[str]) -> list[str]:
+        output = []
         for line in log:
             #Найти последнее двоеточие
             lastColonIndex = line.index(']:') + 1
             message = line[lastColonIndex:]
             dataChunks = line[:lastColonIndex].split()
 
-            #Для обычного сообщения журнала разделители ниже:
             #Дата и время сообщения журнала
             dateTimeChunk = f'{dataChunks[0]} {dataChunks[1]}'
-            dateTimeChunk = f'<span style="color: gray;">{dateTimeChunk[1:-1]}</span>'
+            dateTimeChunk = f'<span style="color: gray; text-decoration: underlined;">{dateTimeChunk}</span>'
 
             #Канал и уровень журналирования
             loggerInfoChunk = f'[<span style="color: green;">{dataChunks[2][1:].split("@")[0]}</span>@'
@@ -161,53 +160,60 @@ class LeafyyLogging(
 
             loggerInfoChunk += f'<span style="color: {lvlColor};">{dataChunks[2][:-1].split("@")[1]}</span>]'
 
-            #Источник сообщения, вплоть до строки кода
-            #Сделаем подсветку синтаксиса для каждого элемента пути
-            sourceTokens = dataChunks[3][1:].split('.')
+            #Если журнал передаётся в полном виде, то будет также
+            #присутствовать информация о источнике сообщения.
 
-            sourceChunk = '['
+            sourceChunk = ''
 
-            toFunctions = False
-            for ix, token in enumerate(sourceTokens):
-                if (token.startswith('<')):
-                    continue
+            if (len(dataChunks) > 3):
+                #Источник сообщения, вплоть до строки кода
+                #Сделаем подсветку синтаксиса для каждого элемента пути
+                sourceTokens = dataChunks[3][1:].split('.')
 
-                if (ix > 0):
-                    sourceChunk += '.'
+                sourceChunk = '['
 
-                if (token[0].istitle()):
-                    toFunctions = True
-                    sourceChunk += f'<span class="bold" style="color:darkorange;">{token}</span>'
-                    continue
+                toFunctions = False
+                for ix, token in enumerate(sourceTokens):
+                    if (token.startswith('<')):
+                        continue
 
-                if (toFunctions or (ix == len(sourceTokens) - 1)):
-                    sourceChunk += f'<span style="color:blue;">{token}</span>'
-                    continue
+                    if (ix > 0):
+                        sourceChunk += '.'
 
-                else:
-                    sourceChunk += f'<span class="bold" style="color:coral;">{token}</span>'
-                    continue
+                    if (token[0].istitle()):
+                        toFunctions = True
+                        sourceChunk += f'<span class="bold" style="color:darkorange;">{token}</span>'
+                        continue
 
-            sourceChunk += f' {dataChunks[4]}' #строка кода
+                    if (toFunctions or (ix == len(sourceTokens) - 1)):
+                        sourceChunk += f'<span style="color:blue;">{token}</span>'
+                        continue
+
+                    else:
+                        sourceChunk += f'<span class="bold" style="color:coral;">{token}</span>'
+                        continue
+
+                sourceChunk += f' {dataChunks[4]}' #строка кода
 
             #Собираем всё
             completeLine = ' '.join((dateTimeChunk, loggerInfoChunk, sourceChunk))
             completeLine += message
 
             #Отправляем в сборщик
-            logs.append(completeLine)
+            output.append(completeLine)
 
-        return logs
+        return output
 
     def getLogFile(self, name: str, html: bool = False) -> Log:
         data = {
             'name': name,
-            'size': getsize(f"logs/{name}")
+            'time': getmtime(f'logs/{name}'),
+            'size': getsize(f'logs/{name}')
         }
 
         if (html):
             initial = fread(f'logs/{name}', encoding = 'utf-8').splitlines()
-            decorated = self.formatLog(initial)
+            decorated = self.format(initial)
             data.update(lines = decorated)
 
         else:
