@@ -10,18 +10,7 @@ class LeafyyLoggingApi:
         title = 'API Листочка: подсистема журнала'
     )
 
-    def assignApi(self):
-        @self.api.post('/log',
-            name = 'Опубликовать сообщение журнала сервера',
-            description = 'Приказывает серверу опубликовать сообщение журнала от логгера Web.')
-        def logReport(message: LogReport, request: Request, response: Response):
-            self.logger.publish(message.level, message.message.replace(
-                'USER_IP', f'{request.client.host}:{request.client.port}'
-            ))
-
-            response.status_code = 202
-            return response
-        
+    def assignApi(self):        
         @self.api.get('/update', response_model = list[str],
             name = 'Получить стек новых сообщений консоли')
         def logUpdate():

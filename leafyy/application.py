@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from PySide6           import QtWidgets
+from PySide6           import QtCore, QtWidgets
 from sys               import argv, exit as iexit
 from os                import makedirs
 from packaging         import version as versioning
@@ -30,6 +30,8 @@ class Leafyy(QtWidgets.QApplication):
         self.log = LeafyyLogging()
         self.errors = LeafyyErrors()
         self.logger = LeafyyLogger('App')
+        self.logger.info(f'Запуск "Листочка" версии {self.version}, авторские права не защищены')
+        self.logger.info(f'Инициализация службы...')
         self.logger.info(
             'Инициализирована подсистема журналирования '
             f'(установлен уровень {self.log.globalLevel.name})')
@@ -57,6 +59,7 @@ class Leafyy(QtWidgets.QApplication):
         self.logger.debug('Привет, ребят!')
 
         self.web.assignApis()
+        self.cli.assignClis()
 
     @staticmethod
     def checkEnvironment():
@@ -67,6 +70,6 @@ class Leafyy(QtWidgets.QApplication):
         for dir in DIRS:
             makedirs(dir, exist_ok = True)
 
-    def _exit(self):
+    def quit_(self):
         self.web.stop()
         self.exit()

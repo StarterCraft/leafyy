@@ -47,11 +47,33 @@ class LeafyyIterableComponent(LeafyyComponent):
         ...
 
 
-class LeafyyWorker(QtCore.QThread):
-    def __init__(self, f) -> None:
+class LeafyyWorker(QtCore.QObject):
+    def __init__(self, f, *a, **kw):
         super().__init__()
         self.f = f
+        self.a = a
+        self.kw = kw
 
     def run(self):
-        self.f()
-        super().run()
+        self.f(*self.a, **self.kw)
+
+
+class LeafyyThreadedWorker(QtCore.QObject):
+    def __init__(self, f, *a, **kw) -> None:
+        super().__init__()
+        self.f = f
+        self.a = a
+        self.kw = kw
+        self.t = QtCore.QThread()
+
+    def _exec(self):
+        self.f(*self.a, **self.kw)
+
+    def run(self):
+        self.moveToThread(self.t)
+        self.t.finished.connect(self.deleteLater)
+        self.t.started.connect(self._exec)
+        self.t.start()
+
+    def exit(self):
+        self.t.requestInterruption()

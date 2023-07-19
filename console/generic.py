@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from PySide6   import QtCore
 from typing    import Callable, Iterator, ItemsView
-from traceback import format_exc
+from webutils  import formatExc
 
 from .models   import Command
 
@@ -20,24 +20,34 @@ class LeafyyConsoleCommands(
     def __len__(self) -> int:
         return len(self.commands.items())
     
-    def model(self) -> NotImplemented:
-        return NotImplemented
+    def model(self) -> list[tuple[str, Command]]:
+        output = []
+        output.append(('help', self['help']))
+        output.extend(sorted([c for c in self.commands.items() if len(c[0].split()) == 1 and c[0] != 'help'], key = lambda c: c[0]))
+        output.extend(sorted([c for c in self.commands.items() if len(c[0].split()) > 1 and c[0] != 'help'], key = lambda c: c[0]))
+        return output
 
     def append(self, command: Command):
         self.commands.update({command.key: command})
 
     def command(self,
-        f: Callable[[list[str]], None],
         key: str,
         displayName: str = None,
         description: str = None
         ) -> Callable[[list[str]], None]:
-        self.append(key, Command(key = key, call = f, displayName = displayName, description = description))
+        def _commandInner(fn: Callable[[list[str]], None]) -> Callable[[list[str]], None]:
+            def decorated(args: list[str]):
+                try:
+                    if (args):
+                        print(f'found ARGS', args)
+                        fn(args)
+                    else:
+                        fn()
+                except Exception as e:
+                    self.logger.error(f'Произошла ошибка при выполнении команды {key}: {formatExc(e)}')
+            c = Command(key = key, call = decorated, displayName = displayName, description = description)
+            self.append(c)
 
-        def decorated(args: list[str]):
-            try:
-                f(args)
-            except Exception as e:
-                self.logger.error(format_exc().splitlines())
+            return decorated
 
-        return decorated
+        return _commandInner

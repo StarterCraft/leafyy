@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from PySide6         import QtCore, QtWidgets
+from PySide6         import QtCore
 from fastapi         import FastAPI
 from typing          import Any
 
@@ -28,8 +28,8 @@ def deepupdate(self: dict, key: str, value: Any, sep: str = '.'):
 
 
 #Доступ к компонентам
-def app() -> QtWidgets.QApplication:
-    return QtWidgets.QApplication.instance()
+def app() -> QtCore.QCoreApplication:
+    return QtCore.QCoreApplication.instance()
 
 def tr(*args, **kwargs) -> str:
     return app().translate(*args, **kwargs)

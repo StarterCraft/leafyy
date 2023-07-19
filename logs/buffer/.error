@@ -1,2 +1,2 @@
 time;origin;caller;message
-1689605370.682076;Device-COM3;LeafyyDevice.start;Последовательный порт COM3 не удалось открыть: SerialPortError.DeviceNotFoundError
+1689762032.449304;Device-COM3;LeafyyDevice.start;Последовательный порт COM3 не удалось открыть: SerialPortError.DeviceNotFoundError

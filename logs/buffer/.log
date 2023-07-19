@@ -1,15 +1,19 @@
-<span style="color:gray">07.17 22:49:30.588458</span> [<span style="color:green">App</span>@<span style="color:blue">INFO</span>]: Инициализирована подсистема журналирования (установлен уровень DEBUG)
-<span style="color:gray">07.17 22:49:30.604272</span> [<span style="color:green">App</span>@<span style="color:blue">INFO</span>]: Инициализирована подсистема консоли
-<span style="color:gray">07.17 22:49:30.618291</span> [<span style="color:green">App</span>@<span style="color:blue">INFO</span>]: Инициализирована подсистема веб-сервера
-<span style="color:gray">07.17 22:49:30.636043</span> [<span style="color:green">Devices</span>@<span style="color:darkgray">DEBUG</span>]: Информация о портах получена
-<span style="color:gray">07.17 22:49:30.638472</span> [<span style="color:green">Devices</span>@<span style="color:blue">INFO</span>]: Загружены настройки устройств
-<span style="color:gray">07.17 22:49:30.640810</span> [<span style="color:green">App</span>@<span style="color:blue">INFO</span>]: Инициализирована подсистема устройств
-<span style="color:gray">07.17 22:49:30.654530</span> [<span style="color:green">App</span>@<span style="color:blue">INFO</span>]: Инициализирован веб-интерфейс
-<span style="color:gray">07.17 22:49:30.669450</span> [<span style="color:green">Device-COM3</span>@<span style="color:blue">INFO</span>]: Инициализация устройства по адресу COM3
-<span style="color:gray">07.17 22:49:30.671973</span> [<span style="color:green">Device-COM3</span>@<span style="color:darkgray">DEBUG</span>]: Инициализирован порт COM3, 9600 бод
-<span style="color:gray">07.17 22:49:30.674797</span> [<span style="color:green">Devices</span>@<span style="color:darkgray">DEBUG</span>]: Устройство по адресу COM3 зарегистрировано
-<span style="color:gray">07.17 22:49:30.675789</span> [<span style="color:green">Devices</span>@<span style="color:darkgray">DEBUG</span>]: Пытаюсь запустить устройство в системе
-<span style="color:gray">07.17 22:49:30.678050</span> [<span style="color:green">Device-COM3</span>@<span style="color:darkgray">DEBUG</span>]: Пытаюсь открыть порт COM3
-<span style="color:gray">07.17 22:49:30.682076</span> [<span style="color:green">Device-COM3</span>@<span style="color:red">ERROR</span>]: Последовательный порт COM3 не удалось открыть: SerialPortError.DeviceNotFoundError
-<span style="color:gray">07.17 22:49:30.686065</span> [<span style="color:green">WebService</span>@<span style="color:blue">INFO</span>]: Веб-сервер запущен
-<span style="color:gray">07.17 22:49:30.688080</span> [<span style="color:green">App</span>@<span style="color:darkgray">DEBUG</span>]: Привет, ребят!
+<span style="color:gray">07.19 18:20:32.407056</span> [<span style="color:green">App</span>@<span style="color:blue">INFO</span>]: Запуск "Листочка" версии 0.1a3, авторские права не защищены
+<span style="color:gray">07.19 18:20:32.408073</span> [<span style="color:green">App</span>@<span style="color:blue">INFO</span>]: Инициализация службы...
+<span style="color:gray">07.19 18:20:32.409063</span> [<span style="color:green">App</span>@<span style="color:blue">INFO</span>]: Инициализирована подсистема журналирования (установлен уровень DEBUG)
+<span style="color:gray">07.19 18:20:32.415065</span> [<span style="color:green">App</span>@<span style="color:blue">INFO</span>]: Инициализирована подсистема консоли
+<span style="color:gray">07.19 18:20:32.421063</span> [<span style="color:green">App</span>@<span style="color:blue">INFO</span>]: Инициализирована подсистема веб-сервера
+<span style="color:gray">07.19 18:20:32.428063</span> [<span style="color:green">Devices</span>@<span style="color:darkgray">DEBUG</span>]: Информация о портах получена
+<span style="color:gray">07.19 18:20:32.429068</span> [<span style="color:green">Devices</span>@<span style="color:blue">INFO</span>]: Загружены настройки устройств
+<span style="color:gray">07.19 18:20:32.430073</span> [<span style="color:green">App</span>@<span style="color:blue">INFO</span>]: Инициализирована подсистема устройств
+<span style="color:gray">07.19 18:20:32.438210</span> [<span style="color:green">App</span>@<span style="color:blue">INFO</span>]: Инициализирован веб-интерфейс
+<span style="color:gray">07.19 18:20:32.444618</span> [<span style="color:green">Device-COM3</span>@<span style="color:blue">INFO</span>]: Инициализация устройства по адресу COM3
+<span style="color:gray">07.19 18:20:32.445292</span> [<span style="color:green">Device-COM3</span>@<span style="color:darkgray">DEBUG</span>]: Инициализирован порт COM3, 9600 бод
+<span style="color:gray">07.19 18:20:32.446304</span> [<span style="color:green">Devices</span>@<span style="color:darkgray">DEBUG</span>]: Устройство по адресу COM3 зарегистрировано
+<span style="color:gray">07.19 18:20:32.447306</span> [<span style="color:green">Devices</span>@<span style="color:darkgray">DEBUG</span>]: Пытаюсь запустить устройство в системе
+<span style="color:gray">07.19 18:20:32.448302</span> [<span style="color:green">Device-COM3</span>@<span style="color:darkgray">DEBUG</span>]: Пытаюсь открыть порт COM3
+<span style="color:gray">07.19 18:20:32.449304</span> [<span style="color:green">Device-COM3</span>@<span style="color:red">ERROR</span>]: Последовательный порт COM3 не удалось открыть: SerialPortError.DeviceNotFoundError
+<span style="color:gray">07.19 18:20:32.450304</span> [<span style="color:green">WebService</span>@<span style="color:blue">INFO</span>]: Веб-сервер запущен
+<span style="color:gray">07.19 18:20:32.451302</span> [<span style="color:green">App</span>@<span style="color:darkgray">DEBUG</span>]: Привет, ребят!
+<span style="color:gray">07.19 18:21:20.837501</span> [<span style="color:green">WebUi</span>@<span style="color:darkgray">DEBUG</span>]: Загружена локальная библиотека js-cookie (версия 3.0.5) для клиента 127.0.0.1:60059
+<span style="color:gray">07.19 18:21:20.875141</span> [<span style="color:green">WebUi</span>@<span style="color:darkgray">DEBUG</span>]: Загружена локальная библиотека jquery (версия 3.7.0) для клиента 127.0.0.1:60058

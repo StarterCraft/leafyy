@@ -2,9 +2,8 @@
 import logging
 import os
 import inspect
-import traceback
 
-from autils   import strl
+from webutils import formatExc
 from pydantic import PositiveFloat
 from colorama import Fore, Style
 from datetime import datetime
@@ -270,14 +269,14 @@ class LeafyyLogger:
 
         self.handler.setFormatter(logging.Formatter(self.formatString))
 
-        self.Logger.warning(message + ('\n' + strl(traceback.format_exception(exc), '\n') if (exc) else ''))
+        self.Logger.warning(message + ('\n' + formatExc(exc) if (exc) else ''))
         if (self.logLevel <= LeafyyLogLevel.WARNING and not self.printDsb):
             print(f'[{Fore.GREEN}{self.name}{Style.RESET_ALL}@{Fore.YELLOW}WARN{Style.RESET_ALL}]: {message}')
 
         self.toBuffer(
             f'<span style="color:gray">{ctime.strftime(f"%m.%d %H:%M:%S.%f")}</span> '
             f'[<span style="color:green">{self.name}</span>'
-            '@<span style="color:orange">WARN</span>]: ' + message + ('\n' + strl(traceback.format_exception(exc), '\n') if (exc) else '')
+            '@<span style="color:orange">WARN</span>]: ' + message + ('\n' + formatExc(exc) if (exc) else '')
             )
         
         if (origin):
@@ -285,7 +284,7 @@ class LeafyyLogger:
                 ctime.timestamp(),
                 origin,
                 funcName,
-                message + ('\n' + strl(traceback.format_exception(exc), '\n') if (exc) else '')
+                message + ('\n' + formatExc(exc) if (exc) else '')
                 )
         
     def error(self, message: str, back: int = 1, origin: str = '', exc: Exception = None):
@@ -330,14 +329,14 @@ class LeafyyLogger:
             self.formatString = '%(asctime)s [%(name)s@%(levelname)s] %(message)s'
         self.handler.setFormatter(logging.Formatter(self.formatString))
 
-        self.Logger.error(message + ('\n' + strl(traceback.format_exception(exc), '\n') if (exc) else ''))
+        self.Logger.error(message + ('\n' + formatExc(exc) if (exc) else ''))
         if (self.logLevel <= LeafyyLogLevel.ERROR and not self.printDsb):
             print(f'[{Fore.GREEN}{self.name}{Style.RESET_ALL}@{Fore.YELLOW}ERROR{Style.RESET_ALL}]: {message}')
 
         self.toBuffer(
             f'<span style="color:gray">{ctime.strftime(f"%m.%d %H:%M:%S.%f")}</span> '
             f'[<span style="color:green">{self.name}</span>'
-            '@<span style="color:red">ERROR</span>]: ' + message + ('\n' + strl(traceback.format_exception(exc), '\n') if (exc) else '')
+            '@<span style="color:red">ERROR</span>]: ' + message + ('\n' + formatExc(exc) if (exc) else '')
             )
         
         if (origin):
@@ -345,7 +344,7 @@ class LeafyyLogger:
                 ctime.timestamp(),
                 origin, 
                 funcName,
-                message + ('\n' + strl(traceback.format_exception(exc), '\n') if (exc) else '')
+                message + ('\n' + formatExc(exc) if (exc) else '')
                 )
           
     def critical(self, message: str, back: int = 1, origin: str = '', exc: Exception = None):
@@ -391,14 +390,14 @@ class LeafyyLogger:
 
         self.handler.setFormatter(logging.Formatter(self.formatString))
         
-        self.Logger.critical(message + ('\n' + strl(traceback.format_exception(exc), '\n') if (exc) else ''))
+        self.Logger.critical(message + ('\n' + formatExc(exc) if (exc) else ''))
         if (self.logLevel <= LeafyyLogLevel.CRITICAL and not self.printDsb):
             print(f'[{Fore.GREEN}{self.name}{Style.RESET_ALL}@{Fore.YELLOW}CRITICAL{Style.RESET_ALL}]: {message}')
 
         self.toBuffer(
             f'<span style="color:gray">{ctime.strftime(f"%m.%d %H:%M:%S.%f")}</span> '
             f'[<span style="color:green">{self.name}</span>'
-            '@<span style="color:magenta">CRITICAL</span>]: ' + message + ('\n' + strl(traceback.format_exception(exc), '\n') if (exc) else '')
+            '@<span style="color:magenta">CRITICAL</span>]: ' + message + ('\n' + formatExc(exc) if (exc) else '')
             )
         
         if (origin):
@@ -406,6 +405,6 @@ class LeafyyLogger:
                 ctime.timestamp(),
                 origin,
                 funcName,
-                message + ('\n' + strl(traceback.format_exception(exc), '\n') if (exc) else '')
+                message + ('\n' + formatExc(exc) if (exc) else '')
                 )
         

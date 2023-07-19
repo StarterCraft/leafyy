@@ -63,7 +63,7 @@ function report(level, message, callback = reportStdCallback) {
     }
     
     $.ajax({
-        url: "/log",
+        url: "/log/",
         type: "POST",
         contentType: "application/json;charset=UTF-8",
         data: JSON.stringify({

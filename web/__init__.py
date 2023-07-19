@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
+from PySide6        import QtCore
 from leafyy         import app, options
-from leafyy.generic import LeafyyComponent, LeafyyWorker
+from leafyy.generic import LeafyyComponent, LeafyyThreadedWorker
 
 from fastapi import FastAPI
 from uvicorn import run as urun
@@ -19,6 +20,7 @@ class LeafyyWebService(
         
     def assignApis(self):
         app().ui.assignApi()
+        app().cli.assignApi()
         app().log.assignApi()
         app().devices.assignApi()
 
@@ -28,8 +30,8 @@ class LeafyyWebService(
 
     def run(self):
         'Run with Uvicorn'
-        self.w = LeafyyWorker(self.uvicornate)
-        self.w.start()
+        self.w = LeafyyThreadedWorker(self.uvicornate)
+        self.w.run()
         
     def start(self):
         self.run()

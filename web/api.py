@@ -6,7 +6,7 @@ from requests             import get
 from packaging            import version as versioning
 from re                   import findall
 
-from fastapi              import FastAPI, Request
+from fastapi              import Request
 from fastapi.templating   import Jinja2Templates
 from starlette.templating import _TemplateResponse
 from starlette.exceptions import HTTPException
@@ -19,6 +19,7 @@ from leafyy               import web
 from leafyy.generic       import LeafyyComponent
 from webutils             import JsResponse, CssResponse
 
+from .models              import LogReport
 from .template            import Template
 
 
@@ -214,6 +215,18 @@ class LeafyyWebInterface(LeafyyComponent):
                 console = logging().getGeneralBuffer(),
                 logConfig = logging().model()
             )
+        
+        
+        @web().post('/log/',
+            name = 'Опубликовать сообщение журнала сервера',
+            description = 'Приказывает серверу опубликовать сообщение журнала от логгера Web.')
+        def logReport(request: Request, response: Response, message: LogReport):
+            self.logger.publish(message.level, message.message.replace(
+                'USER_IP', f'{request.client.host}:{request.client.port}'
+            ))
+
+            response.status_code = 202
+            return response
 
         @web().get('/log/view', response_class = HTMLResponse,
             name = 'Просмотр файла журнала',

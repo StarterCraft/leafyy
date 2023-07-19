@@ -31,6 +31,18 @@ function hideStatusBar() {
     $(".status-bar").hide();
 }
 
+function serverError(request) {
+    if (request.status == 0) 
+        setStatus("<span class=\"negative bold\";>Соединение потеряно.</span>");
+
+    else setStatus("<span class=\"negative bold\";>Ошибка при отправке запроса: </span>" + 
+        "статус: " + request.status + request.statusText + ", ответ: " + request.responseText)
+}
+
+$.ajaxSetup({
+    error: serverError
+});
+
 function onLogLevelSelectChange(sel) {
     const thisSel = $("select#" + sel);
     thisSel.css(
@@ -134,6 +146,10 @@ function onSaveSettings() {
         (data, textStatus, request) => onSaveSettingsResult(request.status, data, d),
         (request, textStatus, error) => onSaveSettingsResult(request.status, request.responseText, d)
     );
+}
+
+function onFlushConsole() {
+    $("#view").empty();
 }
 
 /** 
@@ -283,23 +299,11 @@ consoleUpdateIntervalId = window.setInterval(keepConsoleUpdated, consoleUpdatePe
 
 function onConsoleSendResult(status, responseText, message) {
     if (status == 202) {
-        report(
-            "INFO",
-            "USER_IP >> " + message.target + " [Accepted] " + message.data
-        );
-
         const inputData = $("#data")[0];
         inputData.value = "";
     }
 
-    else {
-        report(
-            "ERROR",
-            "USER_IP >> " + message.target + " [Failure (" + status + ", " + responseText + ")] " + message.data
-        );
-    }
-
-    onUpdateConsoleData();
+    onManualUpdateConsoleData();
 }
 
 function fetchConsoleForm() {
@@ -314,8 +318,8 @@ function fetchConsoleForm() {
 
     var d = {
         "target": target,
-        "data": data,
-        "type": type
+        "type": type,
+        "data": data
     };
 
     return d;
@@ -343,10 +347,12 @@ function onConsoleSend() {
         return;
     }
 
+    report("INFO", "USER_IP >> " + d.target + " [Sent] " + d.data);
+
     $.ajax({
         type: "post",
-        url: "/console",
-        data: JSON.stringify(d)
+        url: "/console/",
+        data: JSON.stringify(d),
     }).then(
         (data, textStatus, request) => onConsoleSendResult(request.status, data, d),
         (request, textStatus, error) => onConsoleSendResult(request.status, request.responseText, d)

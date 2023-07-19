@@ -137,70 +137,78 @@ class LeafyyLogging(
     def format(self, log: list[str]) -> list[str]:
         output = []
         for line in log:
-            #Найти последнее двоеточие
-            lastColonIndex = line.index(']:') + 1
-            message = line[lastColonIndex:]
-            dataChunks = line[:lastColonIndex].split()
+            try:
+                #Найти последнее двоеточие
+                lastColonIndex = line.index(']:') + 1
+                message = line[lastColonIndex:]
+                dataChunks = line[:lastColonIndex].split()
 
-            #Дата и время сообщения журнала
-            dateTimeChunk = f'{dataChunks[0]} {dataChunks[1]}'
-            dateTimeChunk = f'<span style="color: gray; text-decoration: underlined;">{dateTimeChunk}</span>'
+                #Дата и время сообщения журнала
+                dateTimeChunk = f'{dataChunks[0]} {dataChunks[1]}'
+                dateTimeChunk = f'<span style="color: gray; text-decoration: underlined;">{dateTimeChunk}</span>'
 
-            #Канал и уровень журналирования
-            loggerInfoChunk = f'[<span style="color: green;">{dataChunks[2][1:].split("@")[0]}</span>@'
-            
-            loggerLvl = dataChunks[2][:-1].split('@')[1]
-            lvlColor = ''
-            match loggerLvl:
-                case 'DEBUG': lvlColor = 'gray'
-                case 'INFO': lvlColor = 'blue'
-                case 'WARNING': lvlColor = 'orange'
-                case 'ERROR': lvlColor = 'red'
-                case _: lvlColor = 'darkred'
+                #Канал и уровень журналирования
+                loggerInfoChunk = f'[<span style="color: green;">{dataChunks[2][1:].split("@")[0]}</span>@'
+                
+                loggerLvl = dataChunks[2][:-1].split('@')[1]
+                lvlColor = ''
+                match loggerLvl:
+                    case 'DEBUG': lvlColor = 'gray'
+                    case 'INFO': lvlColor = 'blue'
+                    case 'WARNING': lvlColor = 'orange'
+                    case 'ERROR': lvlColor = 'red'
+                    case _: lvlColor = 'darkred'
 
-            loggerInfoChunk += f'<span style="color: {lvlColor};">{dataChunks[2][:-1].split("@")[1]}</span>]'
+                loggerInfoChunk += f'<span style="color: {lvlColor};">{dataChunks[2][:-1].split("@")[1]}</span>]'
 
-            #Если журнал передаётся в полном виде, то будет также
-            #присутствовать информация о источнике сообщения.
+                #Если журнал передаётся в полном виде, то будет также
+                #присутствовать информация о источнике сообщения.
 
-            sourceChunk = ''
+                sourceChunk = ''
 
-            if (len(dataChunks) > 3):
-                #Источник сообщения, вплоть до строки кода
-                #Сделаем подсветку синтаксиса для каждого элемента пути
-                sourceTokens = dataChunks[3][1:].split('.')
+                if (len(dataChunks) > 3):
+                    #Источник сообщения, вплоть до строки кода
+                    #Сделаем подсветку синтаксиса для каждого элемента пути
+                    sourceTokens = dataChunks[3][1:].split('.')
 
-                sourceChunk = '['
+                    sourceChunk = '['
 
-                toFunctions = False
-                for ix, token in enumerate(sourceTokens):
-                    if (token.startswith('<')):
-                        continue
+                    toFunctions = False
+                    for ix, token in enumerate(sourceTokens):
+                        if (token.startswith('<')):
+                            continue
 
-                    if (ix > 0):
-                        sourceChunk += '.'
+                        if (ix > 0):
+                            sourceChunk += '.'
 
-                    if (token[0].istitle()):
-                        toFunctions = True
-                        sourceChunk += f'<span class="bold" style="color:darkorange;">{token}</span>'
-                        continue
+                        if (token[0].istitle()):
+                            toFunctions = True
+                            sourceChunk += f'<span class="bold" style="color:darkorange;">{token}</span>'
+                            continue
 
-                    if (toFunctions or (ix == len(sourceTokens) - 1)):
-                        sourceChunk += f'<span style="color:blue;">{token}</span>'
-                        continue
+                        if (toFunctions or (ix == len(sourceTokens) - 1)):
+                            sourceChunk += f'<span style="color:blue;">{token}</span>'
+                            continue
 
-                    else:
-                        sourceChunk += f'<span class="bold" style="color:coral;">{token}</span>'
-                        continue
+                        else:
+                            sourceChunk += f'<span class="bold" style="color:coral;">{token}</span>'
+                            continue
 
-                sourceChunk += f' {dataChunks[4]}' #строка кода
+                    sourceChunk += f' {dataChunks[4]}' #строка кода
 
-            #Собираем всё
-            completeLine = ' '.join((dateTimeChunk, loggerInfoChunk, sourceChunk))
-            completeLine += message
+                #Собираем всё
+                completeLine = ' '.join((dateTimeChunk, loggerInfoChunk, sourceChunk))
+                completeLine += message
 
-            #Отправляем в сборщик
-            output.append(completeLine)
+                #Отправляем в сборщик
+                output.append(completeLine)
+
+            except:
+                li = '<span style="background-color: beige;">'
+                li += line.replace(' ', '·')
+                li += '</span>'
+
+                output.append(li)
 
         return output
 
