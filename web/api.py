@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from typing               import Annotated
 from glob                 import glob
 from os                   import sep
 from autils               import fread, fwrite
@@ -6,7 +7,7 @@ from requests             import get
 from packaging            import version as versioning
 from re                   import findall
 
-from fastapi              import Request
+from fastapi              import APIRouter, Request, Depends
 from fastapi.templating   import Jinja2Templates
 from starlette.templating import _TemplateResponse
 from starlette.exceptions import HTTPException
@@ -19,11 +20,14 @@ from leafyy               import web
 from leafyy.generic       import LeafyyComponent
 from webutils             import JsResponse, CssResponse
 
-from .models              import LogReport
 from .template            import Template
 
 
 class LeafyyWebInterface(LeafyyComponent):
+    api = APIRouter(
+        tags = ['ui']
+    )
+
     def __init__(self) -> None:
         super().__init__('WebUi')
 
@@ -44,37 +48,37 @@ class LeafyyWebInterface(LeafyyComponent):
         return td
 
     def assignApi(self):
-        @web().get('/leafyy.css', response_class = CssResponse,   
+        @self.api.get('/leafyy.css', response_class = CssResponse, tags = ['uiUtil'],
             name = 'Получить глобальный CSS',
             description = 'Получает глобальный CSS-файл, необходимый для работы веб-сервиса.')
         def getGlobalCss() -> str:
             return fread('web/leafyy.css')
 
-        @web().get('/{cssId}.css', response_class = CssResponse,
+        @self.api.get('/{cssId}.css', response_class = CssResponse, tags = ['uiUtil'],
             name = 'Получить CSS по ID',
             description = 'Получает указанный CSS-файл на основе предоставленного ID.')
         def getCss(cssId: str) -> str:
             return fread(f'web/templates/{cssId}/{cssId}.css')
 
-        @web().get('/leafyy.js', response_class = JsResponse,
+        @self.api.get('/leafyy.js', response_class = JsResponse, tags = ['uiUtil'],
             name = 'Получить глобальный JS',
             description = 'Получает глобальный JS-файл, необходимый для работы веб-сервиса.')
         def getGlobalJs() -> str:
             return fread('web/leafyy.js')
 
-        @web().get('/{scriptId}.js', response_class = JsResponse,
+        @self.api.get('/{scriptId}.js', response_class = JsResponse, tags = ['uiUtil'],
             name = 'Получить JS по ID',
             description = 'Получает указанный JS-файл на основе предоставленного ID.')
         def getJs(scriptId: str) -> str:
             return fread(f'web/templates/{scriptId}/{scriptId}.js')
 
-        @web().get('/site.webmanifest', response_class = Response,
+        @self.api.get('/site.webmanifest', response_class = Response, tags = ['uiUtil'],
             name = 'Получить веб манифест',
             description = 'Получает файл веб манифеста.')
         def getWebManifest() -> str:
             return fread('web/site.webmanifest')
 
-        @web().get('/resources/{resourceId}', response_class = FileResponse,
+        @self.api.get('/resources/{resourceId}', response_class = FileResponse, tags = ['uiUtil'],
             name = 'Получить ресурс по ID',
             description = 'Получает указанный ресурс на основе предоставленного ID.')
         def getResource(resourceId: str) -> FileResponse:
@@ -101,7 +105,7 @@ class LeafyyWebInterface(LeafyyComponent):
 
             return versioning.parse(version)
 
-        @web().get('/libraries/web/{libraryId}.js', response_class = JsResponse,
+        @self.api.get('/libraries/web/{libraryId}.js', response_class = JsResponse, tags = ['uiUtil'],
             name = 'Получить актуальную JS-библиотеку')
         def getWebLibrary(libraryId: str, request: Request) -> str:
             '''
@@ -122,7 +126,7 @@ class LeafyyWebInterface(LeafyyComponent):
 
             return code
 
-        @web().get('/libraries/cache/{libraryId}.js', response_class = JsResponse,
+        @self.api.get('/libraries/cache/{libraryId}.js', response_class = JsResponse, tags = ['uiUtil'],
             name = 'Получить кэшированную JS-библиотеку')
         def getCachedLibrary(libraryId: str, request: Request) -> str:
             code = fread(f'web/libraries/{libraryId}.js')
@@ -135,7 +139,7 @@ class LeafyyWebInterface(LeafyyComponent):
 
             return code
 
-        @web().get('/libraries/{libraryId}.js', response_class = JsResponse,
+        @self.api.get('/libraries/{libraryId}.js', response_class = JsResponse, tags = ['uiUtil'],
             name = 'Получить JS-библиотеку')
         def getLibrary(libraryId: str, request: Request) -> str:
             '''
@@ -166,19 +170,19 @@ class LeafyyWebInterface(LeafyyComponent):
 
             return d
 
-        @web().get('/favicon.ico', response_class = FileResponse,
+        @self.api.get('/favicon.ico', response_class = FileResponse, tags = ['uiUtil'],
             name = 'Получить favicon',
             description = 'Получает favicon.')
         def getFavicon() -> FileResponse:
             return f'web/resources/favicon.svg'
 
-        @web().get('/auth', response_class = HTMLResponse,
+        @self.api.get('/auth', response_class = HTMLResponse,
             name = 'Авторизация',
             description = 'Отрисовывает страницу авторизации.')
         def auth(request: Request) -> _TemplateResponse:
             return self['auth'].render(request)
 
-        @web().get('/', response_class = HTMLResponse, 
+        @self.api.get('/', response_class = HTMLResponse, 
             name = 'Главная страница',
             description = 'Отрисовывает главную страницу с информацией о грядках.')
         def index(request: Request) -> _TemplateResponse:
@@ -190,7 +194,7 @@ class LeafyyWebInterface(LeafyyComponent):
                 errors = errors().format()
             )
 
-        @web().get('/devices', response_class = HTMLResponse,
+        @self.api.get('/devices', response_class = HTMLResponse,
             name = 'Страница оборудования',
             description = 'Отрисовывает страницу оборудования с информацией о нем.')
         def devices(request: Request) -> _TemplateResponse:
@@ -199,36 +203,25 @@ class LeafyyWebInterface(LeafyyComponent):
                 devices = _devices().model()
             )
 
-        @web().get('/rules', response_class = HTMLResponse,
+        @self.api.get('/rules', response_class = HTMLResponse,
             name = 'Правила',
             description = 'Отрисовывает страницу с правилами.')
         def rules(request: Request) -> _TemplateResponse:
             return self['rules'].render(request)
 
-        @web().get('/log', response_class = HTMLResponse,
+        @self.api.get('/log', response_class = HTMLResponse,
             name = 'Журнал и консоль',
             description = 'Отрисовывает страницу доступа к консоли и журналу.')
-        def console(request: Request) -> _TemplateResponse:
+        def console(request: Request, token: Annotated[str, Depends(web().authBearer)]) -> _TemplateResponse:
             return self['console'].render(
                 request,
+                token = token,
                 devices = _devices().model(),
                 console = logging().getGeneralBuffer(),
                 logConfig = logging().model()
             )
-        
-        
-        @web().post('/log/',
-            name = 'Опубликовать сообщение журнала сервера',
-            description = 'Приказывает серверу опубликовать сообщение журнала от логгера Web.')
-        def logReport(request: Request, response: Response, message: LogReport):
-            self.logger.publish(message.level, message.message.replace(
-                'USER_IP', f'{request.client.host}:{request.client.port}'
-            ))
 
-            response.status_code = 202
-            return response
-
-        @web().get('/log/view', response_class = HTMLResponse,
+        @self.api.get('/log/view', response_class = HTMLResponse,
             name = 'Просмотр файла журнала',
             description = 'Отрисовывает страницу со списком файлов журнала.')
         def logList(request: Request, reversed = 0) -> _TemplateResponse:
@@ -238,7 +231,7 @@ class LeafyyWebInterface(LeafyyComponent):
                 reversed = reversed
             )
 
-        @web().get('/log/view/{name}', response_class = HTMLResponse,
+        @self.api.get('/log/view/{name}', response_class = HTMLResponse,
             name = 'Просмотр файла журнала',
             description = 'Отрисовывает страницу просмотра указанного файла журнала.')
         def logView(request: Request, name: str) -> _TemplateResponse:
@@ -247,7 +240,7 @@ class LeafyyWebInterface(LeafyyComponent):
                 logFile = logging().getLogFile(name, html = True)
             )
         
-        @web().get('/doc', response_class = HTMLResponse,
+        @self.api.get('/doc', response_class = HTMLResponse,
             name = 'Документация',
             description = 'Отрисовывает страницу с документацией.')
         def doc(request: Request) -> _TemplateResponse:
@@ -260,3 +253,5 @@ class LeafyyWebInterface(LeafyyComponent):
                 statusCode = exception.status_code,
                 exception = exception
                 )
+
+        web().include_router(self.api)
