@@ -134,3 +134,6 @@ class LeafyyByteOperations:
             array.append(byte)
         return array
 
+
+class LeafyyDeviceMessage:
+    pass

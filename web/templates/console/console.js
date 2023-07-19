@@ -351,7 +351,7 @@ function onConsoleSend() {
 
     $.ajax({
         type: "post",
-        url: "/console/",
+        url: "/console",
         data: JSON.stringify(d),
     }).then(
         (data, textStatus, request) => onConsoleSendResult(request.status, data, d),

@@ -1,19 +1,19 @@
 # -*- coding: utf-8 -*-
-from fastapi import FastAPI, Request, Response
+from fastapi import APIRouter, Request, Response
 
-from leafyy  import devices, app
+from leafyy  import devices, web
 from leafyy.generic import LeafyyThreadedWorker
 
 from .models import Order
 
 
 class LeafyyConsoleApi:
-    api = FastAPI(
-        name = 'API Листочка: подсистема моментальных команд'
+    api = APIRouter(
+        prefix = '/console',
     )
 
     def assignApi(self):
-        @self.api.post('/',
+        @self.api.post('', tags = ['console'],
             name = 'Исполнить команду',
             description = 'Исполняет команду, находящуюся в теле запроса.')
         def postExecCmd(request: Request, response: Response, data: Order):
@@ -33,3 +33,5 @@ class LeafyyConsoleApi:
                     return response
             else:
                 devices(data.target).send(devices().convertData(data.data, data.type))
+
+        web().include_router(self.api)

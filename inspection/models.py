@@ -18,6 +18,12 @@ class Log(BaseModel):
     time:  PositiveFloat
     lines: Optional[list[str]]
 
+class LogReport(BaseModel):
+    time:    PositiveFloat
+    logger:  str
+    level:   str
+    message: str
+
 class ErrorRecord(BaseModel):
     time:    PositiveFloat
     origin:  Optional[str]

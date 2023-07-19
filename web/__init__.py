@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
-from PySide6        import QtCore
 from leafyy         import app, options
 from leafyy.generic import LeafyyComponent, LeafyyThreadedWorker
 
-from fastapi import FastAPI
-from uvicorn import run as urun
+from fastapi          import FastAPI
+from fastapi.security import OAuth2PasswordBearer
+from uvicorn          import run as urun
 
 
 class LeafyyWebService(
@@ -17,6 +17,8 @@ class LeafyyWebService(
             title = 'Leafyy Web Service', 
             description = 'Testing!',
             debug = options('webServiceDebug', False))
+        
+        self.authBearer = OAuth2PasswordBearer(tokenUrl = 'token')
         
     def assignApis(self):
         app().ui.assignApi()
