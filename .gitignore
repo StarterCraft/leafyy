@@ -56,7 +56,8 @@ compile_commands.json
 
 # log
 *.log
-*.error
+/logs/buffer/.error
 
 #vscode
 .vscode/*
+logs/buffer/.error

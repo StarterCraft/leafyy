@@ -26,8 +26,8 @@ class LeafyyLogging(
         self.fileName = f'logs/Leafyy_{strftime("%d.%m.%Y_%H%M%S", localtime(app().startup))}.log'
 
         #Вместо стеков попробуем использовать буферы
-        self.generalBuffer = 'logs/buffer/.log'
-        self.updateBuffer = 'logs/buffer/update.log'
+        self.generalBuffer = 'logs/.buffer.log'
+        self.updateBuffer = 'logs/update.buffer.log'
 
         fwrite(self.generalBuffer, '')
         fwrite(self.updateBuffer, '')

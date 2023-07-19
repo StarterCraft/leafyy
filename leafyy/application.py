@@ -64,7 +64,7 @@ class Leafyy(QtWidgets.QApplication):
     @staticmethod
     def checkEnvironment():
         DIRS = [
-            'logs/buffer'
+            'logs'
         ]
 
         for dir in DIRS:

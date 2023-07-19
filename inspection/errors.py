@@ -16,7 +16,7 @@ class LeafyyErrors(
     def __init__(self) -> None:
         super().__init__('Errors')
 
-        self.errorBuffer = 'logs/buffer/.error'
+        self.errorBuffer = 'logs/error.buffer.log'
 
         fwrite(self.errorBuffer, 'time;origin;caller;message\n') #csv стиль
 
