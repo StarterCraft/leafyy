@@ -6,6 +6,14 @@ if (typeof(String.prototype.trim) === "undefined")
     };
 }
 
+function prepare() {
+    if ($(document).height() <= $(window).height()) {		
+        $("footer").addClass("fixed-bottom");
+    }
+}
+
+window.onload = prepare;
+
 function getCookie(id, _default) {
     c = Cookies.get(id);
     if (typeof c === "undefined") 

@@ -9,6 +9,17 @@
     --color-negation-highlight: #fe1c00;
 }
 
+/*fonts*/
+
+/*Интегрировать шрифт пока не будем, есть дела поважнее*/
+
+@font-face {
+    font-family: "Jikharev";
+    src: 
+        url("/resources/Jikharev.woff") format('woff'),
+        url("/resources/Jikharev.ttf") format('truetype');
+}
+
 /*classes*/
 
 .hidden {
@@ -83,6 +94,7 @@
 
 .grand {
     font-size: x-large;
+    /* font-family: 'Jikharev', system-ui; */
 }
 
 .bold {
@@ -345,4 +357,12 @@ a {
 
 a:hover {
     color: var(--color-accent-highlight);
+}
+
+footer.fixed-bottom {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 10;
 }
