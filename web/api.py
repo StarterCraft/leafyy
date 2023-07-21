@@ -6,7 +6,6 @@ from autils               import fread, fwrite
 from requests             import get
 from packaging            import version as versioning
 from re                   import findall
-from importlib            import import_module
 
 from fastapi              import APIRouter, Request, Depends
 from fastapi.templating   import Jinja2Templates
@@ -44,9 +43,7 @@ class LeafyyWebInterface(LeafyyComponent):
         templateNames = [name.split(sep)[-1] for name in glob('web/templates/*')]
 
         for name in templateNames:
-            td.update({
-                name: Template(name, self.jinja)
-            })
+            td.update({name: Template(name, self.jinja)})
 
         return td
 
@@ -179,11 +176,47 @@ class LeafyyWebInterface(LeafyyComponent):
         def getFavicon() -> FileResponse:
             return f'web/resources/favicon.svg'
 
+        @self.api.get('/auth', response_class = HTMLResponse,
+            name = 'Авторизация',
+            description = 'Отрисовывает страницу авторизации.')
+        def getAuthPage(request: Request) -> _TemplateResponse:
+            return self['auth'].render(request)
+
         @self.api.get('/', response_class = HTMLResponse, 
             name = 'Главная страница',
-            description = 'Отрисовывает главную страницу.')
+            description = 'Отрисовывает главную страницу с информацией о грядках.')
         def getIndexPage(request: Request) -> _TemplateResponse:
-            return self['index'].render(request)
+            return self['index'].render(
+                request,
+                devices = _devices().model(),
+                errors = errors().format()
+            )
+
+        @self.api.get('/devices', response_class = HTMLResponse,
+            name = 'Страница оборудования',
+            description = 'Отрисовывает страницу оборудования с информацией о нем.')
+        def getDevicesPage(request: Request) -> _TemplateResponse:
+            return self['devices'].render(
+                request,
+                devices = _devices().model()
+            )
+
+        @self.api.get('/rules', response_class = HTMLResponse,
+            name = 'Правила',
+            description = 'Отрисовывает страницу с правилами.')
+        def getRulesPage(request: Request) -> _TemplateResponse:
+            return self['rules'].render(request)
+
+        @self.api.get('/log', response_class = HTMLResponse,
+            name = 'Журнал и консоль',
+            description = 'Отрисовывает страницу доступа к консоли и журналу.')
+        def getConsolePage(request: Request) -> _TemplateResponse:
+            return self['console'].render(
+                request,
+                devices = _devices().model(),
+                console = logging().getGeneralBuffer(),
+                logConfig = logging().model()
+            )
 
         @self.api.get('/log/view', response_class = HTMLResponse,
             name = 'Просмотр файла журнала',
@@ -204,15 +237,11 @@ class LeafyyWebInterface(LeafyyComponent):
                 logFile = logging().getLogFile(name, html = True)
             )
         
-        @self.api.get('/{name}', response_class = HTMLResponse,
-            name = 'Страница',
-            description = 'Отрисовывает страницу с данным именем.'
-            )
-        def getPage(request: Request, name: str) -> _TemplateResponse:
-            try:
-                return self[name].render(request)
-            except KeyError as e:
-                raise HTTPException(404) from e
+        @self.api.get('/doc', response_class = HTMLResponse,
+            name = 'Документация',
+            description = 'Отрисовывает страницу с документацией.')
+        def getDocPage(request: Request) -> _TemplateResponse:
+            return self['doc'].render(request)
         
         @web().exception_handler(HTTPException)
         def error(request: Request, exception: HTTPException) -> _TemplateResponse:

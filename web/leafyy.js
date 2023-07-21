@@ -12,7 +12,7 @@ function prepare() {
     }
 }
 
-window.onload = prepare;
+window.onload += prepare;
 
 function getCookie(id, _default) {
     c = Cookies.get(id);

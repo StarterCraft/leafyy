@@ -23,7 +23,7 @@
             <a class="action" href="/">домой</a>
             <a class="action" href="/rules">правила</a>
             <a class="action" href="/devices">устройства</a>
-            <a class="action" href="/console">консоль</a>
+            <a class="action" href="/log">консоль</a>
             <a class="action" href="/doc">справка</a>
         </nav>
     </header class="block stretcher">
@@ -46,7 +46,7 @@
             {% else %}
             <a class="action" href="/log/view?reversed=1">сначала старые</a>
             {% endif %}
-            <a class="action" href="/console">к консоли</a>
+            <a class="action" href="/log">к консоли</a>
         </nav>
     </div>
     {% if logData %}
@@ -73,6 +73,15 @@
     Нет файлов для отображения.
     </div>
     {% endif %}
+    <footer class="block stretcher">
+        <div>
+        Листочек, система автоматического контроля растений. 
+        2023 год. Никакие права не защищены.
+        </div>
+        <div>
+        {{version}}
+        </div>
+    </footer>
     <script src="/libraries/jquery.js"></script>
     <script src="/libraries/js-cookie.js"></script>
     <script src="/leafyy.js"></script>
