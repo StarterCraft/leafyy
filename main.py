@@ -4,7 +4,7 @@ import sys
 from leafyy.application import Leafyy
 
 
-__version__ = '0.1a3'
+__version__ = '0.1dev4'
 
 
 def main(args: list[str]) -> int:
