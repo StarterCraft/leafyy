@@ -3,6 +3,8 @@ from PySide6         import QtCore
 from fastapi         import FastAPI
 from typing          import Any
 
+import packaging.version as versioning
+
 
 #Утилитарные функции
 def deepget(self: dict, key: str, default: Any = None, sep: str = '.'):
@@ -30,6 +32,9 @@ def deepupdate(self: dict, key: str, value: Any, sep: str = '.'):
 #Доступ к компонентам
 def app() -> QtCore.QCoreApplication:
     return QtCore.QCoreApplication.instance()
+
+def version() -> versioning.Version:
+    return app().version
 
 def tr(*args, **kwargs) -> str:
     return app().translate(*args, **kwargs)

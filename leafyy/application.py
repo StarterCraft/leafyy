@@ -23,6 +23,10 @@ class Leafyy(QtWidgets.QApplication):
         assert QtWidgets.QApplication.instance() is self
 
         self.version = versioning.parse(version)
+        self.setApplicationVersion(version)
+
+        self.setApplicationName('Leafyy')
+        self.setApplicationDisplayName('Листочек')
 
         print(f'Starting Leafyy v.{self.version}, uncopyrighted')
         print(f'Запуск "Листочка" версии {self.version}, авторские права не защищены')

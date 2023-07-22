@@ -16,7 +16,7 @@ from fastapi.responses    import Response, HTMLResponse, FileResponse
 from leafyy               import devices as _devices
 from leafyy               import log as logging
 from leafyy               import errors
-from leafyy               import web
+from leafyy               import web, version
 from leafyy.generic       import LeafyyComponent
 from webutils             import JsResponse, CssResponse
 
@@ -180,7 +180,10 @@ class LeafyyWebInterface(LeafyyComponent):
             name = 'Авторизация',
             description = 'Отрисовывает страницу авторизации.')
         def getAuthPage(request: Request) -> _TemplateResponse:
-            return self['auth'].render(request)
+            return self['auth'].render(
+                request,
+                version = str(version())
+                )
 
         @self.api.get('/', response_class = HTMLResponse, 
             name = 'Главная страница',
@@ -188,6 +191,7 @@ class LeafyyWebInterface(LeafyyComponent):
         def getIndexPage(request: Request) -> _TemplateResponse:
             return self['index'].render(
                 request,
+                version = str(version()),
                 devices = _devices().model(),
                 errors = errors().format()
             )
@@ -198,6 +202,7 @@ class LeafyyWebInterface(LeafyyComponent):
         def getDevicesPage(request: Request) -> _TemplateResponse:
             return self['devices'].render(
                 request,
+                version = str(version()),
                 devices = _devices().model()
             )
 
@@ -205,7 +210,10 @@ class LeafyyWebInterface(LeafyyComponent):
             name = 'Правила',
             description = 'Отрисовывает страницу с правилами.')
         def getRulesPage(request: Request) -> _TemplateResponse:
-            return self['rules'].render(request)
+            return self['rules'].render(
+                request,
+                version = str(version())
+                )
 
         @self.api.get('/log', response_class = HTMLResponse,
             name = 'Журнал и консоль',
@@ -213,6 +221,7 @@ class LeafyyWebInterface(LeafyyComponent):
         def getConsolePage(request: Request) -> _TemplateResponse:
             return self['console'].render(
                 request,
+                version = str(version()),
                 devices = _devices().model(),
                 console = logging().getGeneralBuffer(),
                 logConfig = logging().model()
@@ -224,6 +233,7 @@ class LeafyyWebInterface(LeafyyComponent):
         def getLogListPage(request: Request, reversed = 0) -> _TemplateResponse:
             return self['logList'].render(
                 request,
+                version = str(version()),
                 logData = logging().getLogFolderSummary(reversed),
                 reversed = reversed
             )
@@ -234,6 +244,7 @@ class LeafyyWebInterface(LeafyyComponent):
         def getLogViewPage(request: Request, name: str) -> _TemplateResponse:
             return self['logView'].render(
                 request,
+                version = str(version()),
                 logFile = logging().getLogFile(name, html = True)
             )
         
@@ -241,7 +252,10 @@ class LeafyyWebInterface(LeafyyComponent):
             name = 'Документация',
             description = 'Отрисовывает страницу с документацией.')
         def getDocPage(request: Request) -> _TemplateResponse:
-            return self['doc'].render(request)
+            return self['doc'].render(
+                request,
+                version = str(version())
+                )
         
         @web().exception_handler(HTTPException)
         def error(request: Request, exception: HTTPException) -> _TemplateResponse:

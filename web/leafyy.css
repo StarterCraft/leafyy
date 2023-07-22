@@ -359,6 +359,20 @@ a:hover {
     color: var(--color-accent-highlight);
 }
 
+footer {
+    font-size: small;
+}
+
+footer.block {
+    margin: 0 24px;
+    border-bottom: none;
+    border-top: 3px solid black;
+    border-right: 1.5px solid black;
+    border-left: 1.5px solid black;
+    border-bottom-left-radius: 0px;
+    border-bottom-right-radius: 0px;
+}
+
 footer.fixed-bottom {
     position: fixed;
     left: 0;

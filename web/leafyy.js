@@ -6,13 +6,13 @@ if (typeof(String.prototype.trim) === "undefined")
     };
 }
 
-function prepare() {
+function prepareIt() {
     if ($(document).height() <= $(window).height()) {		
         $("footer").addClass("fixed-bottom");
     }
 }
 
-window.onload = prepare;
+$(document).ready(prepareIt);
 
 function getCookie(id, _default) {
     c = Cookies.get(id);

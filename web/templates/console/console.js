@@ -17,7 +17,7 @@ function prepare() {
     )
 }
 
-window.onload += prepare;
+$(document).ready(prepare);
 
 function setStatus(content) {
     const status = $("#status")[0];
