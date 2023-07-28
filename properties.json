@@ -1,0 +1,15 @@
+{
+    "log": {
+        "level": "DEBUG"
+    },
+    "postgres": {
+        "name": "testing",
+        "user": "leafyydev",
+        "password": "debug",
+        "host": "localhost"
+    },
+    "service": {
+        "debug": true,
+        "port": 38001
+    }
+}

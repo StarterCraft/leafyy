@@ -6,7 +6,7 @@ from time            import time
 from typing          import Any, Iterator
 
 from leafyy.generic  import LeafyyIterableComponent
-from leafyy          import options, devices, errors
+from leafyy          import devices, errors
 from devices         import LeafyyStatus
 from .message        import LeafyyDeviceMessage
 from .models         import Device
@@ -74,7 +74,7 @@ class LeafyyDevice(LeafyyIterableComponent):
     @logWindowVisibility.setter
     def logWindowVisibility(self, value: bool):
         self.visibleInConsole = value
-        options().setLogWindowSources(self.name, value, 1)
+        #properties().setLogWindowSources(self.name, value, 1)
 
     @property
     def decodeASCII(self):
@@ -83,7 +83,7 @@ class LeafyyDevice(LeafyyIterableComponent):
     @decodeASCII.setter
     def decodeASCII(self, value: bool):
         self.decodeASCIIMode = value
-        options().setLogDecodeASCII(self.address, value)
+        #properties().setLogDecodeASCII(self.address, value)
 
     def start(self):
         self.logger.debug(f'Пытаюсь открыть порт {self.address}')

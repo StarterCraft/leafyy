@@ -1,13 +1,12 @@
 # -*- coding: utf-8 -*-
-#coding=utf-8
-from typing import List, Dict, Any
+from typing import Any
 from json   import loads, dumps
 from autils import fread, fwrite
 
 from leafyy import deepget
 
 
-class LeafyyOptions(dict):
+class LeafyyProperties(dict):
     FILENAME = 'options.json'
 
     def __init__(self):

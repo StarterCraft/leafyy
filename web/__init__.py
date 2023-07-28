@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from leafyy         import app, options
+from leafyy         import app, properties
 from leafyy.generic import LeafyyComponent, LeafyyThreadedWorker
 
 from fastapi          import FastAPI
@@ -16,7 +16,7 @@ class LeafyyWebService(
             loggerName = 'WebService',
             title = 'Leafyy Web Service', 
             description = 'Testing!',
-            debug = options('webServiceDebug', False))
+            debug = properties('webServiceDebug', False))
         
         self.authBearer = OAuth2PasswordBearer(tokenUrl = 'token')
         
@@ -28,7 +28,7 @@ class LeafyyWebService(
 
     def uvicornate(self):
         urun(self, 
-            port = options().get('serverPort', 38001))
+            port = properties().get('serverPort', 38001))
 
     def run(self):
         'Run with Uvicorn'

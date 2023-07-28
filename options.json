@@ -1,9 +1,0 @@
-{
-    "logLevel": "DEBUG",
-    "logLoggers": {
-        
-    },
-    "webServiceDebug": true,
-    "serviceMode": 0,
-    "serverPort": 38001
-}

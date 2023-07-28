@@ -8,7 +8,7 @@ from pydantic import PositiveFloat
 from colorama import Fore, Style
 from datetime import datetime
 
-from leafyy   import log, errors, options
+from leafyy   import log, errors, properties
 
 from .models  import Logger
 from .generic import LeafyyLogLevel
@@ -90,7 +90,7 @@ class LeafyyLogger:
     @logWindowVisibility.setter
     def logWindowVisibility(self, value: bool):
         self.console = value
-        options().setlogWindowLoggers(self.name, value)
+        properties().setlogWindowLoggers(self.name, value)
 
     def setLogLevel(self, logLevel: LeafyyLogLevel):
         '''
@@ -113,10 +113,10 @@ class LeafyyLogger:
         self.logLevel = logLevel
         self.Logger.setLevel(logLevel.value)
 
-    def toBuffer(self, message: str):
+    def record(self, message: str):
         'Отправить сообщение в стек'
         if (self.console):
-            log().toBuffer(message)
+            log().record(message)
 
     def asError(self, time: PositiveFloat, origin: str, caller: str, message: str):
         errors().record(time, origin, caller, message)
@@ -173,7 +173,7 @@ class LeafyyLogger:
         if (self.logLevel == LeafyyLogLevel.DEBUG) and not self.printDsb:
             print(f'[{Fore.GREEN}{self.name}{Style.RESET_ALL}@{Fore.YELLOW}DEBUG{Style.RESET_ALL}]: {message}')
 
-        self.toBuffer(
+        self.record(
             f'<span style="color:gray">{ctime.strftime(f"%m.%d %H:%M:%S.%f")}</span> '
             f'[<span style="color:green">{self.name}</span>'
             f'@<span style="color:darkgray">DEBUG</span>]: {message}'
@@ -220,7 +220,7 @@ class LeafyyLogger:
         if (self.logLevel <= LeafyyLogLevel.INFO and not self.printDsb):
             print(f'[{Fore.GREEN}{self.name}{Style.RESET_ALL}@{Fore.YELLOW}INFO{Style.RESET_ALL}]: {message}')
 
-        self.toBuffer(
+        self.record(
             f'<span style="color:gray">{ctime.strftime(f"%m.%d %H:%M:%S.%f")}</span> '
             f'[<span style="color:green">{self.name}</span>'
             f'@<span style="color:blue">INFO</span>]: {message}'
@@ -273,7 +273,7 @@ class LeafyyLogger:
         if (self.logLevel <= LeafyyLogLevel.WARNING and not self.printDsb):
             print(f'[{Fore.GREEN}{self.name}{Style.RESET_ALL}@{Fore.YELLOW}WARN{Style.RESET_ALL}]: {message}')
 
-        self.toBuffer(
+        self.record(
             f'<span style="color:gray">{ctime.strftime(f"%m.%d %H:%M:%S.%f")}</span> '
             f'[<span style="color:green">{self.name}</span>'
             '@<span style="color:orange">WARN</span>]: ' + message + ('\n' + formatExc(exc) if (exc) else '')
@@ -333,7 +333,7 @@ class LeafyyLogger:
         if (self.logLevel <= LeafyyLogLevel.ERROR and not self.printDsb):
             print(f'[{Fore.GREEN}{self.name}{Style.RESET_ALL}@{Fore.YELLOW}ERROR{Style.RESET_ALL}]: {message}')
 
-        self.toBuffer(
+        self.record(
             f'<span style="color:gray">{ctime.strftime(f"%m.%d %H:%M:%S.%f")}</span> '
             f'[<span style="color:green">{self.name}</span>'
             '@<span style="color:red">ERROR</span>]: ' + message + ('\n' + formatExc(exc) if (exc) else '')
@@ -394,7 +394,7 @@ class LeafyyLogger:
         if (self.logLevel <= LeafyyLogLevel.CRITICAL and not self.printDsb):
             print(f'[{Fore.GREEN}{self.name}{Style.RESET_ALL}@{Fore.YELLOW}CRITICAL{Style.RESET_ALL}]: {message}')
 
-        self.toBuffer(
+        self.record(
             f'<span style="color:gray">{ctime.strftime(f"%m.%d %H:%M:%S.%f")}</span> '
             f'[<span style="color:green">{self.name}</span>'
             '@<span style="color:magenta">CRITICAL</span>]: ' + message + ('\n' + formatExc(exc) if (exc) else '')

@@ -22,7 +22,7 @@ class LeafyyConsoleApi:
 
             if (data.target == 'server'):
                 try:
-                    self[cmdName].call(cmdArgs)
+                    self(cmdName, cmdArgs)
                     response.status_code = 202
                     return response
                 except KeyError:

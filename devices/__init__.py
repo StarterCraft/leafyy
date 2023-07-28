@@ -18,8 +18,8 @@ class LeafyyDevices(
     LeafyyIterableComponent,
     LeafyyDevicesApi
     ):
-    configFileName = 'device.json'
-    devices: List[LeafyyDevice] = []
+    #configFileName = 'device.json'
+    devices: dict[str, LeafyyDevice] = {}
 
     def __init__(self):
         super().__init__('devices')
@@ -33,16 +33,13 @@ class LeafyyDevices(
 
     def __getitem__(self, key: int | str) -> LeafyyDevice:
         if (isinstance(key, str)):
-            try:
-                return [d for d in self.devices if (d.address == key)][0]
-            except IndexError as e:
-                raise KeyError(f'Устройства с таким адресом не найдено', key) from e
+            return self.devices[key]
             
         else:
-            return self.devices[key]
+            return self.devices.values()[key]
         
     def __iter__(self) -> Iterator[LeafyyDevice]:
-        return iter(self.devices)
+        return iter(self.devices.values())
     
     def __len__(self) -> int:
         return len(self.devices)

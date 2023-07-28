@@ -1,7 +1,10 @@
 # -*- coding: utf-8 -*-
 from PySide6         import QtCore
+from typing          import Any, Annotated
 from fastapi         import FastAPI
-from typing          import Any
+
+from psycopg2        import connection, cursor
+from psycopg2.sql    import SQL
 
 import packaging.version as versioning
 
@@ -36,8 +39,11 @@ def app() -> QtCore.QCoreApplication:
 def version() -> versioning.Version:
     return app().version
 
-def tr(*args, **kwargs) -> str:
-    return app().translate(*args, **kwargs)
+def postgres(queryId: str = None, *args: Any) -> cursor | Any:
+    if (queryId):
+        return app().postgres().execute(queryId, args)
+
+    return app().postgres()
 
 def log():
     return app().log
@@ -45,7 +51,7 @@ def log():
 def errors():
     return app().errors
 
-def options(key: str = None, default: Any = None, sep: str = '.') -> dict | Any:
+def properties(key: str = None, default: Any = None, sep: str = '.') -> dict | Any:
     if (key):
         return app().options(key, default, sep)
     
@@ -63,8 +69,8 @@ def rules():
 def ui():
     return app().ui
 
-def cli(cmd = None):
+def cli(cmd: str = None, *args: str):
     if (cmd):
-        return app().cli(cmd)
+        return app().cli(cmd, args)
     
     return app().cli

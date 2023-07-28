@@ -1,14 +1,13 @@
 # -*- coding: utf-8 -*-
 from PySide6 import QtCore
 from typing import Iterator
+from pydantic import PositiveFloat
 from time import strftime, localtime
 from glob import glob
 from os.path import getsize, getmtime, sep as psep
 from autils import fread, fwrite
 
-from fastapi           import FastAPI
-
-from leafyy            import app, web
+from leafyy            import app, web, postgres
 from inspection.logger import LeafyyLogLevel, LeafyyLogger
 from .api              import LeafyyLoggingApi
 from .models           import Log, LogConfig
@@ -18,48 +17,36 @@ class LeafyyLogging(
     QtCore.QObject,
     LeafyyLoggingApi
     ):
-    loggers: list[LeafyyLogger] = []
+    loggers: dict[str, LeafyyLogger] = {}
 
     def __init__(self) -> None:
         super().__init__()
 
         self.fileName = f'logs/Leafyy_{strftime("%d.%m.%Y_%H%M%S", localtime(app().startup))}.log'
 
-        #Вместо стеков попробуем использовать буферы
-        self.generalBuffer = 'logs/.buffer.log'
-        self.updateBuffer = 'logs/update.buffer.log'
-
-        fwrite(self.generalBuffer, '')
-        fwrite(self.updateBuffer, '')
+        #Очищаем таблицу в базе данных для текущего журнала
+        postgres('inspection.truncateLog')
 
         self.globalLevel = LeafyyLogLevel.DEBUG
         
     def __getitem__(self, key: int | str) -> LeafyyLogger:
         if (isinstance(key, str)):
-            try:
-                return [l for l in self.loggers if (l.name == key)][0]
-            except IndexError as e:
-                raise KeyError(f'Канала журналирования не найдено', key) from e
+            return self.loggers[key]
             
         else:
-            return self.loggers[key]
+            return self.loggers.values()[key]
         
     def __iter__(self) -> Iterator[LeafyyLogger]:
-        return iter(self.loggers)
+        return iter(self.loggers.values())
     
     def __len__(self) -> int:
         return len(self.loggers)
 
-    def append(self, logger: LeafyyLogger):
-        self.loggers.append(logger)
+    def append(self, logger: LeafyyLogger) -> None:
+        self.loggers.update({logger.name: logger})
 
-    def remove(self, logger: LeafyyLogger | str):
-        if (isinstance(logger, LeafyyLogger)):
-            self.loggers.remove(logger)
-
-        if (isinstance(logger, str)):
-            self.loggers.remove(
-                [l for l in self if (l.name == logger)][0])
+    def remove(self, logger: str) -> None:
+        self.loggers.pop(logger)
             
     def model(self) -> LogConfig:
         return {
@@ -83,32 +70,18 @@ class LeafyyLogging(
                 self[c.name].setLogLevel(LeafyyLogLevel[c.level])
             except KeyError:
                 continue
+     
+    def record(self, time: PositiveFloat, origin: str, caller: str, message: str) -> None:
+        postgres().insert('insertLog', (time, origin, caller, message))
 
-    def toBuffer(self, message: str) -> None:
-        fwrite(self.generalBuffer, f'{message}\n', mode = 'a')
-        fwrite(self.updateBuffer, f'{message}\n', mode = 'a')
-
-    def toUpdateBuffer(self, message: str) -> None:
-        fwrite(self.updateBuffer, f'{message}\n', mode = 'a')
-
-    def getGeneralBuffer(self) -> list[str]:
-        self.flushUpdateBuffer()
-        return fread(self.generalBuffer).splitlines()
+    def getLogRecords(self) -> list[tuple]:
+        return postgres().fetchall('selectLog', 0)
     
-    def getUpdateBuffer(self) -> list[str]:
-        d = fread(self.updateBuffer).splitlines()
-        self.flushUpdateBuffer()
-        return d
+    def getRecentLogRecords(self, begin: PositiveFloat) -> list[tuple]:
+        return postgres().fetchall('selectLog', begin)
     
-    def flush(self):
-        self.flushGeneralBuffer()
-        self.flushUpdateBuffer()
-
-    def flushGeneralBuffer(self) -> None:
-        fwrite(self.generalBuffer, '')
-
-    def flushUpdateBuffer(self) -> None:
-        fwrite(self.updateBuffer, '')
+    def flush(self) -> None:
+        postgres('inspection.truncateLog')
 
     def setGlobalLogLevel(self, level: LeafyyLogLevel | str | int):
         lvl = LeafyyLogLevel.DEBUG

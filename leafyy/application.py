@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
-from PySide6           import QtCore, QtWidgets
-from sys               import argv, exit as iexit
+from PySide6           import QtWidgets
 from os                import makedirs
 from packaging         import version as versioning
 from time              import time
 
+from database.elephant import LeafyyPostgresDatabase
 from inspection        import LeafyyLogging
 from inspection.logger import LeafyyLogger
 from inspection.errors import LeafyyErrors
-from options           import LeafyyOptions
+from options           import LeafyyProperties
 from console           import LeafyyConsole
 from devices           import LeafyyDevices
 from web               import LeafyyWebService
@@ -31,6 +31,8 @@ class Leafyy(QtWidgets.QApplication):
         print(f'Starting Leafyy v.{self.version}, uncopyrighted')
         print(f'Запуск "Листочка" версии {self.version}, авторские права не защищены')
 
+        self.postgres = LeafyyPostgresDatabase()
+
         self.log = LeafyyLogging()
         self.errors = LeafyyErrors()
         self.logger = LeafyyLogger('App')
@@ -40,7 +42,7 @@ class Leafyy(QtWidgets.QApplication):
             'Инициализирована подсистема журналирования '
             f'(установлен уровень {self.log.globalLevel.name})')
 
-        self.options = LeafyyOptions()
+        self.options = LeafyyProperties()
         self.log.setGlobalLogLevel(self.options('logLevel'))
 
         self.cli = LeafyyConsole()
