@@ -18,7 +18,7 @@ class LeafyyDevices(
     LeafyyIterableComponent,
     LeafyyDevicesApi
     ):
-    #configFileName = 'device.json'
+    configFileName = 'device.json'
     devices: dict[str, LeafyyDevice] = {}
 
     def __init__(self):
@@ -66,7 +66,7 @@ class LeafyyDevices(
         fwrite(self.configFileName, dumps(config))
     
     def append(self, device: LeafyyDevice):
-        self.devices.append(device)
+        self.devices.update({device.address: device})
 
         self.logger.debug(
             f'Устройство по адресу {device.address} зарегистрировано'
@@ -92,5 +92,3 @@ class LeafyyDevices(
             if (device.isEnabled):
                 self.logger.debug('Пытаюсь запустить устройство в системе')
                 device.start()
-
-    

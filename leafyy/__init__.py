@@ -1,12 +1,10 @@
 # -*- coding: utf-8 -*-
-from PySide6         import QtCore
-from typing          import Any, Annotated
-from fastapi         import FastAPI
+from PySide6           import QtCore
+from typing            import Any
 
-from psycopg2        import connection, cursor
-from psycopg2.sql    import SQL
-
-import packaging.version as versioning
+from fastapi           import FastAPI
+from psycopg2._psycopg import cursor
+from packaging.version import Version
 
 
 #Утилитарные функции
@@ -36,14 +34,14 @@ def deepupdate(self: dict, key: str, value: Any, sep: str = '.'):
 def app() -> QtCore.QCoreApplication:
     return QtCore.QCoreApplication.instance()
 
-def version() -> versioning.Version:
+def version() -> Version:
     return app().version
 
 def postgres(queryId: str = None, *args: Any) -> cursor | Any:
     if (queryId):
-        return app().postgres().execute(queryId, args)
+        return app().postgres.execute(queryId, args)
 
-    return app().postgres()
+    return app().postgres
 
 def log():
     return app().log
@@ -53,9 +51,9 @@ def errors():
 
 def properties(key: str = None, default: Any = None, sep: str = '.') -> dict | Any:
     if (key):
-        return app().options(key, default, sep)
+        return app().properties(key, default, sep)
     
-    return app().options
+    return app().properties
 
 def web() -> FastAPI:
     return app().web

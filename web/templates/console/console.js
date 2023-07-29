@@ -55,6 +55,7 @@ let consoleAutoScroll = Boolean(getCookie("X10", true));
 let consoleShouldUpdate = Boolean(getCookie("X11", true))
 let minConsoleUpdatePeriod = Number(getCookie("X12", 2));
 let maxConsoleUpdatePeriod = Number(getCookie("X13", 3600));
+let lastConsoleUpdateTime = Date.now();
 
 function onReceivedLogConfig(data) {
     const modal = ".modal#log-settings";
@@ -150,6 +151,7 @@ function onSaveSettings() {
 
 function onFlushConsole() {
     $("#view").empty();
+    lastConsoleUpdateTime = Date.now();
 }
 
 /** 
@@ -253,10 +255,11 @@ let lastConsoleUpdateResult = false;
 function onReceivedUpdatedConsoleData(data) {
     data.forEach(addConsoleMessageLine);
     lastConsoleUpdateResult = (data.length > 0);
+    lastConsoleUpdateTime = Date.now();
 }
 
 function onUpdateConsoleData() {
-    $.get("/log/update", data => {
+    $.get("/log/update", lastConsoleUpdateTime, data => {
         onReceivedUpdatedConsoleData(data);
     });
 }

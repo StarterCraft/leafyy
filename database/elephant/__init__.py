@@ -1,16 +1,16 @@
-from PySide6         import QtCore
-from typing          import Any, Iterator, Annotated
-from os              import sep as psep
-from glob            import glob
+from PySide6           import QtCore
+from typing            import Any, Iterator, Annotated
+from os                import sep as psep
+from glob              import glob
 
-from psycopg2        import connection, cursor
-from psycopg2        import connect
-from psycopg2.sql    import SQL
-from psycopg2.extras import NamedTupleConnection, NamedTupleCursor
+from psycopg2._psycopg import connection, cursor
+from psycopg2          import connect
+from psycopg2.sql      import SQL
+from psycopg2.extras   import NamedTupleConnection, NamedTupleCursor
 
-from autils          import fread
+from autils            import fread
 
-from leafyy          import properties
+from leafyy            import properties
 
 
 class LeafyyPostgresDatabase(
@@ -29,7 +29,7 @@ class LeafyyPostgresDatabase(
         super().__init__()
 
         self.updateCredentials()
-        self.queries = self.updateQueries()
+        self.updateQueries()
 
     def __getitem__(self, key: int | str) -> Annotated[str, SQL]:
         if (isinstance(key, str)):
@@ -46,7 +46,7 @@ class LeafyyPostgresDatabase(
 
     def credentials(self) -> dict[str, str]:
         return {
-            'name': self.dbName,
+            'dbname': self.dbName,
             'user': self.dbUser,
             'password': self.dbPassword,
             'host': self.dbHost
@@ -60,13 +60,11 @@ class LeafyyPostgresDatabase(
 
         self.credentialsChanged.emit()
 
-        self.logger.debug('Данные для подключения к базе данных обновлены')
-
     def updateQueries(self) -> None:
         fileNames = glob('**/sql/*.sql')
 
         for fileName in fileNames:
-            qName = f'{fileName.split(psep)[-3]}.{fileName.split(psep)[-1]}'
+            qName = f'{fileName.split(psep)[-3]}.{fileName.split(psep)[-1][:-4]}'
             self.queries.update({qName: fread(fileName)})
 
     def connect(self) -> connection:

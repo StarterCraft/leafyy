@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import logging
+import sys
 import os
 import inspect
 
@@ -62,7 +63,7 @@ class LeafyyLogger:
         super(LeafyyLogger, self).__init__()
         self.name = name
         self.logLevel = logLevel
-        self.printDsb = not stdPrint
+        self.stdPrint = stdPrint
         self.console = console
 
         self.Logger = logging.getLogger(name)
@@ -70,9 +71,13 @@ class LeafyyLogger:
                 
         self.Logger.setLevel(self.logLevel.value)
 
-        self.handler = logging.FileHandler(rf'{log().fileName}', 'a+', 'utf-8')
-        
-        self.Logger.addHandler(self.handler)
+        self.file = logging.FileHandler(f'{log().fileName}', 'a+', 'utf-8')
+        self.Logger.addHandler(self.file)
+
+        self.printer = logging.StreamHandler(sys.stdout)
+
+        if (stdPrint):
+            self.Logger.addHandler(self.printer)
 
         log().append(self)
 
@@ -113,10 +118,10 @@ class LeafyyLogger:
         self.logLevel = logLevel
         self.Logger.setLevel(logLevel.value)
 
-    def record(self, message: str):
+    def record(self, time: PositiveFloat, level: str, message: str):
         'Отправить сообщение в стек'
         if (self.console):
-            log().record(message)
+            log().record(time, self.name, level, message)
 
     def asError(self, time: PositiveFloat, origin: str, caller: str, message: str):
         errors().record(time, origin, caller, message)
@@ -167,17 +172,19 @@ class LeafyyLogger:
         else:
             self.formatString = '%(asctime)s [%(name)s@%(levelname)s] %(message)s'
 
-        self.handler.setFormatter(logging.Formatter(self.formatString))
+        self.file.setFormatter(logging.Formatter(self.formatString))
+
+        if (self.logLevel == LeafyyLogLevel.DEBUG) and self.stdPrint:
+            self.Logger.addHandler(self.printer)
+            self.printer.setFormatter(logging.Formatter(
+                f'[{Fore.GREEN}%(name)s{Style.RESET_ALL}@{Fore.BLACK}%(levelname)s{Style.RESET_ALL}]: %(message)s'
+                ))
+        else:
+            self.Logger.removeHandler(self.printer)
 
         self.Logger.debug(message)
-        if (self.logLevel == LeafyyLogLevel.DEBUG) and not self.printDsb:
-            print(f'[{Fore.GREEN}{self.name}{Style.RESET_ALL}@{Fore.YELLOW}DEBUG{Style.RESET_ALL}]: {message}')
 
-        self.record(
-            f'<span style="color:gray">{ctime.strftime(f"%m.%d %H:%M:%S.%f")}</span> '
-            f'[<span style="color:green">{self.name}</span>'
-            f'@<span style="color:darkgray">DEBUG</span>]: {message}'
-            )
+        self.record(ctime, 'DEBUG', message)
 
     def info(self, message: str, back: int = 1):
         '''
@@ -214,17 +221,19 @@ class LeafyyLogger:
         else:
             self.formatString = '%(asctime)s [%(name)s@%(levelname)s] %(message)s'
 
-        self.handler.setFormatter(logging.Formatter(self.formatString))
+        self.file.setFormatter(logging.Formatter(self.formatString))
+
+        if (self.logLevel <= LeafyyLogLevel.INFO) and self.stdPrint:
+            self.Logger.addHandler(self.printer)
+            self.printer.setFormatter(logging.Formatter(
+                f'[{Fore.GREEN}%(name)s{Style.RESET_ALL}@{Fore.BLUE}%(levelname)s{Style.RESET_ALL}]: %(message)s'
+                ))
+        else:
+            self.Logger.removeHandler(self.printer)
 
         self.Logger.info(message)
-        if (self.logLevel <= LeafyyLogLevel.INFO and not self.printDsb):
-            print(f'[{Fore.GREEN}{self.name}{Style.RESET_ALL}@{Fore.YELLOW}INFO{Style.RESET_ALL}]: {message}')
-
-        self.record(
-            f'<span style="color:gray">{ctime.strftime(f"%m.%d %H:%M:%S.%f")}</span> '
-            f'[<span style="color:green">{self.name}</span>'
-            f'@<span style="color:blue">INFO</span>]: {message}'
-            )
+        
+        self.record(ctime, 'INFO', message)
         
     def warning(self, message: str, back: int = 1, origin: str = '', exc: Exception = None):
         '''
@@ -267,25 +276,24 @@ class LeafyyLogger:
         else:
             self.formatString = '%(asctime)s [%(name)s@%(levelname)s] %(message)s'
 
-        self.handler.setFormatter(logging.Formatter(self.formatString))
+        self.file.setFormatter(logging.Formatter(self.formatString))
 
-        self.Logger.warning(message + ('\n' + formatExc(exc) if (exc) else ''))
-        if (self.logLevel <= LeafyyLogLevel.WARNING and not self.printDsb):
-            print(f'[{Fore.GREEN}{self.name}{Style.RESET_ALL}@{Fore.YELLOW}WARN{Style.RESET_ALL}]: {message}')
+        if (self.logLevel <= LeafyyLogLevel.WARNING and self.stdPrint):
+            self.Logger.addHandler(self.printer)
+            self.printer.setFormatter(logging.Formatter(
+                f'[{Fore.GREEN}%(name)s{Style.RESET_ALL}@{Fore.YELLOW}%(levelname)s{Style.RESET_ALL}]: %(message)s'
+                ))
+        else:
+            self.Logger.removeHandler(self.printer)
 
-        self.record(
-            f'<span style="color:gray">{ctime.strftime(f"%m.%d %H:%M:%S.%f")}</span> '
-            f'[<span style="color:green">{self.name}</span>'
-            '@<span style="color:orange">WARN</span>]: ' + message + ('\n' + formatExc(exc) if (exc) else '')
-            )
+        excStr = '\n' + formatExc(exc) if (exc) else ''
+
+        self.Logger.warning(message + excStr)
+
+        self.record(ctime, 'WARNING', message + excStr)
         
         if (origin):
-            self.asError(
-                ctime.timestamp(),
-                origin,
-                funcName,
-                message + ('\n' + formatExc(exc) if (exc) else '')
-                )
+            self.asError(ctime.timestamp(), origin, funcName, message + excStr)
         
     def error(self, message: str, back: int = 1, origin: str = '', exc: Exception = None):
         '''
@@ -327,25 +335,25 @@ class LeafyyLogger:
                                  '%(message)s')
         else:
             self.formatString = '%(asctime)s [%(name)s@%(levelname)s] %(message)s'
-        self.handler.setFormatter(logging.Formatter(self.formatString))
 
-        self.Logger.error(message + ('\n' + formatExc(exc) if (exc) else ''))
-        if (self.logLevel <= LeafyyLogLevel.ERROR and not self.printDsb):
-            print(f'[{Fore.GREEN}{self.name}{Style.RESET_ALL}@{Fore.YELLOW}ERROR{Style.RESET_ALL}]: {message}')
-
-        self.record(
-            f'<span style="color:gray">{ctime.strftime(f"%m.%d %H:%M:%S.%f")}</span> '
-            f'[<span style="color:green">{self.name}</span>'
-            '@<span style="color:red">ERROR</span>]: ' + message + ('\n' + formatExc(exc) if (exc) else '')
-            )
+        self.file.setFormatter(logging.Formatter(self.formatString))
         
+        if (self.logLevel <= LeafyyLogLevel.ERROR and self.stdPrint):
+            self.Logger.addHandler(self.printer)
+            self.printer.setFormatter(logging.Formatter(
+                f'[{Fore.GREEN}%(name)s{Style.RESET_ALL}@{Fore.RED}%(levelname)s{Style.RESET_ALL}]: %(message)s'
+                ))
+        else:
+            self.Logger.removeHandler(self.printer)
+            
+        excStr = '\n' + formatExc(exc) if (exc) else ''
+
+        self.Logger.error(message + excStr)
+
+        self.record(ctime, 'ERROR', message + excStr)        
+
         if (origin):
-            self.asError(
-                ctime.timestamp(),
-                origin, 
-                funcName,
-                message + ('\n' + formatExc(exc) if (exc) else '')
-                )
+            self.asError(ctime.timestamp(), origin, funcName, message + excStr)
           
     def critical(self, message: str, back: int = 1, origin: str = '', exc: Exception = None):
         '''
@@ -388,23 +396,21 @@ class LeafyyLogger:
         else:
             self.formatString = '%(asctime)s [%(name)s@%(levelname)s] %(message)s'
 
-        self.handler.setFormatter(logging.Formatter(self.formatString))
+        self.file.setFormatter(logging.Formatter(self.formatString))
         
-        self.Logger.critical(message + ('\n' + formatExc(exc) if (exc) else ''))
-        if (self.logLevel <= LeafyyLogLevel.CRITICAL and not self.printDsb):
-            print(f'[{Fore.GREEN}{self.name}{Style.RESET_ALL}@{Fore.YELLOW}CRITICAL{Style.RESET_ALL}]: {message}')
+        if (self.logLevel <= LeafyyLogLevel.CRITICAL and self.stdPrint):
+            self.Logger.addHandler(self.printer)
+            self.printer.setFormatter(logging.Formatter(
+                f'[{Fore.GREEN}%(name)s{Style.RESET_ALL}@{Fore.RED}%(levelname)s{Style.RESET_ALL}]: %(message)s'
+                ))
+        else:
+            self.Logger.removeHandler(self.printer)
+            
+        excStr = '\n' + formatExc(exc) if (exc) else ''
 
-        self.record(
-            f'<span style="color:gray">{ctime.strftime(f"%m.%d %H:%M:%S.%f")}</span> '
-            f'[<span style="color:green">{self.name}</span>'
-            '@<span style="color:magenta">CRITICAL</span>]: ' + message + ('\n' + formatExc(exc) if (exc) else '')
-            )
+        self.Logger.critical(message + excStr)
+
+        self.record(ctime, 'CRITICAL', message + excStr) 
         
         if (origin):
-            self.asError(
-                ctime.timestamp(),
-                origin,
-                funcName,
-                message + ('\n' + formatExc(exc) if (exc) else '')
-                )
-        
+            self.asError(ctime.timestamp(), origin, funcName, message + excStr)

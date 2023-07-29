@@ -15,11 +15,11 @@ class LogConfig(BaseModel):
 class Log(BaseModel):
     name:  str
     size:  PositiveInt
-    time:  PositiveFloat
+    mtime: PositiveFloat
     lines: Optional[list[str]]
 
-class LogReport(BaseModel):
-    time:    PositiveFloat
+class LogRecord(BaseModel):
+    stamp:   PositiveFloat
     logger:  str
     level:   str
     message: str

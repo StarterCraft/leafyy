@@ -7,7 +7,7 @@ from leafyy import deepget
 
 
 class LeafyyProperties(dict):
-    FILENAME = 'options.json'
+    FILENAME = 'properties.json'
 
     def __init__(self):
         super().__init__()

@@ -17,7 +17,7 @@ class LeafyyLoggingApi:
         @self.api.post('',
             name = 'Опубликовать сообщение журнала сервера',
             description = 'Приказывает серверу опубликовать сообщение журнала от логгера Web.')
-        def postLogReport(request: Request, response: Response, message: LogReport):
+        def postLogReport(request: Request, response: Response, message: LogRecord):
             self[message.logger].publish(message.level, message.message.replace(
                 'USER_IP', f'{request.client.host}:{request.client.port}'
             ))
@@ -26,9 +26,9 @@ class LeafyyLoggingApi:
             return response
 
         @self.api.get('/update', response_model = list[str],
-            name = 'Получить стек новых сообщений консоли')
-        def getLogUpdate():
-            return self.getUpdateBuffer()
+            name = 'Получить стек новых сообщений консоли, начиная с времени stamp')
+        def getLogUpdate(request: Request, stamp: PositiveFloat):
+            return self.format(self.getRecentLogRecords(stamp))
                 
         @self.api.get('/{name}', response_class = FileStreamResponse,
             name = 'Скачивание файла журнала',

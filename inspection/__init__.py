@@ -3,14 +3,15 @@ from PySide6 import QtCore
 from typing import Iterator
 from pydantic import PositiveFloat
 from time import strftime, localtime
+from datetime import datetime
 from glob import glob
 from os.path import getsize, getmtime, sep as psep
-from autils import fread, fwrite
+from autils import fread
 
 from leafyy            import app, web, postgres
 from inspection.logger import LeafyyLogLevel, LeafyyLogger
 from .api              import LeafyyLoggingApi
-from .models           import Log, LogConfig
+from .models           import Log, LogConfig, LogRecord
 
 
 class LeafyyLogging(
@@ -71,14 +72,11 @@ class LeafyyLogging(
             except KeyError:
                 continue
      
-    def record(self, time: PositiveFloat, origin: str, caller: str, message: str) -> None:
-        postgres().insert('insertLog', (time, origin, caller, message))
+    def record(self, time: datetime, logger: str, level: str, message: str) -> None:
+        postgres().insert('inspection.insertLog', (time, logger, level, message))
 
-    def getLogRecords(self) -> list[tuple]:
-        return postgres().fetchall('selectLog', 0)
-    
-    def getRecentLogRecords(self, begin: PositiveFloat) -> list[tuple]:
-        return postgres().fetchall('selectLog', begin)
+    def getLogRecords(self, begin: PositiveFloat = 0) -> list[tuple]:
+        return postgres().fetchall('inspection.selectLog', datetime.fromtimestamp(begin))
     
     def flush(self) -> None:
         postgres('inspection.truncateLog')
@@ -107,7 +105,7 @@ class LeafyyLogging(
         
         return sorted(data, key = lambda t: t['time'], reverse = not bool(reversed))
     
-    def format(self, log: list[str]) -> list[str]:
+    def formatLines(self, log: list[str]) -> list[str]:
         output = []
         for line in log:
             try:
@@ -184,6 +182,30 @@ class LeafyyLogging(
                 output.append(li)
 
         return output
+    
+    def formatRecords(self, log: list[LogRecord]) -> list[str]:
+        output = []
+
+        for record in log:
+            dateTimeChunk = f'<span style="color: gray; text-decoration: underlined;">{record.stamp}</span>'
+            loggerInfoChunk = f'[<span style="color: green;">{record.logger}</span>@'
+            
+            loggerLvl = record.level
+            lvlColor = ''
+            match loggerLvl:
+                case 'DEBUG': lvlColor = 'gray'
+                case 'INFO': lvlColor = 'blue'
+                case 'WARNING': lvlColor = 'orange'
+                case 'ERROR': lvlColor = 'red'
+                case _: lvlColor = 'darkred'
+
+            loggerInfoChunk += f'<span style="color: {lvlColor};">{loggerLvl}</span>]'
+
+            line = ' '.join(dateTimeChunk, loggerInfoChunk, record.message)
+
+            output.append(line)
+        
+        return output
 
     def getLogFile(self, name: str, html: bool = False) -> Log:
         data = {
@@ -194,7 +216,7 @@ class LeafyyLogging(
 
         if (html):
             initial = fread(f'logs/{name}', encoding = 'utf-8').splitlines()
-            decorated = self.format(initial)
+            decorated = self.formatLines(initial)
             data.update(lines = decorated)
 
         else:

@@ -31,6 +31,7 @@ class Leafyy(QtWidgets.QApplication):
         print(f'Starting Leafyy v.{self.version}, uncopyrighted')
         print(f'Запуск "Листочка" версии {self.version}, авторские права не защищены')
 
+        self.properties = LeafyyProperties()
         self.postgres = LeafyyPostgresDatabase()
 
         self.log = LeafyyLogging()
@@ -41,9 +42,7 @@ class Leafyy(QtWidgets.QApplication):
         self.logger.info(
             'Инициализирована подсистема журналирования '
             f'(установлен уровень {self.log.globalLevel.name})')
-
-        self.options = LeafyyProperties()
-        self.log.setGlobalLogLevel(self.options('logLevel'))
+        self.log.setGlobalLogLevel(self.properties('logLevel', 'DEBUG'))
 
         self.cli = LeafyyConsole()
         self.logger.info('Инициализирована подсистема консоли')
