@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from PySide6           import QtCore
 from typing            import Any, Iterator, Annotated
 from os                import sep as psep
