@@ -118,13 +118,13 @@ class LeafyyLogger:
         self.logLevel = logLevel
         self.Logger.setLevel(logLevel.value)
 
-    def record(self, time: PositiveFloat, level: str, message: str):
+    def record(self, time: datetime, level: str, message: str):
         'Отправить сообщение в стек'
 
         if (self.console):
             log().record(time, self.name, level, message)
 
-    def asError(self, time: PositiveFloat, origin: str, caller: str, message: str):
+    def asError(self, time: datetime, origin: str, caller: str, message: str):
         errors().record(time, origin, caller, message)
             
     def publish(self, value: LeafyyLogLevel | str, message: str):
@@ -354,7 +354,7 @@ class LeafyyLogger:
         self.record(ctime, 'ERROR', message + excStr)        
 
         if (origin):
-            self.asError(ctime.timestamp(), origin, funcName, message + excStr)
+            self.asError(ctime, origin, funcName, message + excStr)
           
     def critical(self, message: str, back: int = 1, origin: str = '', exc: Exception = None):
         '''

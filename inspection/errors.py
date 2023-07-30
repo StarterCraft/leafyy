@@ -6,6 +6,7 @@ from pydantic       import PositiveFloat
 from autils         import fread, fwrite, lto
 
 from leafyy.generic import LeafyyComponent
+from leafyy         import postgres
 from .models        import ErrorRecord
 
 
@@ -16,9 +17,8 @@ class LeafyyErrors(
     def __init__(self) -> None:
         super().__init__('Errors')
 
-        self.errorBuffer = 'logs/error.buffer.log'
-
-        fwrite(self.errorBuffer, 'time;origin;caller;message\n') #csv стиль
+        #Очищаем таблицу в базе данных для текущего журнала
+        postgres('inspection.truncateError')
 
     def __getitem__(self, key: int | str) -> list[ErrorRecord] | ErrorRecord:
         if (isinstance(key, str)):
@@ -37,40 +37,27 @@ class LeafyyErrors(
         return len(fread(self.errorBuffer).splitlines()[1:])
 
     def append(self, error: ErrorRecord):
-        fwrite(self.errorBuffer, ';'.join(lto(str, error.dict().values())) + '\n', mode = 'a')
+        postgres().insert('inspection.insertError', tuple(error.dict().values()))
 
-    def remove(self, key: int | str):
-        if (isinstance(key, int)):
-            stime = str(key)
-            buf = fread(self.errorBuffer).splitlines()[1:]
-
-            for line in buf[:]:
-                if (line.split(';')[0] == stime):
-                    buf.remove(line)
-
-            fwrite(self.errorBuffer, '\n'.join(buf))
+    def remove(self, key: datetime | str):
+        if (isinstance(key, datetime)):
+            postgres('inspection.deleteErrorByStamp', key)
 
         if (isinstance(key, str)):
-            buf = fread(self.errorBuffer).splitlines()[1:]
-
-            for line in buf[:]:
-                if (line.split(';')[1] == key):
-                    buf.remove(line)
-
-            fwrite(self.errorBuffer, '\n'.join(buf))
+            postgres('inspection.deleteErrorByOrigin', key)
             
     def model(self) -> list[ErrorRecord]:
         return [
             ErrorRecord(
-                time = ld.split(';')[0],
-                origin = ld.split(';')[1],
-                caller = ld.split(';')[2],
-                message = ld.split(';')[3]
+                stamp = tu[0].timestamp(),
+                origin = tu[1],
+                caller = tu[2],
+                message = tu[3]
                 )
-             for ld in fread(self.errorBuffer).splitlines()[1:]]
+            for tu in postgres().fetchall('inspection.selectError', datetime.fromtimestamp(1))]
     
-    def record(self, time: PositiveFloat, origin: str, caller: str, message: str):
-        self.append(ErrorRecord(time = time, origin = origin, caller = caller, message = message))
+    def record(self, stamp: datetime, origin: str, caller: str, message: str):
+        self.append(ErrorRecord(stamp = stamp, origin = origin, caller = caller, message = message))
 
     def format(self, errors: list[ErrorRecord] = None) -> list[str]:
         output = []
@@ -80,7 +67,7 @@ class LeafyyErrors(
 
         for error in errors:
             timeChunk = '<span style="color: gray; text-decoration: underlined;">'
-            timeChunk += datetime.fromtimestamp(error.time).strftime('%m.%d %H:%M:%S.%f')
+            timeChunk += error.stamp.strftime('%m.%d %H:%M:%S.%f')
             timeChunk += '</span>'
 
             sourceChunk = f'[<span class="bold" style="color:darkorange;">{error.caller.split(".")[0]}</span>.'

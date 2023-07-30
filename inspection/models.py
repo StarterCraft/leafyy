@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from pydantic import BaseModel, PositiveInt, PositiveFloat
 from typing   import Optional
+from datetime import datetime
 
 
 class Logger(BaseModel):
@@ -15,17 +16,17 @@ class LogConfig(BaseModel):
 class Log(BaseModel):
     name:  str
     size:  PositiveInt
-    mtime: PositiveFloat
+    mtime: datetime
     lines: Optional[list[str]]
 
 class LogRecord(BaseModel):
-    stamp:   PositiveFloat
+    stamp:   datetime
     logger:  str
     level:   str
     message: str
 
 class ErrorRecord(BaseModel):
-    time:    PositiveFloat
+    stamp:   datetime
     origin:  Optional[str]
     caller:  str
     message: str

@@ -1,2 +1,2 @@
-INSERT INTO leafyy.log (stamp, logger, level, message)
+INSERT INTO leafyyInternals.log (stamp, logger, level, message)
 VALUES %s

@@ -1,2 +1,2 @@
-SELECT * FROM leafyy.log
+SELECT * FROM leafyyInternals.log
 WHERE stamp > %s

@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS leafyyerror
 (
     stamp timestamp without time zone NOT NULL,
     caller text COLLATE pg_catalog."default" NOT NULL,
-    origin character varying(12) COLLATE pg_catalog."default" NOT NULL,
+    origin character varying(64) COLLATE pg_catalog."default" NOT NULL,
     message text COLLATE pg_catalog."default" NOT NULL,
     CONSTRAINT log_pkey PRIMARY KEY ("time")
 )

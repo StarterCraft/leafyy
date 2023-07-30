@@ -5,8 +5,8 @@
 CREATE TABLE IF NOT EXISTS leafyylog
 (
     stamp timestamp without time zone NOT NULL,
-    logger text COLLATE pg_catalog."default" NOT NULL,
-    level character varying(12) COLLATE pg_catalog."default" NOT NULL,
+    logger character varying(32) COLLATE pg_catalog."default" NOT NULL,
+    level character varying(16) COLLATE pg_catalog."default" NOT NULL,
     message text COLLATE pg_catalog."default" NOT NULL,
     CONSTRAINT log_pkey PRIMARY KEY ("time")
 )
