@@ -1,20 +1,20 @@
 # -*- coding: utf-8 -*-
-from pydantic import BaseModel, PositiveInt
+from pydantic import BaseModel, NonNegativeInt
 from typing   import Optional
 
 
 class Device(BaseModel):
     address:     str
-    displayName: str
+    displayName: Optional[str]
     description: Optional[str]
-    status:      int
+    enabled:     bool
     decodeMode:  str
 
 class DeviceCounter(BaseModel):
-    total:    PositiveInt
-    active:   PositiveInt
-    disabled: PositiveInt
-    failed:   PositiveInt
+    total:    NonNegativeInt
+    active:   NonNegativeInt
+    disabled: NonNegativeInt
+    failed:   NonNegativeInt
 
 class Devices(BaseModel):
     count:   DeviceCounter

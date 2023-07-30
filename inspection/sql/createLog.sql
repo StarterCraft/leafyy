@@ -14,5 +14,5 @@ CREATE TABLE IF NOT EXISTS leafyylog
 TABLESPACE pg_default;
 
 ALTER TABLE IF EXISTS leafyylog
-    OWNER to leafyydev;
+    OWNER to leafyy;
 

@@ -1,2 +1,2 @@
-INSERT INTO leafyyInternals.error (stamp, caller, origin, message)
+INSERT INTO "leafyyInternals".error (stamp, caller, origin, message)
 VALUES %s

@@ -1,1 +1,1 @@
-TRUNCATE leafyyInternals.log;
+TRUNCATE "leafyyInternals".log;

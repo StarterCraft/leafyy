@@ -54,8 +54,8 @@ class LeafyyPostgresDatabase(
         }
 
     def updateCredentials(self) -> None:
-        self.dbName = properties('postgres.name', 'leafyy')
-        self.dbUser = properties('postgres.user', 'leafyyService')
+        self.dbName = properties('postgres.dbname', 'leafyy')
+        self.dbUser = properties('postgres.user', 'leafyy')
         self.dbPassword = properties('postgres.password', 'debug')
         self.dbHost = properties('postgres.host', 'localhost')
 

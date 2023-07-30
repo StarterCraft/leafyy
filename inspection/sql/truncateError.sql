@@ -1,1 +1,1 @@
-TRUNCATE leafyyInternals.error;
+TRUNCATE "leafyyInternals".error;

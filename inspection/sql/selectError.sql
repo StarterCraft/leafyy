@@ -1,2 +1,2 @@
-SELECT * FROM leafyyInternals.error
+SELECT * FROM "leafyyInternals".error
 WHERE stamp > %s

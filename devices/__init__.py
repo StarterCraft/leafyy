@@ -1,24 +1,22 @@
 # -*- coding: utf-8 -*-
-from PySide6 import QtCore, QtSerialPort
-from json import loads, dumps
-from fastapi import FastAPI
-from typing import Iterator, List
-from autils import fread, fwrite
+from PySide6        import QtSerialPort
+from json           import loads, dumps
+from typing         import Iterator, List
+from autils         import fread, fwrite
 
 from leafyy.generic import LeafyyIterableComponent
-from leafyy         import web
+from leafyy         import web, postgres
 
-from .generic import LeafyyStatus, LeafyyByteOperations
-from .device  import LeafyyDevice
-from .api     import LeafyyDevicesApi
-from .models  import Devices
+from .generic       import LeafyyStatus, LeafyyByteOperations
+from .device        import LeafyyDevice
+from .api           import LeafyyDevicesApi
+from .models        import Device, Devices, DeviceCounter
 
 
 class LeafyyDevices(
     LeafyyIterableComponent,
     LeafyyDevicesApi
     ):
-    configFileName = 'device.json'
     devices: dict[str, LeafyyDevice] = {}
 
     def __init__(self):
@@ -59,11 +57,12 @@ class LeafyyDevices(
         super().assignApi()
         web().mount('/devices', self.api)
 
-    def getConfig(self) -> list[dict]:
-        return loads(fread(self.configFileName, encoding = 'utf-8'))
+    def getConfig(self) -> list[Device]:
+        return [Device(**dd._asdict()) for dd in postgres().fetchall('devices.selectDevices')]
 
-    def writeConfig(self, config: list[dict]):
-        fwrite(self.configFileName, dumps(config))
+    def writeConfig(self, config: list[Device]):
+        postgres('devices.truncateDevices')
+        postgres().insert('devices.insertDevices', *config)
 
     def append(self, device: LeafyyDevice):
         self.devices.update({device.address: device})
@@ -72,20 +71,21 @@ class LeafyyDevices(
             f'Устройство по адресу {device.address} зарегистрировано'
         )
 
-    def remove(self, component: LeafyyDevice | str):
-        if (isinstance(component, LeafyyDevice)):
-            self.devices.remove(component)
+    def remove(self, _device: LeafyyDevice | str):
+        if (isinstance(_device, LeafyyDevice)):
+            self.devices.remove(_device)
 
-        if (isinstance(component, str)):
-            self.devices.remove(self[component.name])
+        if (isinstance(_device, str)):
+            self.devices.remove(self[_device.name])
 
         self.logger.debug(
-            f'Компонент {component.name} недоступен'
+            f'Устройство {_device.name} недоступен'
         )
 
     def initDevices(self):
         for deviceData in self.config:
-            LeafyyDevice(**deviceData)
+            print(deviceData)
+            LeafyyDevice(**deviceData.dict())
 
     def start(self):
         for device in self:

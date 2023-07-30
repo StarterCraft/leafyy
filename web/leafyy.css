@@ -373,6 +373,10 @@ footer.block {
     border-bottom-right-radius: 0px;
 }
 
+footer.block:hover {
+    box-shadow: 0 -2px 2px var(--color-accent-highlight);
+}
+
 footer.fixed-bottom {
     position: fixed;
     left: 0;
