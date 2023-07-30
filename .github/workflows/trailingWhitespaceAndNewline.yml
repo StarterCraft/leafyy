@@ -1,8 +1,7 @@
 name: Trim whitespace and add newline
 
 on:
-  push:
-    branches: [main]
+  push
 
 jobs:
   trim-and-newline:
