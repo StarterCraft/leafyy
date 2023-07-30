@@ -4,7 +4,7 @@ from pydantic import BaseModel, constr
 class User(BaseModel):
     username: str
     password: constr(
-        min_length = 96, 
+        min_length = 96,
         max_length = 96,
         strip_whitespace = True,
         to_upper = True,
