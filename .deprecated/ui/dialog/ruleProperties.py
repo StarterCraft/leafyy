@@ -5,10 +5,10 @@ from uidef.dialog.ruleProperties import Ui_RulePropertiesDialog
 
 
 class LeafyyRuleDialog(
-    LeafyyUiComponent, 
+    LeafyyUiComponent,
     QtWidgets.QMainWindow,
     Ui_RulePropertiesDialog):
     def __init__(self):
         super().__init__(f'rulePropertiesDialog ({id(self)})', LeafyyUiComponentType.Dialog)
-        
+
         self.logger.debug(f'Инициализирован диалог {self.name}')

@@ -17,7 +17,7 @@ def deepget(self: dict, key: str, default: Any = None, sep: str = '.'):
 
         if (fetched is NotImplemented):
             return default
-    
+
     return fetched
 
 def deepupdate(self: dict, key: str, value: Any, sep: str = '.'):
@@ -52,7 +52,7 @@ def errors():
 def properties(key: str = None, default: Any = None, sep: str = '.') -> dict | Any:
     if (key):
         return app().properties(key, default, sep)
-    
+
     return app().properties
 
 def web() -> FastAPI:
@@ -70,5 +70,5 @@ def ui():
 def cli(cmd: str = None, *args: str):
     if (cmd):
         return app().cli(cmd, args)
-    
+
     return app().cli

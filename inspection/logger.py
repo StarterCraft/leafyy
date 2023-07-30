@@ -19,7 +19,7 @@ class LeafyyLogger:
     '''
     Класс канала журналирования.
 
-    Журналирование необходимо для отборажения пользователю информацию о 
+    Журналирование необходимо для отборажения пользователю информацию о
     текущих действиях сервера, сообщения о предупреждениях и об ошибках.
 
     Каналов журналирования (или `логгеров`) может быть сколько угодно.
@@ -49,7 +49,7 @@ class LeafyyLogger:
             Возможные уровни журналирования:
              —— DEBUG (все сообщения, по умолчанию);
              —— INFO (важные сообщения);
-             —— WARNING (сообщения важностью 
+             —— WARNING (сообщения важностью
                 ПРЕДУПРЕЖДЕНИЕ и выше);
              —— ERROR (только сообщения об ошибках и
                 критические сообщения);
@@ -68,7 +68,7 @@ class LeafyyLogger:
 
         self.Logger = logging.getLogger(name)
         self.formatString = ''
-                
+
         self.Logger.setLevel(self.logLevel.value)
 
         self.file = logging.FileHandler(f'{log().fileName}', 'a+', 'utf-8')
@@ -91,7 +91,7 @@ class LeafyyLogger:
     @property
     def logWindowVisibility(self):
         return self.console
-    
+
     @logWindowVisibility.setter
     def logWindowVisibility(self, value: bool):
         self.console = value
@@ -107,7 +107,7 @@ class LeafyyLogger:
             Возможные уровни журналирования:
              —— DEBUG (все сообщения, по умолчанию);
              —— INFO (важные сообщения);
-             —— WARNING (сообщения важностью 
+             —— WARNING (сообщения важностью
                 ПРЕДУПРЕЖДЕНИЕ и выше);
              —— ERROR (только сообщения об ошибках и
                 критические сообщения);
@@ -126,7 +126,7 @@ class LeafyyLogger:
 
     def asError(self, time: datetime, origin: str, caller: str, message: str):
         errors().record(time, origin, caller, message)
-            
+
     def publish(self, value: LeafyyLogLevel | str, message: str):
         'Опубликовать сообщение с заданным уровнем.'
         if (isinstance(value, LeafyyLogLevel)):
@@ -155,7 +155,7 @@ class LeafyyLogger:
         fileName = callerFrame.f_code.co_filename
         lineNo = callerFrame.f_lineno
         funcName = callerFrame.f_code.co_qualname
-        
+
         indexFrom = 0
 
         if ('leafyy' in fileName):
@@ -204,7 +204,7 @@ class LeafyyLogger:
         fileName = callerFrame.f_code.co_filename
         lineNo = callerFrame.f_lineno
         funcName = callerFrame.f_code.co_qualname
-        
+
         indexFrom = 0
 
         if ('leafyy' in fileName):
@@ -233,9 +233,9 @@ class LeafyyLogger:
             self.Logger.removeHandler(self.printer)
 
         self.Logger.info(message)
-        
+
         self.record(ctime, 'INFO', message)
-        
+
     def warning(self, message: str, back: int = 1, origin: str = '', exc: Exception = None):
         '''
         Опубликовать сообщение с уровнем WARNING (ПРЕДУПРЕЖДЕНИE).
@@ -259,7 +259,7 @@ class LeafyyLogger:
         fileName = callerFrame.f_code.co_filename
         lineNo = callerFrame.f_lineno
         funcName = callerFrame.f_code.co_qualname
-        
+
         indexFrom = 0
 
         if ('leafyy' in fileName):
@@ -292,10 +292,10 @@ class LeafyyLogger:
         self.Logger.warning(message + excStr)
 
         self.record(ctime, 'WARNING', message + excStr)
-        
+
         if (origin):
             self.asError(ctime.timestamp(), origin, funcName, message + excStr)
-        
+
     def error(self, message: str, back: int = 1, origin: str = '', exc: Exception = None):
         '''
         Опубликовать сообщение с уровнем ERROR (ОШИБКА).
@@ -319,7 +319,7 @@ class LeafyyLogger:
         fileName = callerFrame.f_code.co_filename
         lineNo = callerFrame.f_lineno
         funcName = callerFrame.f_code.co_qualname
-        
+
         indexFrom = 0
 
         if ('leafyy' in fileName):
@@ -338,7 +338,7 @@ class LeafyyLogger:
             self.formatString = '%(asctime)s [%(name)s@%(levelname)s] %(message)s'
 
         self.file.setFormatter(logging.Formatter(self.formatString))
-        
+
         if (self.logLevel <= LeafyyLogLevel.ERROR and self.stdPrint):
             self.Logger.addHandler(self.printer)
             self.printer.setFormatter(logging.Formatter(
@@ -346,16 +346,16 @@ class LeafyyLogger:
                 ))
         else:
             self.Logger.removeHandler(self.printer)
-            
+
         excStr = '\n' + formatExc(exc) if (exc) else ''
 
         self.Logger.error(message + excStr)
 
-        self.record(ctime, 'ERROR', message + excStr)        
+        self.record(ctime, 'ERROR', message + excStr)
 
         if (origin):
             self.asError(ctime, origin, funcName, message + excStr)
-          
+
     def critical(self, message: str, back: int = 1, origin: str = '', exc: Exception = None):
         '''
         Опубликовать сообщение с уровнем CRITICAL (КРИТИЧЕСКИЙ).
@@ -379,7 +379,7 @@ class LeafyyLogger:
         fileName = callerFrame.f_code.co_filename
         lineNo = callerFrame.f_lineno
         funcName = callerFrame.f_code.co_qualname
-        
+
         indexFrom = 0
 
         if ('leafyy' in fileName):
@@ -398,7 +398,7 @@ class LeafyyLogger:
             self.formatString = '%(asctime)s [%(name)s@%(levelname)s] %(message)s'
 
         self.file.setFormatter(logging.Formatter(self.formatString))
-        
+
         if (self.logLevel <= LeafyyLogLevel.CRITICAL and self.stdPrint):
             self.Logger.addHandler(self.printer)
             self.printer.setFormatter(logging.Formatter(
@@ -406,12 +406,12 @@ class LeafyyLogger:
                 ))
         else:
             self.Logger.removeHandler(self.printer)
-            
+
         excStr = '\n' + formatExc(exc) if (exc) else ''
 
         self.Logger.critical(message + excStr)
 
-        self.record(ctime, 'CRITICAL', message + excStr) 
-        
+        self.record(ctime, 'CRITICAL', message + excStr)
+
         if (origin):
             self.asError(ctime.timestamp(), origin, funcName, message + excStr)

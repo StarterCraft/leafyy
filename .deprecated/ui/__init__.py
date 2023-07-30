@@ -19,7 +19,7 @@ class LeafyyUiTheme(LeafyyDirectDict):
 
     def __iter__(self) -> Iterator[Tuple[str, str]]:
         return iter(zip(
-            self.componentList, 
+            self.componentList,
             [self.__dict__[ck] for ck in self.componentList]))
 
     def read(self) -> None:
@@ -62,7 +62,7 @@ class LeafyyUiComponent(LeafyyComponent):
             **kwargs
         ):
         super().__init__(
-            name, 
+            name,
             *args,
             displayName = displayName,
             loggerName = loggerName,
@@ -77,7 +77,7 @@ class LeafyyUiComponent(LeafyyComponent):
         self.defaultSize = QtCore.QSize(
             *deepget(
                 options().ui,
-                f'{self.name}.size',                
+                f'{self.name}.size',
                 default = (self.minimumSize().width(), self.minimumSize().height())
             )
         )
@@ -143,7 +143,7 @@ class LeafyyUi(LeafyyComponent):
         LeafyySettingsWindow()
         LeafyyLogWindow()
 
-        for c in self: 
+        for c in self:
             self.logger.debug(f'{c.name} size: {c.size()}')
 
         self.interconnect()
@@ -158,7 +158,7 @@ class LeafyyUi(LeafyyComponent):
         self.logger.debug(
             'Взаимосвязывание сигналов в интерфейсе выполнено'
         )
-        
+
     def bind(self):
         for component in self:
             component.bind()
@@ -246,9 +246,9 @@ class LeafyyUi(LeafyyComponent):
             self.logWindow.setLoggingSourceActions.addAction(setLoggerVisibilityAction)
 
             self.settingsWindow.treeDevices.addTopLevelItem(d.liwDevicesItem)
-            
+
             d.port.readyRead.connect(lambda: self.logWindow.writeDeviceMessage(d))
-    
+
     def loadThemes(self):
         self.themes: List[LeafyyUiTheme] = []
 
@@ -275,7 +275,7 @@ class LeafyyUi(LeafyyComponent):
         appTheme = self.getTheme(
             theme if theme else deepget(options().ui, 'app.theme', 'default')
         )
-        
+
         app().setStyle(appTheme.style)
 
         appQss = appTheme.get('app', '')
@@ -301,7 +301,7 @@ class LeafyyUi(LeafyyComponent):
         for target, styleSheet in theme:
             subName = '.'.join(target.split('.')[1:])
 
-            if (len(target.split('.')) > 1 and 
+            if (len(target.split('.')) > 1 and
                 hasattr(c, subName)):
                 getattr(c, subName).setStyleSheet(styleSheet)
 

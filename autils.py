@@ -23,7 +23,7 @@ def strl(*arg: Any, sep = '') -> str: ...
 def strl(*arg, sep = '') -> str:
     if (len(arg) == 1):
         return ''.join(arg[0])
-    
+
     return ''.join(arg)
 
 @overload
@@ -33,7 +33,7 @@ def uniquel(*arg: Hashable) -> bool: ...
 def uniquel(*arg) -> bool:
     if (len(arg) == 1):
         return len(arg[0]) == len(set(arg[0]))
-    
+
     return len(arg) == len(set(arg))
 
 
@@ -57,7 +57,7 @@ def convert(intr: int, base: int) -> str:
 
 
 def lto(targetType, seq: Iterable) -> Iterable:
-    try: 
+    try:
         return type(seq)(targetType(i) for i in seq)
     except TypeError:
         return list(targetType(i) for i in seq)

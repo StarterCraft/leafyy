@@ -15,4 +15,4 @@ TABLESPACE pg_default;
 
 ALTER TABLE IF EXISTS leafyylog
     OWNER to leafyydev;
-    
+

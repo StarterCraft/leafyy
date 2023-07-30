@@ -34,16 +34,16 @@ class LeafyyDevices(
     def __getitem__(self, key: int | str) -> LeafyyDevice:
         if (isinstance(key, str)):
             return self.devices[key]
-            
+
         else:
             return self.devices.values()[key]
-        
+
     def __iter__(self) -> Iterator[LeafyyDevice]:
         return iter(self.devices.values())
-    
+
     def __len__(self) -> int:
         return len(self.devices)
-    
+
     def model(self) -> Devices:
         return {
             'count': {
@@ -54,17 +54,17 @@ class LeafyyDevices(
             },
             'devices': [d.model() for d in self]
         }
-    
+
     def assignApi(self):
         super().assignApi()
         web().mount('/devices', self.api)
 
     def getConfig(self) -> list[dict]:
         return loads(fread(self.configFileName, encoding = 'utf-8'))
-    
+
     def writeConfig(self, config: list[dict]):
         fwrite(self.configFileName, dumps(config))
-    
+
     def append(self, device: LeafyyDevice):
         self.devices.update({device.address: device})
 
@@ -86,7 +86,7 @@ class LeafyyDevices(
     def initDevices(self):
         for deviceData in self.config:
             LeafyyDevice(**deviceData)
-        
+
     def start(self):
         for device in self:
             if (device.isEnabled):

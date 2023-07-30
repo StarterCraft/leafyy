@@ -59,7 +59,7 @@ class Leafyy(QtWidgets.QApplication):
     def start(self):
         self.devices.initDevices()
         self.devices.start()
-        
+
         self.web.start()
         self.logger.debug('Привет, ребят!')
 

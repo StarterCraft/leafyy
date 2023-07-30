@@ -14,7 +14,7 @@ class Template:
         self.engine = engine
         self.address = f'{name}/{name}.jinja'
 
-    def render(self, request: Request, statusCode: PositiveInt = 200, **kw: Any) -> _TemplateResponse: 
+    def render(self, request: Request, statusCode: PositiveInt = 200, **kw: Any) -> _TemplateResponse:
             return self.engine.TemplateResponse(
                 self.address,
                 {

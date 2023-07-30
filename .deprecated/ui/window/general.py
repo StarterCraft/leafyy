@@ -8,7 +8,7 @@ from uidef.window.general import Ui_GeneralWindow
 
 class LeafyyGeneralWindow(
     LeafyyUiComponent,
-    QtWidgets.QMainWindow, 
+    QtWidgets.QMainWindow,
     Ui_GeneralWindow):
     def __init__(self):
         super().__init__(
@@ -16,7 +16,7 @@ class LeafyyGeneralWindow(
             LeafyyUiComponentType.Window,
             displayName = 'Основное окно'
         )
-        
+
         self.setWindowTitle(self.displayName)
         self.setCentralWidget(self.mdi)
 
@@ -43,11 +43,11 @@ class LeafyyGeneralWindow(
         if (force or not self.isVisible()):
             super().show()
             self.updateUi()
-        
+
         else:
             self.close()
 
     def close(self):
         super().close()
         ui().updateUi()
-        
+

@@ -14,12 +14,12 @@ class LeafyyWebService(
         super().__init__(
             'WebService',
             loggerName = 'WebService',
-            title = 'Leafyy Web Service', 
+            title = 'Leafyy Web Service',
             description = 'Testing!',
             debug = properties('webServiceDebug', False))
-        
+
         self.authBearer = OAuth2PasswordBearer(tokenUrl = 'token')
-        
+
     def assignApis(self):
         app().ui.assignApi()
         app().cli.assignApi()
@@ -27,14 +27,14 @@ class LeafyyWebService(
         app().devices.assignApi()
 
     def uvicornate(self):
-        urun(self, 
+        urun(self,
             port = properties().get('serverPort', 38001))
 
     def run(self):
         'Run with Uvicorn'
         self.w = LeafyyThreadedWorker(self.uvicornate)
         self.w.run()
-        
+
     def start(self):
         self.run()
 
@@ -42,4 +42,4 @@ class LeafyyWebService(
 
     def stop(self):
         self.w.exit()
-        
+

@@ -4,8 +4,8 @@ QTextEdit {
     font-family: 'Consolas';
 }
 
-QFrame#frmSend QComboBox, 
-QFrame#frmSend QLineEdit, 
+QFrame#frmSend QComboBox,
+QFrame#frmSend QLineEdit,
 QFrame#frmSend QPushButton {
     font-family: 'Consolas';
     font-size: 10pt;

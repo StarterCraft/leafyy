@@ -1,13 +1,13 @@
 if (typeof(String.prototype.trim) === "undefined")
 {
-    String.prototype.trim = function() 
+    String.prototype.trim = function()
     {
         return String(this).replace(/^\s+|\s+$/g, '');
     };
 }
 
 function prepareIt() {
-    if ($(document).height() <= $(window).height()) {		
+    if ($(document).height() <= $(window).height()) {
         $("footer").addClass("fixed-bottom");
     }
 }
@@ -16,7 +16,7 @@ $(document).ready(prepareIt);
 
 function getCookie(id, _default) {
     c = Cookies.get(id);
-    if (typeof c === "undefined") 
+    if (typeof c === "undefined")
         return _default;
 
     else return c;
@@ -38,8 +38,8 @@ function showModal(modalId) {
 }
 
 function hideModal(modalId) {
-    $(".modal#" + modalId).css("display", "none"); 
-    $(".modal-field").css("display", "none");   
+    $(".modal#" + modalId).css("display", "none");
+    $(".modal-field").css("display", "none");
 }
 
 function toggleCheckbox(boxId) {
@@ -69,7 +69,7 @@ function report(level, message, callback = reportStdCallback) {
     if (!levels.includes(level)){
         throw SyntaxError("Unsupported level: " + level);
     }
-    
+
     $.ajax({
         url: "/log/",
         type: "POST",

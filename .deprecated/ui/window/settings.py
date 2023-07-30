@@ -17,7 +17,7 @@ class LeafyySettingsWindowTab(Enum):
 
 
 class LeafyySettingsWindow(
-    LeafyyUiComponent, 
+    LeafyyUiComponent,
     QtWidgets.QMainWindow,
     Ui_SettingsWindow):
     def __init__(self):
@@ -26,7 +26,7 @@ class LeafyySettingsWindow(
             LeafyyUiComponentType.Window,
             displayName = 'Настройки'
         )
-        
+
         self.logger.debug('Окно настроек инициализировано')
 
     def interconnect(self):
@@ -55,7 +55,7 @@ class LeafyySettingsWindow(
         self.treeKeys.blockSignals(True)
         self.treeKeys.clearSelection()
         self.treeKeys.blockSignals(False)
-        
+
         self.treeUi.blockSignals(True)
         self.treeUi.clearSelection()
         self.treeUi.blockSignals(False)
@@ -95,7 +95,7 @@ class LeafyySettingsWindow(
         for key, subdict in keyBindingItemDefs.items():
             topLevelItem = QtWidgets.QTreeWidgetItem(self.treeKeys, [key])
             for bindingId, bindingDesc in subdict.items():
-                bindingItem = QtWidgets.QTreeWidgetItem(topLevelItem, 
+                bindingItem = QtWidgets.QTreeWidgetItem(topLevelItem,
                     [bindingDesc, options().keys[bindingId]])
                 bindingItem.setData(1, 0x100, bindingId)
 
@@ -106,7 +106,7 @@ class LeafyySettingsWindow(
 
         self.treeKeys.expandAll()
         self.treeKeys.header().setSectionResizeMode(QtWidgets.QHeaderView.Interactive)
-        
+
     def updateUiTree(self):
         self.treeUi.clear()
 
@@ -122,26 +122,26 @@ class LeafyySettingsWindow(
             for component in components:
                 item = QtWidgets.QTreeWidgetItem(
                     root, [
-                        component.displayName, 
+                        component.displayName,
                         f'{ui()[component.name].defaultSize.width()} ✕ '
                         f'{ui()[component.name].defaultSize.height()}',
                         ui().getTheme(ui()[component.name].theme).displayName
                         ]
                     )
-                
+
                 item.setFlags(
-                    QtCore.Qt.ItemIsSelectable | 
-                    QtCore.Qt.ItemIsUserCheckable | 
+                    QtCore.Qt.ItemIsSelectable |
+                    QtCore.Qt.ItemIsUserCheckable |
                     QtCore.Qt.ItemIsEnabled
                 )
-                
+
                 print(f'setting data to {component.name}')
                 item.setData(0, 0x100, component.name)
                 print(f'98 {item.data(0, 0x100)} {item.data(1, 0x100)}')
-                
+
                 item.setCheckState(0, (
                     QtCore.Qt.CheckState.Checked if (deepget(options().ui, f'{component.name}.onLaunch', default = False)) else QtCore.Qt.CheckState.Unchecked))
-                
+
             self.treeUi.addTopLevelItem(root)
 
         self.treeUi.header().setSectionResizeMode(QtWidgets.QHeaderView.ResizeToContents)
@@ -237,7 +237,7 @@ class LeafyySettingsWindow(
         currentItem.setText(1, keys)
         options().keys[currentItem.data(1, 0x100)] = keys
         options().write()
-        ui().bind() 
+        ui().bind()
 
         self.statusBar.showMessage(f'Установлена клавиша для {currentItem.text(0)}: {keys}', 5000)
 
@@ -257,7 +257,7 @@ class LeafyySettingsWindow(
 
         if (not data):
             return
-        
+
         self.logger.debug(f'Выбрали {text} ({data}, {value})')
 
         blockH = QtCore.QSignalBlocker(self.spbHorizontal)
@@ -313,11 +313,11 @@ class LeafyySettingsWindow(
             self.cbbComponentTheme.clear()
             self.cbbComponentTheme.setEnabled(False)
             return
-        
+
         if (value != deepget(options().ui, f'{data}.onLaunch', False)):
             if (options().ui.get(data, False)):
                 options().ui[data]['onLaunch'] = value
-            
+
             else:
                 options().ui[data] = {
                     'onLaunch': value
@@ -330,7 +330,7 @@ class LeafyySettingsWindow(
 
         if (not item or not item.data(0, 0x100)):
             return
-        
+
         data = item.data(0, 0x100)
 
         ui()[data].show()
@@ -341,9 +341,9 @@ class LeafyySettingsWindow(
 
         if (not item or not item.data(0, 0x100)):
             return
-        
+
         data = item.data(0, 0x100)
-        
+
         ui()[data].resize(self.spbHorizontal.value(), self.spbVertical.value())
         ui()[data].defaultSize = QtCore.QSize(self.spbHorizontal.value(), self.spbVertical.value())
         options().ui[data]['size'] = [self.spbHorizontal.value(), self.spbVertical.value()]

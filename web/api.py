@@ -39,7 +39,7 @@ class LeafyyWebInterface(LeafyyComponent):
         return self.pages[key]
 
     def loadTemplates(self) -> dict[str, Template]:
-        td = {}        
+        td = {}
         templateNames = [name.split(sep)[-1] for name in glob('web/templates/*')]
 
         for name in templateNames:
@@ -144,13 +144,13 @@ class LeafyyWebInterface(LeafyyComponent):
         def getLibrary(libraryId: str, request: Request) -> str:
             '''
             Метод получает библиотеку для клиента из API или из локальной копии
-            в зависимости от того, какая версия библиотеки актуальна. Если 
+            в зависимости от того, какая версия библиотеки актуальна. Если
             актуальность не удаётся проверить, метод подключит локальную копию и
             вернёт её.
             '''
             d = ''
 
-            try: 
+            try:
                 #Если на сервере хранится актуальная версия библиотеки,
                 #подключить её. Если вышла новая, скачать её и записать
                 #в файл.
@@ -159,13 +159,13 @@ class LeafyyWebInterface(LeafyyComponent):
 
                 else:
                     d = getCachedLibrary(libraryId, request)
-                
+
             except Exception as e:
                 self.logger.error(
                     f'Не удалось подключить актуальную версию библиотеки {libraryId} '
                     f'для клиента {request.client.host}: {type(e).__name__}: {e}. Подключаю локальную '
                     'библиотеку...'
-                ) 
+                )
                 d = getCachedLibrary(libraryId, request)
 
             return d
@@ -185,7 +185,7 @@ class LeafyyWebInterface(LeafyyComponent):
                 version = str(version())
                 )
 
-        @self.api.get('/', response_class = HTMLResponse, 
+        @self.api.get('/', response_class = HTMLResponse,
             name = 'Главная страница',
             description = 'Отрисовывает главную страницу с информацией о грядках.')
         def getIndexPage(request: Request) -> _TemplateResponse:
@@ -247,7 +247,7 @@ class LeafyyWebInterface(LeafyyComponent):
                 version = str(version()),
                 logFile = logging().getLogFile(name, html = True)
             )
-        
+
         @self.api.get('/doc', response_class = HTMLResponse,
             name = 'Документация',
             description = 'Отрисовывает страницу с документацией.')
@@ -256,11 +256,11 @@ class LeafyyWebInterface(LeafyyComponent):
                 request,
                 version = str(version())
                 )
-        
+
         @web().exception_handler(HTTPException)
         def error(request: Request, exception: HTTPException) -> _TemplateResponse:
             return self['error'].render(
-                request, 
+                request,
                 statusCode = exception.status_code,
                 exception = exception
                 )

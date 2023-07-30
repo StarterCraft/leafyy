@@ -30,4 +30,4 @@ class ErrorRecord(BaseModel):
     origin:  Optional[str]
     caller:  str
     message: str
-    
+

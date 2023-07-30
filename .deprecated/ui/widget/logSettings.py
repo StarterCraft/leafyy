@@ -3,7 +3,7 @@ from uidef.widget.logSettings import Ui_LogWindowSettingsWidget
 
 
 class LeafyyLogWindowSettingsWidget(
-    QtWidgets.QWidget, 
+    QtWidgets.QWidget,
     Ui_LogWindowSettingsWidget):
     def __init__(self):
         super().__init__()

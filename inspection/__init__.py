@@ -30,17 +30,17 @@ class LeafyyLogging(
         postgres('inspection.truncateLog')
 
         self.globalLevel = LeafyyLogLevel.DEBUG
-        
+
     def __getitem__(self, key: int | str) -> LeafyyLogger:
         if (isinstance(key, str)):
             return self.loggers[key]
-            
+
         else:
             return self.loggers.values()[key]
-        
+
     def __iter__(self) -> Iterator[LeafyyLogger]:
         return iter(self.loggers.values())
-    
+
     def __len__(self) -> int:
         return len(self.loggers)
 
@@ -49,7 +49,7 @@ class LeafyyLogging(
 
     def remove(self, logger: str) -> None:
         self.loggers.pop(logger)
-            
+
     def model(self) -> LogConfig:
         return {
             'level': self.globalLevel.name,
@@ -59,7 +59,7 @@ class LeafyyLogging(
     def assignApi(self):
         super().assignApi()
         web().mount('/log', self.api)
-            
+
     def getConfig(self) -> LogConfig:
         return self.model()
 
@@ -72,14 +72,14 @@ class LeafyyLogging(
                 self[c.name].setLogLevel(LeafyyLogLevel[c.level])
             except KeyError:
                 continue
-     
+
     def record(self, time: datetime, logger: str, level: str, message: str) -> None:
         postgres().insert('inspection.insertLog', (time, logger, level, message))
 
     def getLogRecords(self, begin: PositiveFloat = 1) -> list[tuple]:
         t = datetime.fromtimestamp(begin / 1000 if osname == 'nt' else begin)
         return postgres().fetchall('inspection.selectLog', t)
-    
+
     def flush(self) -> None:
         postgres('inspection.truncateLog')
 
@@ -102,11 +102,11 @@ class LeafyyLogging(
             {'name': fileName.split(psep)[-1],
              'time': getmtime(fileName),
              'size': getsize(fileName),
-            } 
+            }
             for fileName in glob('logs/*.log')]
-        
+
         return sorted(data, key = lambda t: t['time'], reverse = not bool(reversed))
-    
+
     def format(self, log: list[LogRecord] = None, begin: PositiveFloat = 1) -> list[str]:
         if (not log):
             log = self.getLogRecords(begin)
@@ -116,7 +116,7 @@ class LeafyyLogging(
         for record in log:
             dateTimeChunk = f'<span style="color: gray; text-decoration: underlined;">{record.stamp}</span>'
             loggerInfoChunk = f'[<span style="color: green;">{record.logger}</span>@'
-            
+
             loggerLvl = record.level
             lvlColor = ''
             match loggerLvl:
@@ -131,9 +131,9 @@ class LeafyyLogging(
             line = ' '.join([dateTimeChunk, loggerInfoChunk, record.message])
 
             output.append(line)
-        
+
         return output
-    
+
     def formatLines(self, log: list[str]) -> list[str]:
         output = []
         for line in log:
@@ -149,7 +149,7 @@ class LeafyyLogging(
 
                 #Канал и уровень журналирования
                 loggerInfoChunk = f'[<span style="color: green;">{dataChunks[2][1:].split("@")[0]}</span>@'
-                
+
                 loggerLvl = dataChunks[2][:-1].split('@')[1]
                 lvlColor = ''
                 match loggerLvl:
@@ -211,7 +211,7 @@ class LeafyyLogging(
                 output.append(li)
 
         return output
-    
+
     def getLogFile(self, name: str, html: bool = False) -> Log:
         data = {
             'name': name,
@@ -228,4 +228,4 @@ class LeafyyLogging(
             data.update(lines = fread(f'logs/{name}', encoding = 'utf-8').splitlines())
 
         return data
-        
+

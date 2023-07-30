@@ -11,7 +11,7 @@ void DHTt(const uint8_t pin) {
     DHTNEW sensor(pin);
     char result[32], catres[8];
     boolean success = false;
-    
+
     if ((millis() - readingTime) > 2000) {
         readingTime = millis();
         int chk = sensor.read();
@@ -66,7 +66,7 @@ void DHTt(const uint8_t pin) {
             return;
 
         } else {
-            return; 
+            return;
         }
     }
 }

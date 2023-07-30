@@ -41,7 +41,7 @@ void DHTt(const uint8_t pin) {
         }
 
         delayMicroseconds(80);
-        if (!(DHT_PIN & (1 << DHT_BIT))) { //по истечению 80 мкс, датчик должен отпустить шину 
+        if (!(DHT_PIN & (1 << DHT_BIT))) { //по истечению 80 мкс, датчик должен отпустить шину
             if (count != 0) {
                 goto ReLoad;
                 count--;
@@ -52,7 +52,7 @@ void DHTt(const uint8_t pin) {
         }
 
         //===============Приём 40 бит данных
-        while (DHT_PIN & (1 << DHT_BIT)); //ждем пока на шине появится 1  
+        while (DHT_PIN & (1 << DHT_BIT)); //ждем пока на шине появится 1
         for (j = 0; j < 5; j++) { //цикл для 0-4 байт
             receivedDHTData[j] = 0;
             for (i = 0; i < 8; i++) { //приём битов и укладка их в байты
@@ -60,7 +60,7 @@ void DHTt(const uint8_t pin) {
                 delayMicroseconds(30); //задержка высокого уровня при 0 30 мкс
                 if (DHT_PIN & (1 << DHT_BIT)) //если по истечению времени сигнал на линии высокий, значит передается 1
                     receivedDHTData[j] |= 1 << (7 - i); //тогда i-й бит устанавливаем 1
-                while (DHT_PIN & (1 << DHT_BIT)); //ждем окончание 1 
+                while (DHT_PIN & (1 << DHT_BIT)); //ждем окончание 1
             }
         }
 

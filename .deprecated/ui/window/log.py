@@ -18,7 +18,7 @@ class LeafyyLogWindowSource(Enum):
 
 
 class LeafyyLogWindow(
-    LeafyyUiComponent, 
+    LeafyyUiComponent,
     QtWidgets.QMainWindow,
     Ui_LogWindow):
     def __init__(self):
@@ -66,9 +66,9 @@ class LeafyyLogWindow(
         self.allLoggersAction.setCheckable(True)
         self.allLoggersAction.setChecked(all(l.logWindow for l in log()))
         self.allLoggersAction.setData('logger')
-        
+
         self.setLoggingSourceActions.addAction(self.allLoggersAction)
-        
+
         for logger in log().loggers:
             action = QtGui.QAction(logger.name, self)
             action.setCheckable(True)
@@ -84,7 +84,7 @@ class LeafyyLogWindow(
         return
 
     def interconnect(self):
-        
+
         self.meiLog.triggered.connect(self.show)
         self.meiDevices.triggered.connect(ui().settingsWindow.show0)
         self.meiRules.triggered.connect(ui().settingsWindow.show1)
@@ -136,7 +136,7 @@ class LeafyyLogWindow(
                 action.setChecked(all(l.logWindow for l in log()))
 
                 continue
-                
+
             action.setChecked(log()[text].logWindow)
 
     def updateShowDevicesMenu(self):
@@ -150,7 +150,7 @@ class LeafyyLogWindow(
             if (text.startswith('Все')):
                 action.setChecked(all(d.logWindow for d in devices()))
                 continue
-                
+
             action.setChecked(devices()[text].logWindow)
 
     def show(self, force: bool = False):
@@ -224,14 +224,14 @@ class LeafyyLogWindow(
         data = triggered.data()
         isChecked = triggered.isChecked()
 
-        vendor = (log() 
-                  if (data == 'logger') 
+        vendor = (log()
+                  if (data == 'logger')
                   else devices())
-        
-        config = (options().setLogWindowLoggers  
-                  if (data == 'logger') else 
+
+        config = (options().setLogWindowLoggers
+                  if (data == 'logger') else
                   options().setLogWindowDevices)
-        
+
         common = (self.allLoggersAction
                   if (data == 'logger') else
                   self.allDevicesAction)
@@ -239,12 +239,12 @@ class LeafyyLogWindow(
         if (text.startswith('Все')):
             for a in [ac for ac in self.setLoggingSourceActions.actions()
                       if (ac.data() == data and ac != self.allASCIIAction)]:
-                a.setChecked(isChecked)    
+                a.setChecked(isChecked)
                 vendor[a.text()].logWindow = isChecked
-            
+
             config('All', isChecked)
             return
-        
+
         common.setChecked(all(obj.logWindow for obj in vendor))
         vendor[text].logWindow = isChecked
         config(text, isChecked)
@@ -263,9 +263,9 @@ class LeafyyLogWindow(
             self.txtLogDisplay.append(
                 f'<span style="color:gray">{datetime.now().strftime(f"%m.%d %H:%M:%S.%f")}</span> '
                 f'[<span style="color:lime">{device.address.upper()}</span>]: {toPrint}')
-            
+
             self.scrollDown()
-        
+
     def validateDeviceMessage(self):
         text = self.lneMessage.text()
 
@@ -292,11 +292,11 @@ class LeafyyLogWindow(
             self.txtLogDisplay.append(
                 f'<span style="color:gray">{datetime.now()}</span> '
                 f'[Вы к <span style="color:lime">{port}</span>]: {text}')
-            
+
         else:
             self.txtLogDisplay.append(
                 f'<span style="color:gray">{datetime.now()}</span> '
                 f'[Вы к <span style="color:lime">{self.cbbPort.currentText().capitalize()}</span>]: '
                 f'<span style="color:red">[Не отправлено!]</span> {self.lneMessage.text()}')
-            
+
         self.lneMessage.clear()

@@ -26,13 +26,13 @@ class LeafyyErrors(
                 return [r for r in self.model() if (r['origin'] == key)]
             except IndexError as e:
                 raise KeyError(f'Записей об ошибках из этого источника не найдено', key) from e
-            
+
         else:
             return [r for r in self.model() if (r['time'] == int)]
-        
+
     def __iter__(self) -> Iterator[ErrorRecord]:
         return iter(self.model())
-    
+
     def __len__(self) -> int:
         return len(fread(self.errorBuffer).splitlines()[1:])
 
@@ -45,7 +45,7 @@ class LeafyyErrors(
 
         if (isinstance(key, str)):
             postgres('inspection.deleteErrorByOrigin', key)
-            
+
     def model(self) -> list[ErrorRecord]:
         return [
             ErrorRecord(
@@ -55,7 +55,7 @@ class LeafyyErrors(
                 message = tu[3]
                 )
             for tu in postgres().fetchall('inspection.selectError', datetime.fromtimestamp(1))]
-    
+
     def record(self, stamp: datetime, origin: str, caller: str, message: str):
         self.append(ErrorRecord(stamp = stamp, origin = origin, caller = caller, message = message))
 

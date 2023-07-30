@@ -23,35 +23,35 @@ class LeafyyLogLevel(enum.Enum):
         elif isinstance(other, int):
             return self.value < other
         return NotImplemented
-    
+
     def __le__(self, other):
         if isinstance(other, LeafyyLogLevel):
             return self.value <= other.value
         elif isinstance(other, int):
             return self.value <= other
         return NotImplemented
-    
+
     def __eq__(self, other):
         if isinstance(other, LeafyyLogLevel):
             return self.value == other.value
         elif isinstance(other, int):
             return self.value == other
         return NotImplemented
-    
+
     def __ne__(self, other):
         if isinstance(other, LeafyyLogLevel):
             return self.value != other.value
         elif isinstance(other, int):
             return self.value != other
         return NotImplemented
-    
+
     def __gt__(self, other):
         if isinstance(other, LeafyyLogLevel):
             return self.value > other.value
         elif isinstance(other, int):
             return self.value > other
         return NotImplemented
-    
+
     def __ge__(self, other):
         if isinstance(other, LeafyyLogLevel):
             return self.value >= other.value

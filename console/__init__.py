@@ -38,7 +38,7 @@ class LeafyyConsole(
         for command in self.model():
             desc.append('{:<10}| {}'.format(
                 f'{command[0]} ' +
-                " ".join(command[1].arguments) if command[1].arguments else "", 
+                " ".join(command[1].arguments) if command[1].arguments else "",
                 command[1].description))
 
         return desc

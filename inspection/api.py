@@ -3,7 +3,7 @@ from fastapi  import APIRouter, Request, Response
 
 from leafyy   import web
 
-from .models  import * 
+from .models  import *
 from webutils import FileStreamResponse
 
 
@@ -29,13 +29,13 @@ class LeafyyLoggingApi:
             name = 'Получить стек новых сообщений консоли, начиная с времени stamp')
         def getLogUpdate(request: Request, begin: PositiveFloat):
             return self.format(begin = begin)
-                
+
         @self.api.get('/{name}', response_class = FileStreamResponse,
             name = 'Скачивание файла журнала',
             description = 'Отправляет указанный файл журнала.')
         def getLogFile(request: Request, name: str) -> FileStreamResponse:
             return f'logs/{name}'
-                
+
         @self.api.get('/config', response_model = LogConfig,
             name = 'Получить настройки журналирования',
             description = '')
@@ -44,9 +44,9 @@ class LeafyyLoggingApi:
                 'level': self.globalLevel.name,
                 'sources': self.getLogSources()
                 }
-            
+
             return c
-        
+
         @self.api.put('/config',
             name = 'Записать настройки журналирования',
             description = '')

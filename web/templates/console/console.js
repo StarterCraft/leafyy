@@ -32,10 +32,10 @@ function hideStatusBar() {
 }
 
 function serverError(request) {
-    if (request.status == 0) 
+    if (request.status == 0)
         setStatus("<span class=\"negative bold\";>Соединение потеряно.</span>");
 
-    else setStatus("<span class=\"negative bold\";>Ошибка при отправке запроса: </span>" + 
+    else setStatus("<span class=\"negative bold\";>Ошибка при отправке запроса: </span>" +
         "статус: " + request.status + request.statusText + ", ответ: " + request.responseText)
 }
 
@@ -154,9 +154,9 @@ function onFlushConsole() {
     lastConsoleUpdateTime = Date.now();
 }
 
-/** 
+/**
 *    @param {string} content контент для размещения в новой строке консоли
-*    @param {number} [index=1] 
+*    @param {number} [index=1]
 */
 function addConsoleMessageLine(content) {
     const view = $("#view")[0];
@@ -172,7 +172,7 @@ function addConsoleMessageLine(content) {
     divLine.innerHTML = content;
     view.appendChild(divLine);
 
-    if (consoleAutoScroll) 
+    if (consoleAutoScroll)
         view.scrollTop = view.scrollHeight;
 }
 

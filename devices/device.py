@@ -21,7 +21,7 @@ class LeafyyDevice(LeafyyIterableComponent):
 
         if (not kwargs.get('address', None)):
             raise AttributeError('Устройство не может не иметь адреса')
-        
+
         self.description = kwargs.get('description', '')
         self.isEnabled = kwargs.get('enabled', False)
         self.address = kwargs.get('address')
@@ -44,9 +44,9 @@ class LeafyyDevice(LeafyyIterableComponent):
     def __getitem__(self, _id: int | str) -> NotImplemented:
         if (isinstance(_id, int)):
             return self.plants[_id]
-        
+
         if (isinstance(_id, str)):
-            try: 
+            try:
                 return [plant for plant in self.plants if (plant.name == _id)][0]
             except IndexError as e:
                 raise KeyError(f'Грядка {_id} не существует') from e
@@ -56,7 +56,7 @@ class LeafyyDevice(LeafyyIterableComponent):
 
     def __repr__(self) -> str:
         return f'Arduino at {self.address}, baud {self.port.baudRate()}, {self.port.isOpen()}'
-    
+
     def model(self) -> Device:
         return {
             'address': self.address,
@@ -70,7 +70,7 @@ class LeafyyDevice(LeafyyIterableComponent):
     @property
     def logWindowVisibility(self):
         return self.visibleInConsole
-    
+
     @logWindowVisibility.setter
     def logWindowVisibility(self, value: bool):
         self.visibleInConsole = value
@@ -79,7 +79,7 @@ class LeafyyDevice(LeafyyIterableComponent):
     @property
     def decodeASCII(self):
         return self.decodeASCIIMode
-    
+
     @decodeASCII.setter
     def decodeASCII(self, value: bool):
         self.decodeASCIIMode = value
@@ -90,7 +90,7 @@ class LeafyyDevice(LeafyyIterableComponent):
         self.port.readyRead.connect(self.receive)
         openingResult = self.port.open(QtSerialPort.QSerialPort.ReadWrite)
 
-        if (openingResult): 
+        if (openingResult):
             self.logger.info(f'Последовательный порт {self.address} открыт, 9600 бод')
             self.status = LeafyyStatus.Active
 
@@ -104,7 +104,7 @@ class LeafyyDevice(LeafyyIterableComponent):
     def send(self, data: str | bytearray) -> int:
         if (isinstance(data, str)):
             return self.port.write(bytearray(data, 'ascii'))
-        
+
         return self.port.write(data)
 
     def receive(self):

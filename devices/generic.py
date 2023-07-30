@@ -9,12 +9,12 @@ class LeafyyStatus(Enum):
     Failed = -1
     Disabled = 0
     Active = 1
-    
-    
+
+
 class LeafyyByteOperations:
     '''
     Большое спасибо ChatGPT 3.5 за код для этого класса.
-    Здесь собраны некоторые функции и константы для работы с 
+    Здесь собраны некоторые функции и константы для работы с
     массивами байтов QByteArray.
     '''
     possiblePrefixes = [
@@ -36,7 +36,7 @@ class LeafyyByteOperations:
         Преобразует QByteArray в бинарный формат.
         Например, QByteArray(b'\\X10\\XBA\\XBF') -> '0b00010000 0b10111010 0b10111111'
         '''
-        return (properties('binaryPrefix', '0b') + 
+        return (properties('binaryPrefix', '0b') +
             f"{properties('byteSeparator', ' ')}{properties('binaryPrefix', '0b')}"
             .join([bin(byte)[2:].zfill(8) for byte in arr]))
 
@@ -46,7 +46,7 @@ class LeafyyByteOperations:
         Преобразует QByteArray в восьмеричный формат.
         Например, QByteArray(b'\\X10\\XBA\\XBF') -> '0o020 0o272 0o277'
         '''
-        return (properties('octalPrefix', '0o') + 
+        return (properties('octalPrefix', '0o') +
             f"{properties('byteSeparator', ' ')}{properties('octalPrefix', '0o')}"
             .join([oct(byte)[2:].zfill(3) for byte in arr]))
 
@@ -64,10 +64,10 @@ class LeafyyByteOperations:
         Преобразует QByteArray в шестнадцатеричный формат.
         Например, QByteArray(b'\\X10\\XBA\\XBF') -> '0x10 0xba 0xbf'
         '''
-        return (properties('hexadecimalPrefix', '0x') + 
+        return (properties('hexadecimalPrefix', '0x') +
             f"{properties('byteSeparator', ' ')}{properties('hexadecimalPrefix', '0x')}"
             .join([hex(byte)[2:].zfill(2) for byte in arr]))
-    
+
     #Конверсия строк в QByteArray для разных систем счисления.
 
     @staticmethod
@@ -77,7 +77,7 @@ class LeafyyByteOperations:
         конвертирует её в верхний регистр.
         '''
         cleansy = data.upper()
-        
+
         for prefix in LeafyyByteOperations.possiblePrefixes:
             cleansy = cleansy.replace(prefix, '')
 

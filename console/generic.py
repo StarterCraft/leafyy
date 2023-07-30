@@ -13,13 +13,13 @@ class LeafyyConsoleCommands(
 
     def __getitem__(self, key: str) -> Command:
             return self.commands[key]
-        
+
     def __iter__(self) -> Iterator[tuple[str, Command]]:
         return iter(self.commands.items())
-    
+
     def __len__(self) -> int:
         return len(self.commands.items())
-    
+
     def model(self) -> list[tuple[str, Command]]:
         output = []
         output.append(('help', self['help']))

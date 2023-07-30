@@ -35,13 +35,13 @@ class LeafyyPostgresDatabase(
     def __getitem__(self, key: int | str) -> Annotated[str, SQL]:
         if (isinstance(key, str)):
             return self.queries[key]
-            
+
         else:
             return self.queries.values()[key]
-        
+
     def __iter__(self) -> Iterator[Annotated[str, SQL]]:
         return iter(self.queries.values())
-    
+
     def __len__(self) -> int:
         return len(self.queries)
 
@@ -74,40 +74,40 @@ class LeafyyPostgresDatabase(
             cursor_factory = NamedTupleCursor,
             **self.credentials()
             )
-    
+
     def execute(self, queryId: str, *args: Any) -> cursor:
         with self.connect() as _connection:
             with _connection.cursor() as _cursor:
                 _cursor.execute(self[queryId], args)
                 return _cursor
-    
+
     def single(self, queryId: str, *args: Any) -> tuple:
         with self.connect() as _connection:
             with _connection.cursor() as _cursor:
                 _cursor.execute(self[queryId], args)
                 return _cursor.fetchone()
-    
+
     def fetchone(self, queryId: str, *args: Any) -> tuple:
         return self.single(self[queryId], *args)
-    
+
     def select(self, queryId: str, quantity: int, *args: Any) -> tuple:
         with self.connect() as _connection:
             with _connection.cursor() as _cursor:
                 _cursor.execute(self[queryId], args)
                 return _cursor.fetchmany(quantity) if (quantity > 0) else _cursor.fetchall()
-    
+
     def fetchmany(self, queryId: str, quantity: int, *args: Any) -> tuple:
         with self.connect() as _connection:
             with _connection.cursor() as _cursor:
                 _cursor.execute(self[queryId], args)
                 return _cursor.fetchmany(quantity)
-    
+
     def fetchall(self, queryId: str, *args: Any) -> tuple:
         with self.connect() as _connection:
             with _connection.cursor() as _cursor:
                 _cursor.execute(self[queryId], args)
                 return _cursor.fetchall()
-    
+
     def insert(self, queryId: str, *args: Any) -> None:
         with self.connect() as _connection:
             with _connection.cursor() as _cursor:

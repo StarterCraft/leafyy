@@ -11,9 +11,9 @@ class LeafyyComponent(object):
     друг на друга объектов, имеющих общие атрибуты имени и логгера.
     '''
     def __init__(
-            self, 
-            name: str, 
-            *args, 
+            self,
+            name: str,
+            *args,
             loggerName: str = '',
             displayName: str = '',
             **kwargs
