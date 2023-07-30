@@ -39,4 +39,3 @@ jobs:
           else
             echo "No changes were made to the files."
           fi
-          
