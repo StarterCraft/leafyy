@@ -17,4 +17,4 @@ TABLESPACE pg_default;
 
 ALTER TABLE IF EXISTS "leafyyInternals".devices
     OWNER to leafyy;
-    
+
