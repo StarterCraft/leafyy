@@ -1,1 +1,1 @@
-TRUNCATE development.error;
+TRUNCATE leafyy.error;

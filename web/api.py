@@ -223,7 +223,7 @@ class LeafyyWebInterface(LeafyyComponent):
                 request,
                 version = str(version()),
                 devices = _devices().model(),
-                console = logging().formatRecords(logging().getLogRecords()),
+                console = logging().format(),
                 logConfig = logging().model()
             )
 

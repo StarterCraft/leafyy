@@ -1,2 +1,2 @@
-SELECT * FROM development.error
+SELECT * FROM leafyy.log
 WHERE stamp > %s

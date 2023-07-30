@@ -27,8 +27,8 @@ class LeafyyLoggingApi:
 
         @self.api.get('/update', response_model = list[str],
             name = 'Получить стек новых сообщений консоли, начиная с времени stamp')
-        def getLogUpdate(request: Request, stamp: PositiveFloat):
-            return self.format(self.getRecentLogRecords(stamp))
+        def getLogUpdate(request: Request, begin: PositiveFloat):
+            return self.format(begin = begin)
                 
         @self.api.get('/{name}', response_class = FileStreamResponse,
             name = 'Скачивание файла журнала',

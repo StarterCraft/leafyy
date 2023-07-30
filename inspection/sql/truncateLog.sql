@@ -1,1 +1,1 @@
-TRUNCATE development.log;
+TRUNCATE leafyy.log;

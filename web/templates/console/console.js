@@ -259,7 +259,7 @@ function onReceivedUpdatedConsoleData(data) {
 }
 
 function onUpdateConsoleData() {
-    $.get("/log/update", lastConsoleUpdateTime, data => {
+    $.get("/log/update?begin=" + lastConsoleUpdateTime, data => {
         onReceivedUpdatedConsoleData(data);
     });
 }

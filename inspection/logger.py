@@ -120,6 +120,7 @@ class LeafyyLogger:
 
     def record(self, time: PositiveFloat, level: str, message: str):
         'Отправить сообщение в стек'
+
         if (self.console):
             log().record(time, self.name, level, message)
 

@@ -1,2 +1,2 @@
-INSERT INTO development.log (stamp, logger, level, message)
+INSERT INTO leafyy.log (stamp, logger, level, message)
 VALUES %s

@@ -1,2 +1,2 @@
-INSERT INTO development.error (stamp, caller, origin, message)
+INSERT INTO leafyy.error (stamp, caller, origin, message)
 VALUES %s

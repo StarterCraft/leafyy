@@ -5,6 +5,7 @@ from pydantic import PositiveFloat
 from time import strftime, localtime
 from datetime import datetime
 from glob import glob
+from os import name as osname
 from os.path import getsize, getmtime, sep as psep
 from autils import fread
 
@@ -75,8 +76,9 @@ class LeafyyLogging(
     def record(self, time: datetime, logger: str, level: str, message: str) -> None:
         postgres().insert('inspection.insertLog', (time, logger, level, message))
 
-    def getLogRecords(self, begin: PositiveFloat = 0) -> list[tuple]:
-        return postgres().fetchall('inspection.selectLog', datetime.fromtimestamp(begin))
+    def getLogRecords(self, begin: PositiveFloat = 1) -> list[tuple]:
+        t = datetime.fromtimestamp(begin / 1000 if osname == 'nt' else begin)
+        return postgres().fetchall('inspection.selectLog', t)
     
     def flush(self) -> None:
         postgres('inspection.truncateLog')
@@ -104,6 +106,33 @@ class LeafyyLogging(
             for fileName in glob('logs/*.log')]
         
         return sorted(data, key = lambda t: t['time'], reverse = not bool(reversed))
+    
+    def format(self, log: list[LogRecord] = None, begin: PositiveFloat = 1) -> list[str]:
+        if (not log):
+            log = self.getLogRecords(begin)
+
+        output = []
+
+        for record in log:
+            dateTimeChunk = f'<span style="color: gray; text-decoration: underlined;">{record.stamp}</span>'
+            loggerInfoChunk = f'[<span style="color: green;">{record.logger}</span>@'
+            
+            loggerLvl = record.level
+            lvlColor = ''
+            match loggerLvl:
+                case 'DEBUG': lvlColor = 'gray'
+                case 'INFO': lvlColor = 'blue'
+                case 'WARNING': lvlColor = 'orange'
+                case 'ERROR': lvlColor = 'red'
+                case _: lvlColor = 'darkred'
+
+            loggerInfoChunk += f'<span style="color: {lvlColor};">{loggerLvl}</span>]'
+
+            line = ' '.join([dateTimeChunk, loggerInfoChunk, record.message])
+
+            output.append(line)
+        
+        return output
     
     def formatLines(self, log: list[str]) -> list[str]:
         output = []
@@ -183,30 +212,6 @@ class LeafyyLogging(
 
         return output
     
-    def formatRecords(self, log: list[LogRecord]) -> list[str]:
-        output = []
-
-        for record in log:
-            dateTimeChunk = f'<span style="color: gray; text-decoration: underlined;">{record.stamp}</span>'
-            loggerInfoChunk = f'[<span style="color: green;">{record.logger}</span>@'
-            
-            loggerLvl = record.level
-            lvlColor = ''
-            match loggerLvl:
-                case 'DEBUG': lvlColor = 'gray'
-                case 'INFO': lvlColor = 'blue'
-                case 'WARNING': lvlColor = 'orange'
-                case 'ERROR': lvlColor = 'red'
-                case _: lvlColor = 'darkred'
-
-            loggerInfoChunk += f'<span style="color: {lvlColor};">{loggerLvl}</span>]'
-
-            line = ' '.join(dateTimeChunk, loggerInfoChunk, record.message)
-
-            output.append(line)
-        
-        return output
-
     def getLogFile(self, name: str, html: bool = False) -> Log:
         data = {
             'name': name,

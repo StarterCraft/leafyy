@@ -1,0 +1,23 @@
+name: Trim whitespace and add newline
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  trim-and-newline:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Trim whitespace and add newline
+        run: |
+          find . -type f -not -path './.git/*' -exec sed -i -e 's/[[:space:]]*$//' -e '$a\' {} +
+      - name: Commit changes
+        run: |
+          if [[ $(git status --porcelain) ]]; then
+            git config --global user.name "GitHub Actions"
+            git config --global user.email "actions@github.com"
+            git commit -am "Добавление новой строки в конце файлов, уборка пробелов"
+            git push
+          fi

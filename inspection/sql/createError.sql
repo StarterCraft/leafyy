@@ -1,8 +1,8 @@
--- Table: development.error
+-- Table: leafyyerror
 
--- DROP TABLE IF EXISTS development.error;
+-- DROP TABLE IF EXISTS leafyyerror;
 
-CREATE TABLE IF NOT EXISTS development.error
+CREATE TABLE IF NOT EXISTS leafyyerror
 (
     stamp timestamp without time zone NOT NULL,
     caller text COLLATE pg_catalog."default" NOT NULL,
@@ -13,6 +13,6 @@ CREATE TABLE IF NOT EXISTS development.error
 
 TABLESPACE pg_default;
 
-ALTER TABLE IF EXISTS development.error
+ALTER TABLE IF EXISTS leafyyerror
     OWNER to leafyydev;
     

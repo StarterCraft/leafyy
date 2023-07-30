@@ -1,8 +1,8 @@
--- Table: development.log
+-- Table: leafyylog
 
--- DROP TABLE IF EXISTS development.log;
+-- DROP TABLE IF EXISTS leafyylog;
 
-CREATE TABLE IF NOT EXISTS development.log
+CREATE TABLE IF NOT EXISTS leafyylog
 (
     stamp timestamp without time zone NOT NULL,
     logger text COLLATE pg_catalog."default" NOT NULL,
@@ -13,6 +13,6 @@ CREATE TABLE IF NOT EXISTS development.log
 
 TABLESPACE pg_default;
 
-ALTER TABLE IF EXISTS development.log
+ALTER TABLE IF EXISTS leafyylog
     OWNER to leafyydev;
     
