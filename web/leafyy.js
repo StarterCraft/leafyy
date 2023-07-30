@@ -7,8 +7,8 @@ if (typeof(String.prototype.trim) === "undefined")
 }
 
 function prepareIt() {
-    if ($(document).height() <= $(window).height()) {
-        $("footer").addClass("fixed-bottom");
+    if ($(document).height() > $(window).height()) {
+        $("footer").removeClass("fixed-bottom");
     }
 }
 
