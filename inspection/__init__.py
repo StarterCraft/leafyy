@@ -60,7 +60,7 @@ class LeafyyLogging(
         super().assignApi()
         web().mount('/log', self.api)
 
-    def getConfig(self) -> LogConfig:
+    async def getConfig(self) -> LogConfig:
         return self.model()
 
     def setConfig(self, config: LogConfig):
@@ -76,7 +76,7 @@ class LeafyyLogging(
     def record(self, time: datetime, logger: str, level: str, message: str) -> None:
         postgres().insert('inspection.insertLog', (time, logger, level, message))
 
-    def getLogRecords(self, begin: PositiveFloat = 1) -> list[tuple]:
+    async def getLogRecords(self, begin: PositiveFloat = 1) -> list[tuple]:
         t = datetime.fromtimestamp(begin / 1000 if osname == 'nt' else begin)
         return postgres().fetchall('inspection.selectLog', t)
 
@@ -97,7 +97,7 @@ class LeafyyLogging(
         for logger in self:
             logger.setLogLevel(lvl)
 
-    def getLogFolderSummary(self, reversed = False) -> list[Log]:
+    async def getLogFolderSummary(self, reversed = False) -> list[Log]:
         data = [
             {'name': fileName.split(psep)[-1],
              'time': getmtime(fileName),
@@ -212,7 +212,7 @@ class LeafyyLogging(
 
         return output
 
-    def getLogFile(self, name: str, html: bool = False) -> Log:
+    async def getLogFile(self, name: str, html: bool = False) -> Log:
         data = {
             'name': name,
             'time': getmtime(f'logs/{name}'),

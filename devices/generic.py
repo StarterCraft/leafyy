@@ -31,7 +31,7 @@ class LeafyyByteOperations:
     #Конверсия QByteArray в строки форматов различных систем счисления
 
     @staticmethod
-    def toBinary(arr: QtCore.QByteArray):
+    def toBinary(arr: QtCore.QByteArray) -> str:
         '''
         Преобразует QByteArray в бинарный формат.
         Например, QByteArray(b'\\X10\\XBA\\XBF') -> '0b00010000 0b10111010 0b10111111'

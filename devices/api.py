@@ -16,7 +16,7 @@ class LeafyyDevicesApi:
         @self.api.get('', response_model = Devices,
             name = 'Получить информацию о устройствах',
             description = 'Получает информацию о устройствах.')
-        def getDevices(request: Request) -> Devices:
+        async def getDevices(request: Request) -> Devices:
             return self.model()
 
         web().include_router(self.api)

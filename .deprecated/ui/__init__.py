@@ -262,7 +262,7 @@ class LeafyyUi(LeafyyComponent):
                 f'{len(theme.componentList)} QSS)'
             )
 
-    def getTheme(self, name: str) -> LeafyyUiTheme:
+    async def getTheme(self, name: str) -> LeafyyUiTheme:
         return [t for t in self.themes if (t.name == name)][0]
 
     def themize(self, theme: str = ''):
