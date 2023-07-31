@@ -1,7 +1,7 @@
 #!/bin/bash
 
 if [ "$EUID" -ne 0 ]
-then 
+then
     echo "Для запуска требуются права суперпользователя."
     exit -1
 fi
