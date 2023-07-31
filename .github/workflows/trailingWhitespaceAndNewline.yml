@@ -11,6 +11,7 @@ jobs:
         uses: actions/checkout@v2
       - name: Trim whitespace and add newline
         run: |
+          git pull
           find . -type f -not -path './.git*/*' -exec grep -Iq . {} \; -exec sed -i -e 's/[[:space:]]*$//' -e '$a\' {} +
       - name: Commit changes
         run: |
