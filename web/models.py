@@ -17,3 +17,15 @@ class AccessibleUser(User):
         strip_whitespace = True,
         to_upper = True,
         regex = r'\b[A-Fa-f0-9]{96}\b')
+
+class Token(BaseModel):
+    access_token: str
+    token_type:   str
+
+class TokenPair(BaseModel):
+    access_token: str
+    token_type:   str
+
+class TokenData(BaseModel):
+    username: str | None = None
+    scopes:   str | None = None

@@ -8,7 +8,7 @@ fi
 
 if ! command -v psql &> /dev/null
 then
-    echo "Стадия 2: установка PostgreSQL 15.3"
+    echo "Стадия 4: установка PostgreSQL 15.3"
 
     cd /tmp/
     wget https://ftp.postgresql.org/pub/source/v15.3/postgresql-15.3.tar.gz

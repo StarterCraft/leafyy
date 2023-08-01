@@ -6,24 +6,35 @@ from autils               import fread, fwrite
 from requests             import get
 from packaging            import version as versioning
 from re                   import findall
+from datetime             import datetime, timedelta
 
 from fastapi              import APIRouter, Request, Depends
 from fastapi.templating   import Jinja2Templates
 from starlette.templating import _TemplateResponse
 from starlette.exceptions import HTTPException
 from fastapi.responses    import Response, HTMLResponse, FileResponse
+
 from fastapi.security     import OAuth2PasswordRequestForm
+from hashlib              import pbkdf2_hmac
+from jose                 import JWTError
+from jose.jwt             import encode as jenc, decode as jdec
 
 from leafyy               import devices as _devices
 from leafyy               import log as logging
 from leafyy               import errors, postgres
 from leafyy               import web, version
 from leafyy.generic       import LeafyyComponent
-from webutils             import JsResponse, CssResponse
+from webutils             import JsResponse, CssResponse, formatExc
 
 from .template            import Template
-from .models              import User, AccessibleUser
-from .exceptions          import UsernameNotFoundException, UserDisabledException
+from .models              import User, AccessibleUser, Token, TokenData
+from .exceptions          import *
+
+
+ALGORITHM = 'HS384'
+ACCESS_TOKEN_EXPIRE_MINUTES = 30
+SALT_MULTIPLIER = 381
+HMAC_ITERATIONS = 880738
 
 
 class LeafyyWebInterface(LeafyyComponent):
@@ -178,8 +189,25 @@ class LeafyyWebInterface(LeafyyComponent):
             description = 'Получает favicon.')
         async def getFavicon() -> FileResponse:
             return f'web/resources/favicon.svg'
+        
+        def getSalt() -> str:
+            return fread('web/upsalt.token').lower()
 
-        def getUser(username: str) -> AccessibleUser:
+        def checkPassword(username: str, plain: str, encoded: str) -> bool:
+            try: 
+                h = pbkdf2_hmac(
+                    'sha384', 
+                    plain.encode('utf-8'), 
+                    getSalt().encode('utf-8') * SALT_MULTIPLIER, 
+                    HMAC_ITERATIONS
+                    ).hex()
+                return h == encoded
+            except Exception as e:
+                self.logger.error('При входе пользователя, расшифровке пароля произошла следующая ошибка:',
+                    exc = e)
+                raise UserPasswordException(username) from e
+
+        def selectUser(username: str) -> AccessibleUser:
             thisUser = postgres().fetchone('web.selectUser', username)
 
             if (not thisUser):
@@ -187,14 +215,79 @@ class LeafyyWebInterface(LeafyyComponent):
             elif (not thisUser.enabled):
                 raise UserDisabledException(username)
             else:
-                return AccessibleUser(**thisUser.asdict())
+                return AccessibleUser(**thisUser._asdict())
+            
+        def authenticateUser(username: str, password: str) -> AccessibleUser:
+            user = selectUser(username)
+            checkPassword(username, password, user.password)
+            return user
 
-        def decodeToken(token: Annotated[str, Depends(web().authBearer)]) -> User:
-            return User(username = 'qt', admin = True)
-
-        @self.api.post("/token")
+        async def getUser(token: Annotated[str, Depends(web().authBearer)]) -> AccessibleUser:
+            try:
+                payload = jdec(token, getSalt(), algorithms = [ALGORITHM])
+                username: str = payload['sub']
+                tkd = TokenData(username = username)
+                return selectUser(tkd.username)
+            except UsernameNotFoundException as e:
+                self.logger.error('При входе пользователя произошла следующая ошибка:',
+                    exc = e)
+                raise HTTPException(
+                    status_code = 401,
+                    detail = f'Пользователь с именем {username} не существует',
+                    headers = {"WWW-Authenticate": "Bearer"}
+                ) from e
+            except UserDisabledException as e:
+                self.logger.error('При входе пользователя произошла следующая ошибка:',
+                    exc = e)
+                raise HTTPException(
+                    status_code = 400,
+                    detail = 'Невозможно войти с этим именем пользователя',
+                    headers = {"WWW-Authenticate": "Bearer"}
+                ) from e
+            except (UserPasswordException, KeyError, JWTError) as e:
+                self.logger.error('При входе пользователя произошла следующая ошибка:',
+                    exc = e)
+                raise HTTPException(
+                    status_code = 401,
+                    detail = 'Недопустимые учетные данные',
+                    headers = {"WWW-Authenticate": "Bearer"}
+                ) from e
+            
+        def createAccessToken(data: dict, expires: timedelta | None = None):
+            toEncode = data.copy()
+            if expires:
+                expire = datetime.utcnow() + expires
+            else:
+                expire = datetime.utcnow() + timedelta(minute = 5)
+            toEncode.update({"exp": expire})
+            encodedJwt = jenc(toEncode, getSalt(), algorith = ALGORITHM)
+            return encodedJwt
+            
+        def createRefreshToken(data: dict, expires: timedelta | None = None):
+            toEncode = data.copy()
+            if expires:
+                expire = datetime.utcnow() + expires
+            else:
+                expire = datetime.utcnow() + timedelta(day = 0)
+            toEncode.update({"exp": expire})
+            encodedJwt = jenc(toEncode, getSalt(), algorith = ALGORITHM)
+            return encodedJwt
+            
+        @self.api.post("/token", response_model = Token)
         async def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()]):
-            return {"access_token": 'tokentokentokentokentoken', "token_type": "bearer"}
+            try:
+                user = authenticateUser(form_data.username, form_data.password)
+                accessTokenExpires = timedelta(minutes = ACCESS_TOKEN_EXPIRE_MINUTES)
+                accessToken = createAccessToken({"sub": user.username}, accessTokenExpires)
+                return {'access_token': accessToken, 'token_type': 'bearer'}
+            except Exception as e:
+                self.logger.error('При входе пользователя произошла следующая ошибка:',
+                    exc = e)
+                raise HTTPException(
+                    status_code = 401,
+                    detail = 'Недопустимые учетные данные',
+                    headers = {"WWW-Authenticate": "Bearer"}
+                ) from e
 
         @self.api.get('/auth', response_class = HTMLResponse,
             name = 'Авторизация',
@@ -208,7 +301,7 @@ class LeafyyWebInterface(LeafyyComponent):
         @self.api.get('/', response_class = HTMLResponse,
             name = 'Главная страница',
             description = 'Отрисовывает главную страницу с информацией о грядках.')
-        async def getIndexPage(request: Request, user: Annotated[User, Depends(decodeToken)]) -> _TemplateResponse:
+        async def getIndexPage(request: Request, user: Annotated[User, Depends(getUser)]) -> _TemplateResponse:
             return self['index'].render(
                 request,
                 version = str(version()),
@@ -219,7 +312,7 @@ class LeafyyWebInterface(LeafyyComponent):
         @self.api.get('/devices', response_class = HTMLResponse,
             name = 'Страница оборудования',
             description = 'Отрисовывает страницу оборудования с информацией о нем.')
-        async def getDevicesPage(request: Request, user: Annotated[User, Depends(decodeToken)]) -> _TemplateResponse:
+        async def getDevicesPage(request: Request, user: Annotated[User, Depends(getUser)]) -> _TemplateResponse:
             return self['devices'].render(
                 request,
                 version = str(version()),
@@ -229,7 +322,7 @@ class LeafyyWebInterface(LeafyyComponent):
         @self.api.get('/rules', response_class = HTMLResponse,
             name = 'Правила',
             description = 'Отрисовывает страницу с правилами.')
-        async def getRulesPage(request: Request, user: Annotated[User, Depends(decodeToken)]) -> _TemplateResponse:
+        async def getRulesPage(request: Request, user: Annotated[User, Depends(getUser)]) -> _TemplateResponse:
             return self['rules'].render(
                 request,
                 version = str(version())
@@ -238,7 +331,7 @@ class LeafyyWebInterface(LeafyyComponent):
         @self.api.get('/log', response_class = HTMLResponse,
             name = 'Журнал и консоль',
             description = 'Отрисовывает страницу доступа к консоли и журналу.')
-        async def getConsolePage(request: Request, user: Annotated[User, Depends(decodeToken)]) -> _TemplateResponse:
+        async def getConsolePage(request: Request, user: Annotated[User, Depends(getUser)]) -> _TemplateResponse:
             return self['console'].render(
                 request,
                 version = str(version()),
@@ -250,7 +343,7 @@ class LeafyyWebInterface(LeafyyComponent):
         @self.api.get('/log/view', response_class = HTMLResponse,
             name = 'Просмотр файла журнала',
             description = 'Отрисовывает страницу со списком файлов журнала.')
-        async def getLogListPage(request: Request, user: Annotated[User, Depends(decodeToken)], reversed = 0) -> _TemplateResponse:
+        async def getLogListPage(request: Request, user: Annotated[User, Depends(getUser)], reversed = 0) -> _TemplateResponse:
             return self['logList'].render(
                 request,
                 version = str(version()),
@@ -261,7 +354,7 @@ class LeafyyWebInterface(LeafyyComponent):
         @self.api.get('/log/view/{name}', response_class = HTMLResponse,
             name = 'Просмотр файла журнала',
             description = 'Отрисовывает страницу просмотра указанного файла журнала.')
-        async def getLogViewPage(request: Request, user: Annotated[User, Depends(decodeToken)], name: str) -> _TemplateResponse:
+        async def getLogViewPage(request: Request, user: Annotated[User, Depends(getUser)], name: str) -> _TemplateResponse:
             return self['logView'].render(
                 request,
                 version = str(version()),
@@ -271,17 +364,10 @@ class LeafyyWebInterface(LeafyyComponent):
         @self.api.get('/doc', response_class = HTMLResponse,
             name = 'Документация',
             description = 'Отрисовывает страницу с документацией.')
-        async def getDocPage(request: Request, user: Annotated[User, Depends(decodeToken)]) -> _TemplateResponse:
+        async def getDocPage(request: Request, user: Annotated[User, Depends(getUser)]) -> _TemplateResponse:
             return self['doc'].render(
                 request,
                 version = str(version())
                 )
-
-        @web().exception_handler(HTTPException)
-        def error(self, request: Request, exc: HTTPException) -> _TemplateResponse:
-            print('hello!')
-            return self['error'].render(
-                request
-            )
-
+        
         web().include_router(self.api)

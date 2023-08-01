@@ -88,7 +88,7 @@ class LeafyyPostgresDatabase(
                 return _cursor.fetchone()
 
     def fetchone(self, queryId: str, *args: Any) -> tuple:
-        return self.single(self[queryId], *args)
+        return self.single(queryId, *args)
 
     def select(self, queryId: str, quantity: int, *args: Any) -> Iterable[tuple]:
         with self.connect() as _connection:
