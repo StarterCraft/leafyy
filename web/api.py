@@ -189,16 +189,16 @@ class LeafyyWebInterface(LeafyyComponent):
             description = 'Получает favicon.')
         async def getFavicon() -> FileResponse:
             return f'web/resources/favicon.svg'
-        
+
         def getSalt() -> str:
             return fread('web/upsalt.token').lower()
 
         def checkPassword(username: str, plain: str, encoded: str) -> bool:
-            try: 
+            try:
                 h = pbkdf2_hmac(
-                    'sha384', 
-                    plain.encode('utf-8'), 
-                    getSalt().encode('utf-8') * SALT_MULTIPLIER, 
+                    'sha384',
+                    plain.encode('utf-8'),
+                    getSalt().encode('utf-8') * SALT_MULTIPLIER,
                     HMAC_ITERATIONS
                     ).hex()
                 return h == encoded
@@ -216,7 +216,7 @@ class LeafyyWebInterface(LeafyyComponent):
                 raise UserDisabledException(username)
             else:
                 return AccessibleUser(**thisUser._asdict())
-            
+
         def authenticateUser(username: str, password: str) -> AccessibleUser:
             user = selectUser(username)
             checkPassword(username, password, user.password)
@@ -252,7 +252,7 @@ class LeafyyWebInterface(LeafyyComponent):
                     detail = 'Недопустимые учетные данные',
                     headers = {"WWW-Authenticate": "Bearer"}
                 ) from e
-            
+
         def createAccessToken(data: dict, expires: timedelta | None = None):
             toEncode = data.copy()
             if expires:
@@ -262,7 +262,7 @@ class LeafyyWebInterface(LeafyyComponent):
             toEncode.update({"exp": expire})
             encodedJwt = jenc(toEncode, getSalt(), algorith = ALGORITHM)
             return encodedJwt
-            
+
         def createRefreshToken(data: dict, expires: timedelta | None = None):
             toEncode = data.copy()
             if expires:
@@ -272,7 +272,7 @@ class LeafyyWebInterface(LeafyyComponent):
             toEncode.update({"exp": expire})
             encodedJwt = jenc(toEncode, getSalt(), algorith = ALGORITHM)
             return encodedJwt
-            
+
         @self.api.post("/token", response_model = Token)
         async def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()]):
             try:
@@ -369,5 +369,5 @@ class LeafyyWebInterface(LeafyyComponent):
                 request,
                 version = str(version())
                 )
-        
+
         web().include_router(self.api)
