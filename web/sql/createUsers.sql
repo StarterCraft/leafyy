@@ -16,4 +16,4 @@ TABLESPACE pg_default;
 
 ALTER TABLE IF EXISTS leafyy.users
     OWNER to leafyy;
-    
+

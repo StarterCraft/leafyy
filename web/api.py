@@ -177,10 +177,10 @@ class LeafyyWebInterface(LeafyyComponent):
             description = 'Получает favicon.')
         async def getFavicon() -> FileResponse:
             return f'web/resources/favicon.svg'
-        
+
         def fakeTkDcd(token: Annotated[str, Depends(web().authBearer)]) -> User:
             return User(username = 'qt', admin = True)
-        
+
         @self.api.post("/token")
         async def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()]):
             return {"access_token": 'tokentokentokentokentoken', "token_type": "bearer"}
