@@ -16,13 +16,14 @@ from fastapi.security     import OAuth2PasswordRequestForm
 
 from leafyy               import devices as _devices
 from leafyy               import log as logging
-from leafyy               import errors
+from leafyy               import errors, postgres
 from leafyy               import web, version
 from leafyy.generic       import LeafyyComponent
 from webutils             import JsResponse, CssResponse
 
 from .template            import Template
 from .models              import User, AccessibleUser
+from .exceptions          import UsernameNotFoundException, UserDisabledException
 
 
 class LeafyyWebInterface(LeafyyComponent):
@@ -178,7 +179,17 @@ class LeafyyWebInterface(LeafyyComponent):
         async def getFavicon() -> FileResponse:
             return f'web/resources/favicon.svg'
 
-        def fakeTkDcd(token: Annotated[str, Depends(web().authBearer)]) -> User:
+        def getUser(username: str) -> AccessibleUser:
+            thisUser = postgres().fetchone('web.selectUser', username)
+
+            if (not thisUser):
+                raise UsernameNotFoundException(username)
+            elif (not thisUser.enabled):
+                raise UserDisabledException(username)
+            else:
+                return AccessibleUser(**thisUser.asdict())
+
+        def decodeToken(token: Annotated[str, Depends(web().authBearer)]) -> User:
             return User(username = 'qt', admin = True)
 
         @self.api.post("/token")
@@ -197,7 +208,7 @@ class LeafyyWebInterface(LeafyyComponent):
         @self.api.get('/', response_class = HTMLResponse,
             name = 'Главная страница',
             description = 'Отрисовывает главную страницу с информацией о грядках.')
-        async def getIndexPage(request: Request, user: Annotated[User, Depends(fakeTkDcd)]) -> _TemplateResponse:
+        async def getIndexPage(request: Request, user: Annotated[User, Depends(decodeToken)]) -> _TemplateResponse:
             return self['index'].render(
                 request,
                 version = str(version()),
@@ -208,7 +219,7 @@ class LeafyyWebInterface(LeafyyComponent):
         @self.api.get('/devices', response_class = HTMLResponse,
             name = 'Страница оборудования',
             description = 'Отрисовывает страницу оборудования с информацией о нем.')
-        async def getDevicesPage(request: Request, user: Annotated[User, Depends(fakeTkDcd)]) -> _TemplateResponse:
+        async def getDevicesPage(request: Request, user: Annotated[User, Depends(decodeToken)]) -> _TemplateResponse:
             return self['devices'].render(
                 request,
                 version = str(version()),
@@ -218,7 +229,7 @@ class LeafyyWebInterface(LeafyyComponent):
         @self.api.get('/rules', response_class = HTMLResponse,
             name = 'Правила',
             description = 'Отрисовывает страницу с правилами.')
-        async def getRulesPage(request: Request, user: Annotated[User, Depends(fakeTkDcd)]) -> _TemplateResponse:
+        async def getRulesPage(request: Request, user: Annotated[User, Depends(decodeToken)]) -> _TemplateResponse:
             return self['rules'].render(
                 request,
                 version = str(version())
@@ -227,7 +238,7 @@ class LeafyyWebInterface(LeafyyComponent):
         @self.api.get('/log', response_class = HTMLResponse,
             name = 'Журнал и консоль',
             description = 'Отрисовывает страницу доступа к консоли и журналу.')
-        async def getConsolePage(request: Request, user: Annotated[User, Depends(fakeTkDcd)]) -> _TemplateResponse:
+        async def getConsolePage(request: Request, user: Annotated[User, Depends(decodeToken)]) -> _TemplateResponse:
             return self['console'].render(
                 request,
                 version = str(version()),
@@ -239,7 +250,7 @@ class LeafyyWebInterface(LeafyyComponent):
         @self.api.get('/log/view', response_class = HTMLResponse,
             name = 'Просмотр файла журнала',
             description = 'Отрисовывает страницу со списком файлов журнала.')
-        async def getLogListPage(request: Request, user: Annotated[User, Depends(fakeTkDcd)], reversed = 0) -> _TemplateResponse:
+        async def getLogListPage(request: Request, user: Annotated[User, Depends(decodeToken)], reversed = 0) -> _TemplateResponse:
             return self['logList'].render(
                 request,
                 version = str(version()),
@@ -250,7 +261,7 @@ class LeafyyWebInterface(LeafyyComponent):
         @self.api.get('/log/view/{name}', response_class = HTMLResponse,
             name = 'Просмотр файла журнала',
             description = 'Отрисовывает страницу просмотра указанного файла журнала.')
-        async def getLogViewPage(request: Request, user: Annotated[User, Depends(fakeTkDcd)], name: str) -> _TemplateResponse:
+        async def getLogViewPage(request: Request, user: Annotated[User, Depends(decodeToken)], name: str) -> _TemplateResponse:
             return self['logView'].render(
                 request,
                 version = str(version()),
@@ -260,18 +271,17 @@ class LeafyyWebInterface(LeafyyComponent):
         @self.api.get('/doc', response_class = HTMLResponse,
             name = 'Документация',
             description = 'Отрисовывает страницу с документацией.')
-        async def getDocPage(request: Request, user: Annotated[User, Depends(fakeTkDcd)]) -> _TemplateResponse:
+        async def getDocPage(request: Request, user: Annotated[User, Depends(decodeToken)]) -> _TemplateResponse:
             return self['doc'].render(
                 request,
                 version = str(version())
                 )
-
+        
         @web().exception_handler(HTTPException)
-        def error(request: Request, user: Annotated[User, Depends(fakeTkDcd)], exception: HTTPException) -> _TemplateResponse:
+        def error(self, request: Request, exc: HTTPException) -> _TemplateResponse:
+            print('hello!')
             return self['error'].render(
-                request,
-                statusCode = exception.status_code,
-                exception = exception
-                )
+                request
+            )
 
         web().include_router(self.api)
