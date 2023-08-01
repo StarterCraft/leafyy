@@ -23,3 +23,4 @@ jobs:
             git push
           else
             echo "No changes were made to the files."
+          fi
