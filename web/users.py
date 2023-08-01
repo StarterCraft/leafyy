@@ -16,4 +16,4 @@ class LeafyyUserHandler:
             raise UserDisabledException(username)
         else:
             return AccessibleUser(**thisUser.asdict())
-        
+
