@@ -276,7 +276,7 @@ class LeafyyWebInterface(LeafyyComponent):
                 request,
                 version = str(version())
                 )
-        
+
         @web().exception_handler(HTTPException)
         def error(self, request: Request, exc: HTTPException) -> _TemplateResponse:
             print('hello!')

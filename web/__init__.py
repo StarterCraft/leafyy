@@ -21,7 +21,7 @@ class LeafyyWebService(
             debug = properties('webServiceDebug', False))
 
         self.authBearer = OAuth2PasswordBearer(tokenUrl = 'token')
-        
+
         @self.exception_handler(HTTPException)
         def error(request: Request, exc: HTTPException) -> _TemplateResponse:
             return app().ui['error'].render(
