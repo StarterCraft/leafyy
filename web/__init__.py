@@ -2,7 +2,9 @@
 from leafyy         import app, properties
 from leafyy.generic import LeafyyComponent, LeafyyThreadedWorker
 
-from fastapi          import FastAPI
+from fastapi          import FastAPI, Request
+from starlette.templating import _TemplateResponse
+from starlette.exceptions import HTTPException
 from fastapi.security import OAuth2PasswordBearer
 from uvicorn          import run as urun
 
@@ -19,6 +21,14 @@ class LeafyyWebService(
             debug = properties('webServiceDebug', False))
 
         self.authBearer = OAuth2PasswordBearer(tokenUrl = 'token')
+        
+        @self.exception_handler(HTTPException)
+        def error(request: Request, exc: HTTPException) -> _TemplateResponse:
+            return app().ui['error'].render(
+                request,
+                statusCode = exc.status_code,
+                exception = exc
+            )
 
     def assignApis(self):
         app().ui.assignApi()

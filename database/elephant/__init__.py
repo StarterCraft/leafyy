@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from PySide6           import QtCore
-from typing            import Any, Iterator, Annotated
+from typing            import Any, Iterator, Iterable, Annotated
 from os                import sep as psep
 from glob              import glob
 
@@ -90,19 +90,19 @@ class LeafyyPostgresDatabase(
     def fetchone(self, queryId: str, *args: Any) -> tuple:
         return self.single(self[queryId], *args)
 
-    def select(self, queryId: str, quantity: int, *args: Any) -> tuple:
+    def select(self, queryId: str, quantity: int, *args: Any) -> Iterable[tuple]:
         with self.connect() as _connection:
             with _connection.cursor() as _cursor:
                 _cursor.execute(self[queryId], args)
                 return _cursor.fetchmany(quantity) if (quantity > 0) else _cursor.fetchall()
 
-    def fetchmany(self, queryId: str, quantity: int, *args: Any) -> tuple:
+    def fetchmany(self, queryId: str, quantity: int, *args: Any) -> Iterable[tuple]:
         with self.connect() as _connection:
             with _connection.cursor() as _cursor:
                 _cursor.execute(self[queryId], args)
                 return _cursor.fetchmany(quantity)
 
-    def fetchall(self, queryId: str, *args: Any) -> tuple:
+    def fetchall(self, queryId: str, *args: Any) -> Iterable[tuple]:
         with self.connect() as _connection:
             with _connection.cursor() as _cursor:
                 _cursor.execute(self[queryId], args)

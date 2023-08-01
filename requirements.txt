@@ -7,3 +7,4 @@ requests>=2.31.0
 uvicorn>=0.22.0
 packaging>=23.1
 psycopg2>=2.9.6
+python-multipart>=0.0.6

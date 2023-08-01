@@ -76,7 +76,7 @@ class LeafyyLogging(
     def record(self, time: datetime, logger: str, level: str, message: str) -> None:
         postgres().insert('inspection.insertLog', (time, logger, level, message))
 
-    async def getLogRecords(self, begin: PositiveFloat = 1) -> list[tuple]:
+    def getLogRecords(self, begin: PositiveFloat = 1) -> list[tuple]:
         t = datetime.fromtimestamp(begin / 1000 if osname == 'nt' else begin)
         return postgres().fetchall('inspection.selectLog', t)
 

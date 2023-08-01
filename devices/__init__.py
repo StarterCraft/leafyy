@@ -57,7 +57,7 @@ class LeafyyDevices(
         super().assignApi()
         web().mount('/devices', self.api)
 
-    async def getConfig(self) -> list[Device]:
+    def getConfig(self) -> list[Device]:
         return [Device(**dd._asdict()) for dd in postgres().fetchall('devices.selectDevices')]
 
     def writeConfig(self, config: list[Device]):
@@ -84,7 +84,6 @@ class LeafyyDevices(
 
     def initDevices(self):
         for deviceData in self.config:
-            print(deviceData)
             LeafyyDevice(**deviceData.dict())
 
     def start(self):

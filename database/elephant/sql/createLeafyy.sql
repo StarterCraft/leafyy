@@ -11,10 +11,3 @@ CREATE DATABASE Leafyy
 
 CREATE SCHEMA IF NOT EXISTS leafyy
     AUTHORIZATION leafyy;
-
--- SCHEMA: leafyyCommunication
-
--- DROP SCHEMA IF EXISTS "leafyyCommunication" ;
-
-CREATE SCHEMA IF NOT EXISTS "leafyyCommunication"
-    AUTHORIZATION leafyy;

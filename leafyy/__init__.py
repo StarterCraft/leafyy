@@ -37,7 +37,7 @@ def app() -> QtCore.QCoreApplication:
 def version() -> Version:
     return app().version
 
-async def postgres(queryId: str = None, *args: Any) -> cursor | Any:
+def postgres(queryId: str = None, *args: Any) -> cursor | Any:
     if (queryId):
         return app().postgres.execute(queryId, args)
 
