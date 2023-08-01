@@ -11,15 +11,15 @@ jobs:
         uses: actions/checkout@v2
       - name: Trim whitespace and add newline
         run: |
-          git pull
           find . -type f -not -path './.git*/*' -exec grep -Iq . {} \; -exec sed -i -e 's/[[:space:]]*$//' -e '$a\' {} +
       - name: Commit changes
         run: |
-          if [[ $(git status --porcelain) ]]; then
-            git config --global user.name "GitHub Actions"
-            git config --global user.email "actions@github.com"
-            git commit -am "Добавление новой строки в конце файлов, уборка пробелов"
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
+
+          # Check if any changes were made
+          if [[ -n $(git status -s) ]]; then
+            git commit -am "Добавление строки с кодировкой"
             git push
           else
             echo "No changes were made to the files."
-          fi
