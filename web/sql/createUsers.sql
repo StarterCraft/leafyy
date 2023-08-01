@@ -1,8 +1,8 @@
 -- Table: leafyyInternals.users
 
--- DROP TABLE IF EXISTS "leafyyInternals".users;
+-- DROP TABLE IF EXISTS leafyy.users;
 
-CREATE TABLE IF NOT EXISTS "leafyyInternals".users
+CREATE TABLE IF NOT EXISTS leafyy.users
 (
     login text COLLATE pg_catalog."default" NOT NULL,
     password character(96) COLLATE pg_catalog."default" NOT NULL,
@@ -14,6 +14,6 @@ CREATE TABLE IF NOT EXISTS "leafyyInternals".users
 
 TABLESPACE pg_default;
 
-ALTER TABLE IF EXISTS "leafyyInternals".users
+ALTER TABLE IF EXISTS leafyy.users
     OWNER to leafyy;
     

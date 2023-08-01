@@ -1,8 +1,8 @@
--- Table: "leafyyInternals".devices
+-- Table: leafyy.devices
 
--- DROP TABLE IF EXISTS "leafyyInternals".devices;
+-- DROP TABLE IF EXISTS leafyy.devices;
 
-CREATE TABLE IF NOT EXISTS "leafyyInternals".devices
+CREATE TABLE IF NOT EXISTS leafyy.devices
 (
     address character varying(64) COLLATE pg_catalog."default" NOT NULL,
     "displayName" text COLLATE pg_catalog."default",
@@ -15,6 +15,6 @@ CREATE TABLE IF NOT EXISTS "leafyyInternals".devices
 
 TABLESPACE pg_default;
 
-ALTER TABLE IF EXISTS "leafyyInternals".devices
+ALTER TABLE IF EXISTS leafyy.devices
     OWNER to leafyy;
 

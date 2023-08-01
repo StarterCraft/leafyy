@@ -1,1 +1,1 @@
-TRUNCATE TABLE "leafyyInternals".users
+TRUNCATE TABLE leafyy.users

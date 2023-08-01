@@ -7,9 +7,9 @@ CREATE DATABASE Leafyy
 
 -- SCHEMA: leafyyInternals
 
--- DROP SCHEMA IF EXISTS "leafyyInternals" ;
+-- DROP SCHEMA IF EXISTS leafyy ;
 
-CREATE SCHEMA IF NOT EXISTS "leafyyInternals"
+CREATE SCHEMA IF NOT EXISTS leafyy
     AUTHORIZATION leafyy;
 
 -- SCHEMA: leafyyCommunication

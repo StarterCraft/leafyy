@@ -1,2 +1,2 @@
-SELECT * FROM "leafyyInternals".users
+SELECT * FROM leafyy.users
 WHERE username = %s

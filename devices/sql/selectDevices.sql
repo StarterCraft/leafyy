@@ -1,1 +1,1 @@
-SELECT * FROM "leafyyInternals".devices
+SELECT * FROM leafyy.devices

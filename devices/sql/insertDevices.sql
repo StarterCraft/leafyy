@@ -1,2 +1,2 @@
-INSERT INTO "leafyyInternals".devices
+INSERT INTO leafyy.devices
 VALUES %s
