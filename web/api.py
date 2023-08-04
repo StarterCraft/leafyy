@@ -27,12 +27,13 @@ from leafyy.generic       import LeafyyComponent
 from webutils             import JsResponse, CssResponse, formatExc
 
 from .template            import Template
-from .models              import User, AccessibleUser, Token, TokenData
+from .models              import User, AccessibleUser, TokenPair, TokenData
 from .exceptions          import *
 
 
 ALGORITHM = 'HS384'
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
+REFRESH_TOKEN_EXPIRE_DAYS = 30
 SALT_MULTIPLIER = 381
 HMAC_ITERATIONS = 880738
 
@@ -273,19 +274,42 @@ class LeafyyWebInterface(LeafyyComponent):
             encodedJwt = jenc(toEncode, getSalt(), algorith = ALGORITHM)
             return encodedJwt
 
-        @self.api.post("/token", response_model = Token)
+        @self.api.post("/token", response_model = TokenPair)
         async def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()]):
             try:
                 user = authenticateUser(form_data.username, form_data.password)
                 accessTokenExpires = timedelta(minutes = ACCESS_TOKEN_EXPIRE_MINUTES)
                 accessToken = createAccessToken({"sub": user.username}, accessTokenExpires)
-                return {'access_token': accessToken, 'token_type': 'bearer'}
+                refreshTokenExpires = timedelta(days = REFRESH_TOKEN_EXPIRE_DAYS)
+                refreshToken = createRefreshToken({"sub": user.username}, refreshTokenExpires)
+                return {'access_token': accessToken, 'refresh_token': refreshToken, 'token_type': 'bearer'}
             except Exception as e:
                 self.logger.error('При входе пользователя произошла следующая ошибка:',
                     exc = e)
                 raise HTTPException(
                     status_code = 401,
                     detail = 'Недопустимые учетные данные',
+                    headers = {"WWW-Authenticate": "Bearer"}
+                ) from e
+            
+        @self.api.post("/token/refresh", response_model = TokenPair)
+        async def refreshToken(refresh_token: str):
+            try:
+                payload = jdec(refresh_token, getSalt(), algorithms = [ALGORITHM])
+                username: str = payload['sub']
+                tkd = TokenData(username = username)
+                selectUser(tkd.username)
+                accessTokenExpires = timedelta(minutes = ACCESS_TOKEN_EXPIRE_MINUTES)
+                accessToken = createAccessToken({"sub": username}, accessTokenExpires)
+                refreshTokenExpires = timedelta(days = REFRESH_TOKEN_EXPIRE_DAYS)
+                refreshToken = createRefreshToken({"sub": username}, refreshTokenExpires)
+                return {'access_token': accessToken, 'refresh_token': refreshToken, 'token_type': 'bearer'}
+            except (UsernameNotFoundException, UserDisabledException, JWTError) as e:
+                self.logger.error('При обновлении токена произошла следующая ошибка:',
+                    exc = e)
+                raise HTTPException(
+                    status_code = 401,
+                    detail = 'Недопустимый токен обновления',
                     headers = {"WWW-Authenticate": "Bearer"}
                 ) from e
 
