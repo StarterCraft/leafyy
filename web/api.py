@@ -291,7 +291,7 @@ class LeafyyWebInterface(LeafyyComponent):
                     detail = 'Недопустимые учетные данные',
                     headers = {"WWW-Authenticate": "Bearer"}
                 ) from e
-            
+
         @self.api.post("/token/refresh", response_model = TokenPair)
         async def refreshToken(refresh_token: str):
             try:
