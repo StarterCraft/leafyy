@@ -13,7 +13,6 @@
         <meta name="theme-color" content="#fff3b4">
         <link rel="stylesheet" type="text/css" href="/leafyy.css">
     </head>
-
     <body>
         <header class="block stretcher">
             <img src="/resources/banner.jpg" height="32">
@@ -21,6 +20,18 @@
         <div class="block stretcher">
             <div class="bold grand">
                 Авторизация
+            </div>
+        </div>
+        <div class="block stretcher status-bar" style="display: none;">
+            <div id="status">
+                {% if statusMessage %}
+                {{statusMessage}}
+                {% else %}
+                Выполни вход, чтобы начать взаимодействовать с Листочком.
+                {% endif %}
+            </div>
+            <div>
+                <a class="action" href="#" onclick="hideStatusBar()">скрыть</a>
             </div>
         </div>
         <form class="block vertical" id="loginForm">

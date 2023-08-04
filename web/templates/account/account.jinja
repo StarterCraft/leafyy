@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>
+            Листочек: аккаунт {{account.username}}
+        </title>
+        <link rel="apple-touch-icon" sizes="180x180" href="/resources/apple-touch-icon.png">
+        <link rel="icon" type="image/svg+xml" href="/resources/favicon.svg">
+        <link rel="icon" type="image/png" href="/resources/favicon.png">
+        <link rel="manifest" href="/site.webmanifest">
+        <link rel="mask-icon" href="/resources/safari-pinned-tab.svg" color="#5bbad5">
+        <meta name="msapplication-TileColor" content="#fff3b4">
+        <meta name="theme-color" content="#fff3b4">
+        <link rel="stylesheet" type="text/css" href="/leafyy.css">
+    </head>
+    <body>
+        <header class="block stretcher">
+            <img src="/resources/banner.jpg" height="32">
+            <nav class="actionblock">
+                <a class="action" href="/">домой</a>
+                <a class="action" href="/rules">правила</a>
+                <a class="action" href="/devices">устройства</a>
+                <a class="action" href="/log">консоль</a>
+                <a class="action" href="/doc">справка</a>
+                <a class="action" href="/account" id="account">👤 {{user.username}}</a>
+            </nav>
+        </header class="block stretcher">
+        <div class="block stretcher">
+            <div class="bold grand">
+                {{user.username}}
+                <span class="italic">
+                {% if user.ruler %}
+                (господин системы)
+                {% elif user.warden %}
+                (смотритель)
+                {% else %}
+                (простолюдин)
+                {% endif %}
+                </span>
+            </div>
+            <a class="action" href="/logout" id="logout">🚪 выйти</a>
+        </div>
+        <div class="stretcher">
+            <div class="block vertical" id="changePassword">
+                <span class="bold">
+                    Смена пароля
+                </span>
+                <input class="forminp code" type="password" id="passwordField0" placeholder="Новый пароль...">
+                <input class="forminp code" type="password" id="passwordField0" placeholder="Повторите пароль...">
+                <button class="code formi" id="changePasswordConfirm" onclick="onChangePasswordConfirm()">Применить</button>
+            </div>
+            {% if user.warden or user.ruler %}
+            <div class="block vertical" id="accounts">
+                <span class="bold">
+                    Учётные записи
+                </span>
+                <div class="view vertical">
+                    {% for account in accounts %}
+                    {% if account.username != user.username %}
+                    {% if account.warden and user.ruler %}
+                    <div class="stretcher">
+                        <span>
+                            {{account.username}}
+                            <span class="italic">
+                                (смотритель)
+                            </span>
+                        </span>
+                        <div class="actionblock">
+                            <a class="action" id="deposeWarden-{{account.username}}"
+                                onclick="deposeWarden('{{account.username}}')">низложить</a>
+                            <a class="action" id="disable-{{account.username}}"
+                                onclick="disableAccount('{{account.username}}')">отключить</a>
+                            <a class="action" id="delete-{{account.username}}"
+                                onclick="deleteAccount('{{account.username}}')">удалить</a>
+                        </div>
+                    </div>
+                    {% elif not account.warden and user.ruler %}
+                    <div class="stretcher">
+                        <span>
+                            {{account.username}}
+                            <span class="italic">
+                                (простолюдин)
+                            </span>
+                        </span>
+                        <div class="actionblock">
+                            <a class="action" id="disable-{{account.username}}"
+                                onclick="disableAccount('{{account.username}}')">отключить</a>
+                            <a class="action" id="delete-{{account.username}}"
+                                onclick="deleteAccount('{{account.username}}')">удалить</a>
+                        </div>
+                    </div>
+                    {% elif not account.warden and user.warden %}
+                    <div class="stretcher">
+                        <span>
+                            {{account.username}}
+                            <span class="italic">
+                                (простолюдин)
+                            </span>
+                        </span>
+                        <div class="actionblock">
+                            <a class="action" id="disable-{{account.username}}"
+                                onclick="disableAccount('{{account.username}}')">отключить</a>
+                            <a class="action" id="delete-{{account.username}}"
+                                onclick="deleteAccount('{{account.username}}')">удалить</a>
+                        </div>
+                    </div>
+                    {% endif %}
+                    {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        <div class="block stretcher status-bar" style="display: none;">
+            <div id="status"></div>
+            <div>
+                <a class="action" href="#" onclick="hideStatusBar()">скрыть</a>
+            </div>
+        </div>
+        <footer class="block stretcher fixed-bottom">
+            <div>
+                Листочек, система автоматического контроля растений.
+                2023 год. Никакие права не защищены.
+            </div>
+            <div>
+                {{version}}
+            </div>
+        </footer>
+        <script src="/leafyy.js"></script>
+    </body>
+</html>

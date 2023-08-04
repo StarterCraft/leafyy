@@ -1,91 +1,95 @@
 <!DOCTYPE html>
 <html>
-
-<head>
-    <title>
-        Листочек: файлы журнала
-    </title>
-    <link rel="apple-touch-icon" sizes="180x180" href="/resources/apple-touch-icon.png">
-    <link rel="icon" type="image/svg+xml" href="/resources/favicon.svg">
-    <link rel="icon" type="image/png" href="/resources/favicon.png">
-    <link rel="manifest" href="/site.webmanifest">
-    <link rel="mask-icon" href="/resources/safari-pinned-tab.svg" color="#5bbad5">
-    <meta charset="utf-8">
-    <meta name="msapplication-TileColor" content="#fff3b4">
-    <meta name="theme-color" content="#fff3b4">
-    <link rel="stylesheet" type="text/css" href="/leafyy.css">
-</head>
-
-<body>
-    <header class="block stretcher">
-        <img src="/resources/banner.jpg" height="32">
-        <nav class="actionblock">
-            <a class="action" href="/">домой</a>
-            <a class="action" href="/rules">правила</a>
-            <a class="action" href="/devices">устройства</a>
-            <a class="action" href="/log">консоль</a>
-            <a class="action" href="/doc">справка</a>
-        </nav>
-    </header class="block stretcher">
-    <div class="block stretcher">
-        <div class="bold grand">
-            Файлы журнала
-            <span class="code">
-            {% if logData %}
-            {{logData|length}}
-            {% else %}
-            0
-            {% endif %}
-            </span>
+    <head>
+        <title>
+            Листочек: файлы журнала
+        </title>
+        <link rel="apple-touch-icon" sizes="180x180" href="/resources/apple-touch-icon.png">
+        <link rel="icon" type="image/svg+xml" href="/resources/favicon.svg">
+        <link rel="icon" type="image/png" href="/resources/favicon.png">
+        <link rel="manifest" href="/site.webmanifest">
+        <link rel="mask-icon" href="/resources/safari-pinned-tab.svg" color="#5bbad5">
+        <meta charset="utf-8">
+        <meta name="msapplication-TileColor" content="#fff3b4">
+        <meta name="theme-color" content="#fff3b4">
+        <link rel="stylesheet" type="text/css" href="/leafyy.css">
+    </head>
+    <body>
+        <header class="block stretcher">
+            <img src="/resources/banner.jpg" height="32">
+            <nav class="actionblock">
+                <a class="action" href="/">домой</a>
+                <a class="action" href="/rules">правила</a>
+                <a class="action" href="/devices">устройства</a>
+                <a class="action" href="/log">консоль</a>
+                <a class="action" href="/doc">справка</a>
+                <a class="action" href="/account" id="account">👤 {{user.username}}</a>
+            </nav>
+        </header class="block stretcher">
+        <div class="block stretcher">
+            <div class="bold grand">
+                Файлы журнала
+                <span class="code">
+                {% if logData %}
+                {{logData|length}}
+                {% else %}
+                0
+                {% endif %}
+                </span>
+            </div>
+            <nav class="actionblock">
+                <input class="action" type="search" id="search"
+                    placeholder="поиск..." oninput="onSearchQuery()">
+                {% if reversed %}
+                <a class="action" href="/log/view">сначала новые</a>
+                {% else %}
+                <a class="action" href="/log/view?reversed=1">сначала старые</a>
+                {% endif %}
+                <a class="action" href="/log">к консоли</a>
+            </nav>
         </div>
-        <nav class="actionblock">
-            <input class="action" type="search" id="search"
-                placeholder="поиск..." oninput="onSearchQuery()">
-            {% if reversed %}
-            <a class="action" href="/log/view">сначала новые</a>
-            {% else %}
-            <a class="action" href="/log/view?reversed=1">сначала старые</a>
-            {% endif %}
-            <a class="action" href="/log">к консоли</a>
-        </nav>
-    </div>
-    {% if logData %}
-    <div class="block file-view" id="view">
-        {% for file in logData %}
-        <div class="file-card">
+        {% if logData %}
+        <div class="block file-view" id="view">
+            {% for file in logData %}
+            <div class="file-card">
+                <div>
+                    <img class="icon" src="/resources/file.svg"/>
+                    <a href="/log/view/{{file.name}}">{{file.name}}</a>
+                </div>
+                <div>
+                    <a href="/log/{{file.name}}">
+                    <img class="icon" src="/resources/download.svg"/>
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        <div class="block" id="no-content" style="display: none;">
+        Нет файлов для отображения.
+        </div>
+        {% else %}
+        <div class="block" id="no-content">
+        Нет файлов для отображения.
+        </div>
+        {% endif %}
+        <div class="block stretcher status-bar" style="display: none;">
+            <div id="status"></div>
             <div>
-                <img class="icon" src="/resources/file.svg"/>
-                <a href="/log/view/{{file.name}}">{{file.name}}</a>
+                <a class="action" href="#" onclick="hideStatusBar()">скрыть</a>
+            </div>
+        </div>
+        <footer class="block stretcher fixed-bottom">
+            <div>
+            Листочек, система автоматического контроля растений.
+            2023 год. Никакие права не защищены.
             </div>
             <div>
-                <a href="/log/{{file.name}}">
-                <img class="icon" src="/resources/download.svg"/>
-                </a>
+            {{version}}
             </div>
-        </div>
-        {% endfor %}
-    </div>
-    <div class="block" id="no-content" style="display: none;">
-    Нет файлов для отображения.
-    </div>
-    {% else %}
-    <div class="block" id="no-content">
-    Нет файлов для отображения.
-    </div>
-    {% endif %}
-    <footer class="block stretcher fixed-bottom">
-        <div>
-        Листочек, система автоматического контроля растений.
-        2023 год. Никакие права не защищены.
-        </div>
-        <div>
-        {{version}}
-        </div>
-    </footer>
-    <script src="/libraries/jquery.js"></script>
-    <script src="/libraries/js-cookie.js"></script>
-    <script src="/leafyy.js"></script>
-    <script src="/logList.js"></script>
-</body>
-
+        </footer>
+        <script src="/libraries/jquery.js"></script>
+        <script src="/libraries/js-cookie.js"></script>
+        <script src="/leafyy.js"></script>
+        <script src="/logList.js"></script>
+    </body>
 </html>

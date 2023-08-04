@@ -101,7 +101,11 @@
     font-weight: bold;
 }
 
-.bold:hover {
+.italic {
+    font-style: italic;
+}
+
+.bold:hover, .italic:hover {
     color: var(--color-accent-highlight);
 }
 

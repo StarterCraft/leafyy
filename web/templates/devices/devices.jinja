@@ -24,6 +24,7 @@
                 <a class="action" href="/devices">устройства</a>
                 <a class="action" href="/log">консоль</a>
                 <a class="action" href="/doc">справка</a>
+                <a class="action" href="/account" id="account">👤 {{user.username}}</a>
             </nav>
         </header class="block stretcher">
         <div class="block stretcher">
@@ -70,6 +71,12 @@
             {% else %}
             Нет устройств для отображения.
             {% endif %}
+        </div>
+        <div class="block stretcher status-bar" style="display: none;">
+            <div id="status"></div>
+            <div>
+                <a class="action" href="#" onclick="hideStatusBar()">скрыть</a>
+            </div>
         </div>
         <footer class="block stretcher fixed-bottom">
             <div>

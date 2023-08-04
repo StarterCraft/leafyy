@@ -14,6 +14,18 @@ function prepareIt() {
 
 $(document).ready(prepareIt);
 
+function setStatus(content) {
+    const status = $("#status")[0];
+    status.innerHTML = content;
+
+    const statusBar = $(".status-bar")[0];
+    statusBar.style.display = "inherit";
+}
+
+function hideStatusBar() {
+    $(".status-bar").hide();
+}
+
 function getCookie(id, _default) {
     c = Cookies.get(id);
     if (typeof c === "undefined")

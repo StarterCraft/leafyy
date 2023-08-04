@@ -5,117 +5,121 @@ context:
 -->
 <!DOCTYPE html>
 <html>
-
-<head>
-    <title>
-        Листочек: домашняя страница
-    </title>
-    <link rel="apple-touch-icon" sizes="180x180" href="/resources/apple-touch-icon.png">
-    <link rel="icon" type="image/svg+xml" href="/resources/favicon.svg">
-    <link rel="icon" type="image/png" href="/resources/favicon.png">
-    <link rel="manifest" href="/site.webmanifest">
-    <link rel="mask-icon" href="/resources/safari-pinned-tab.svg" color="#5bbad5">
-    <meta name="msapplication-TileColor" content="#fff3b4">
-    <meta name="theme-color" content="#fff3b4">
-    <link rel="stylesheet" type="text/css" href="/leafyy.css">
-</head>
-
-<body>
-    <header class="block stretcher">
-        <img src="/resources/banner.jpg" height="32">
-        <nav class="actionblock">
-            <a class="action" href="/">домой</a>
-            <a class="action" href="/rules">правила</a>
-            <a class="action" href="/devices">устройства</a>
-            <a class="action" href="/log">консоль</a>
-            <a class="action" href="/doc">справка</a>
-        </nav>
-    </header class="block stretcher">
-    <div class="block">
-        <span>
-            Добро пожаловать в центр управления системы "Листочек".
-            Здесь можно контролировать состояние грядок, оборудования и правил.
-            Загляните в <a href="/doc">документацию</a>, если вы открыли это и
-            ничего не понятно.
-        </span>
-    </div>
-    <div class="block vertical">
-        <span class="bold">
-            Устройства:
-        </span>
-        <span class="code">
-            {% if devices %}
-            всего: {{devices.count.total}},
-            {% if devices.count.active %}
-            <span class="positive">
-            {% else %}
+    <head>
+        <title>
+            Листочек: домашняя страница
+        </title>
+        <link rel="apple-touch-icon" sizes="180x180" href="/resources/apple-touch-icon.png">
+        <link rel="icon" type="image/svg+xml" href="/resources/favicon.svg">
+        <link rel="icon" type="image/png" href="/resources/favicon.png">
+        <link rel="manifest" href="/site.webmanifest">
+        <link rel="mask-icon" href="/resources/safari-pinned-tab.svg" color="#5bbad5">
+        <meta name="msapplication-TileColor" content="#fff3b4">
+        <meta name="theme-color" content="#fff3b4">
+        <link rel="stylesheet" type="text/css" href="/leafyy.css">
+    </head>
+    <body>
+        <header class="block stretcher">
+            <img src="/resources/banner.jpg" height="32">
+            <nav class="actionblock">
+                <a class="action" href="/">домой</a>
+                <a class="action" href="/rules">правила</a>
+                <a class="action" href="/devices">устройства</a>
+                <a class="action" href="/log">консоль</a>
+                <a class="action" href="/doc">справка</a>
+                <a class="action" href="/account" id="account">👤 {{user.username}}</a>
+            </nav>
+        </header class="block stretcher">
+        <div class="block">
             <span>
-            {% endif %}
-            активны: {{devices.count.active}}</span>,
-            {% if devices.count.failed %}
-            <span class="negative">
-            {% else %}
-            <span>
-            {% endif %}
-            ошибка: {{devices.count.failed}}</span>,
-            {% if devices.count.disabled %}
-            <span class="inactive">
-            {% else %}
-            <span>
-            {% endif %}
-            отключены: {{devices.count.disabled}}</span>
-            {% else %}
-            Устройства не инициализированы.
-            {% endif %}
-        </span>
-        <span class="bold">
-            Ошибки:
-        </span>
-        <div class="code log">
-            <div class="line-view vertical">
-            {% if errors %}
-            {% for error in errors %}
-            <div class="log-lineno">
-                {{loop.index}}
-            </div>
-            <div class="log-message">
-                {{error|safe}}
-            </div>
-            {% endfor %}
-            {% else %}
-            Ошибок в системе не выявлялось.
-            {% endif %}
-            </div>
-        </div>
-    </div>
-    <div class="block stretcher">
-        <div class="bold grand">
-            Грядки
-            <span class="code">
-                {% if plants %}
-                {{plants|length}}
-                {% else %}
-                0
-                {% endif %}
+                Добро пожаловать в центр управления системы "Листочек".
+                Здесь можно контролировать состояние грядок, оборудования и правил.
+                Загляните в <a href="/doc">документацию</a>, если вы открыли это и
+                ничего не понятно.
             </span>
         </div>
-        <a class="action" href="#">добавить</a>
-    </div>
-    <div class="block view horizontal">
-    <!-- заглушка -->
-    Нет грядок для отображения.
-    </div>
-    <footer class="block stretcher fixed-bottom">
-        <div>
-        Листочек, система автоматического контроля растений.
-        2023 год. Никакие права не защищены.
+        <div class="block vertical">
+            <span class="bold">
+                Устройства:
+            </span>
+            <span class="code">
+                {% if devices %}
+                всего: {{devices.count.total}},
+                {% if devices.count.active %}
+                <span class="positive">
+                {% else %}
+                <span>
+                {% endif %}
+                активны: {{devices.count.active}}</span>,
+                {% if devices.count.failed %}
+                <span class="negative">
+                {% else %}
+                <span>
+                {% endif %}
+                ошибка: {{devices.count.failed}}</span>,
+                {% if devices.count.disabled %}
+                <span class="inactive">
+                {% else %}
+                <span>
+                {% endif %}
+                отключены: {{devices.count.disabled}}</span>
+                {% else %}
+                Устройства не инициализированы.
+                {% endif %}
+            </span>
+            <span class="bold">
+                Ошибки:
+            </span>
+            <div class="code log">
+                <div class="line-view vertical">
+                {% if errors %}
+                {% for error in errors %}
+                <div class="log-lineno">
+                    {{loop.index}}
+                </div>
+                <div class="log-message">
+                    {{error|safe}}
+                </div>
+                {% endfor %}
+                {% else %}
+                Ошибок в системе не выявлялось.
+                {% endif %}
+                </div>
+            </div>
         </div>
-        <div>
-        {{version}}
+        <div class="block stretcher">
+            <div class="bold grand">
+                Грядки
+                <span class="code">
+                    {% if plants %}
+                    {{plants|length}}
+                    {% else %}
+                    0
+                    {% endif %}
+                </span>
+            </div>
+            <a class="action" href="#">добавить</a>
         </div>
-    </footer>
-    <script src="/libraries/jquery.js"></script>
-    <script src="/leafyy.js"></script>
-</body>
-
+        <div class="block view horizontal">
+        <!-- заглушка -->
+        Нет грядок для отображения.
+        </div>
+        <div class="block stretcher status-bar" style="display: none;">
+            <div id="status"></div>
+            <div>
+                <a class="action" href="#" onclick="hideStatusBar()">скрыть</a>
+            </div>
+        </div>
+        <footer class="block stretcher fixed-bottom">
+            <div>
+            Листочек, система автоматического контроля растений.
+            2023 год. Никакие права не защищены.
+            </div>
+            <div>
+            {{version}}
+            </div>
+        </footer>
+        <script src="/libraries/jquery.js"></script>
+        <script src="/leafyy.js"></script>
+    </body>
 </html>

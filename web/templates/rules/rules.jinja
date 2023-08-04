@@ -1,60 +1,58 @@
 <!DOCTYPE html>
 <html>
-
-<head>
-    <title>
-        Листочек: правила
-    </title>
-    <link rel="apple-touch-icon" sizes="180x180" href="/resources/apple-touch-icon.png">
-    <link rel="icon" type="image/svg+xml" href="/resources/favicon.svg">
-    <link rel="icon" type="image/png" href="/resources/favicon.png">
-    <link rel="manifest" href="/site.webmanifest">
-    <link rel="mask-icon" href="/resources/safari-pinned-tab.svg" color="#5bbad5">
-    <meta name="msapplication-TileColor" content="#fff3b4">
-    <meta name="theme-color" content="#fff3b4">
-    <link rel="stylesheet" type="text/css" href="/leafyy.css">
-</head>
-
-<body>
-    <header class="block stretcher">
-        <img src="/resources/banner.jpg" height="32">
-        <nav class="actionblock">
-            <a class="action" href="/">домой</a>
-            <a class="action" href="/rules">правила</a>
-            <a class="action" href="/devices">устройства</a>
-            <a class="action" href="/log">консоль</a>
-            <a class="action" href="/doc">справка</a>
-        </nav>
-    </header class="block stretcher">
-    <div class="block stretcher">
-        <div class="bold grand">
-            Правила
-            <span class="code">
-                {% if rules %}
-                {{rules|length}}
-                {% else %}
-                0
-                {% endif %}
-            </span>
+    <head>
+        <title>
+            Листочек: правила
+        </title>
+        <link rel="apple-touch-icon" sizes="180x180" href="/resources/apple-touch-icon.png">
+        <link rel="icon" type="image/svg+xml" href="/resources/favicon.svg">
+        <link rel="icon" type="image/png" href="/resources/favicon.png">
+        <link rel="manifest" href="/site.webmanifest">
+        <link rel="mask-icon" href="/resources/safari-pinned-tab.svg" color="#5bbad5">
+        <meta name="msapplication-TileColor" content="#fff3b4">
+        <meta name="theme-color" content="#fff3b4">
+        <link rel="stylesheet" type="text/css" href="/leafyy.css">
+    </head>
+    <body>
+        <header class="block stretcher">
+            <img src="/resources/banner.jpg" height="32">
+            <nav class="actionblock">
+                <a class="action" href="/">домой</a>
+                <a class="action" href="/rules">правила</a>
+                <a class="action" href="/devices">устройства</a>
+                <a class="action" href="/log">консоль</a>
+                <a class="action" href="/doc">справка</a>
+                <a class="action" href="/account" id="account">👤 {{user.username}}</a>
+            </nav>
+        </header class="block stretcher">
+        <div class="block stretcher">
+            <div class="bold grand">
+                Правила
+                <span class="code">
+                    {% if rules %}
+                    {{rules|length}}
+                    {% else %}
+                    0
+                    {% endif %}
+                </span>
+            </div>
+            <a class="action" href="#">добавить</a>
         </div>
-        <a class="action" href="#">добавить</a>
-    </div>
-    <div class="block view horizontal">
-        {% if rules %}
-        <ul>
-            {% for rule in rules %}
-            <li>
-                <div class="rule">
-                    {{rule.name}}
-                </div>
-                {% endfor %}
-                {% else %}
-                Нет правил для отображения.
-                {% endif %}
-            </li>
-        </ul>
+        <div class="block view horizontal">
+            {% if rules %}
+            <ul>
+                {% for rule in rules %}
+                <li>
+                    <div class="rule">
+                        {{rule.name}}
+                    </div>
+                    {% endfor %}
+                    {% else %}
+                    Нет правил для отображения.
+                    {% endif %}
+                </li>
+            </ul>
 
-    </div>
-</body>
-
+        </div>
+    </body>
 </html>

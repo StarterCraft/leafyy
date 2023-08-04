@@ -19,18 +19,6 @@ function prepare() {
 
 $(document).ready(prepare);
 
-function setStatus(content) {
-    const status = $("#status")[0];
-    status.innerHTML = content;
-
-    const statusBar = $(".status-bar")[0];
-    statusBar.style.display = "inherit";
-}
-
-function hideStatusBar() {
-    $(".status-bar").hide();
-}
-
 function serverError(request) {
     if (request.status == 0)
         setStatus("<span class=\"negative bold\";>Соединение потеряно.</span>");
