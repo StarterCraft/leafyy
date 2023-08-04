@@ -297,7 +297,7 @@ class LeafyyWebInterface(LeafyyComponent):
                 request,
                 version = str(version())
                 )
-        
+
         @self.api.get('/account/{username}', response_class = HTMLResponse,
             name = 'Авторизация',
             description = 'Отрисовывает страницу авторизации.')
@@ -307,7 +307,7 @@ class LeafyyWebInterface(LeafyyComponent):
                 user = user,
                 version = str(version())
                 )
-        
+
         @self.api.get('/', response_class = HTMLResponse,
             name = 'Главная страница',
             description = 'Отрисовывает главную страницу с информацией о грядках.')
