@@ -57,10 +57,12 @@
                                 </span>
                                 <span class="bold larger code"> @{{device.address}} </span>
                     </div>
+                    {% if user.warden or user.ruler %}
                     <div class="actionblock">
                         <a class="action" href="#">изменить</a>
                         <a class="action" href="#">удалить</a>
                     </div>
+                    {% endif %}
                 </div>
                 <div class="vertical">
                     <p>{{device.description}}</p>

@@ -176,6 +176,7 @@
                 <a class="action" href="#" onclick="hideStatusBar()">скрыть</a>
             </div>
         </div>
+        {% if user.warden or user.ruler %}
         <div class="block">
             <div id="console" style="display: contents;">
                 <select class="code formi" id="target" onchange="onConsoleTargetSelected()">
@@ -197,6 +198,7 @@
                 <button class="code formi" id="consoleSend" onclick="onConsoleSend()">Отправить</button>
             </div>
         </div>
+        {% endif %}
         <!-- #endregion -->
         <script src="/libraries/jquery.js"></script>
         <script src="/libraries/js-cookie.js"></script>
