@@ -275,7 +275,7 @@ class LeafyyWebInterface(LeafyyComponent):
             return encodedJwt
 
         @self.api.post("/token", response_model = TokenPair)
-        async def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()]):
+        async def accessToken(form_data: Annotated[OAuth2PasswordRequestForm, Depends()]):
             try:
                 user = authenticateUser(form_data.username, form_data.password)
                 accessTokenExpires = timedelta(minutes = ACCESS_TOKEN_EXPIRE_MINUTES)
