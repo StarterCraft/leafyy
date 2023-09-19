@@ -10,7 +10,7 @@ function finishLogin(data) {
 
 function login(event) {
     event.preventDefault();
-    
+
     var username = $('#login').val();
     var password = $('#password').val();
     $.ajax({

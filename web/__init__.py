@@ -38,7 +38,7 @@ class LeafyyWebService(
 
     def uvicornate(self):
         urun(self,
-            host = config('service.host', 'localhost'), 
+            host = config('service.host', 'localhost'),
             port = config('service.port', 8381)
             )
 
