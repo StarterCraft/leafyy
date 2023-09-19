@@ -95,7 +95,7 @@ class LeafyyLogger:
     @logWindowVisibility.setter
     def logWindowVisibility(self, value: bool):
         self.console = value
-        properties().setlogWindowLoggers(self.name, value)
+        config().setlogWindowLoggers(self.name, value)
 
     def setLogLevel(self, logLevel: LeafyyLogLevel):
         '''

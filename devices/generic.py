@@ -36,8 +36,8 @@ class LeafyyByteOperations:
         Преобразует QByteArray в бинарный формат.
         Например, QByteArray(b'\\X10\\XBA\\XBF') -> '0b00010000 0b10111010 0b10111111'
         '''
-        return (properties('binaryPrefix', '0b') +
-            f"{properties('byteSeparator', ' ')}{properties('binaryPrefix', '0b')}"
+        return (config('binaryPrefix', '0b') +
+            f"{config('byteSeparator', ' ')}{config('binaryPrefix', '0b')}"
             .join([bin(byte)[2:].zfill(8) for byte in arr]))
 
     @staticmethod
@@ -46,8 +46,8 @@ class LeafyyByteOperations:
         Преобразует QByteArray в восьмеричный формат.
         Например, QByteArray(b'\\X10\\XBA\\XBF') -> '0o020 0o272 0o277'
         '''
-        return (properties('octalPrefix', '0o') +
-            f"{properties('byteSeparator', ' ')}{properties('octalPrefix', '0o')}"
+        return (config('octalPrefix', '0o') +
+            f"{config('byteSeparator', ' ')}{config('octalPrefix', '0o')}"
             .join([oct(byte)[2:].zfill(3) for byte in arr]))
 
     @staticmethod
@@ -56,7 +56,7 @@ class LeafyyByteOperations:
         Преобразует QByteArray в десятичный формат.
         Например, QByteArray(b'\\X10\\XBA\\XBF') -> '16 186 191'
         '''
-        return f"{properties('byteSeparator', ' ')}".join([str(byte) for byte in arr])
+        return f"{config('byteSeparator', ' ')}".join([str(byte) for byte in arr])
 
     @staticmethod
     def toHexadecimal(arr: QtCore.QByteArray) -> str:
@@ -64,8 +64,8 @@ class LeafyyByteOperations:
         Преобразует QByteArray в шестнадцатеричный формат.
         Например, QByteArray(b'\\X10\\XBA\\XBF') -> '0x10 0xba 0xbf'
         '''
-        return (properties('hexadecimalPrefix', '0x') +
-            f"{properties('byteSeparator', ' ')}{properties('hexadecimalPrefix', '0x')}"
+        return (config('hexadecimalPrefix', '0x') +
+            f"{config('byteSeparator', ' ')}{config('hexadecimalPrefix', '0x')}"
             .join([hex(byte)[2:].zfill(2) for byte in arr]))
 
     #Конверсия строк в QByteArray для разных систем счисления.

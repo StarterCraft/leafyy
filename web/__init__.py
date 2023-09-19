@@ -18,7 +18,7 @@ class LeafyyWebService(
             loggerName = 'WebService',
             title = 'Leafyy Web Service',
             description = 'Testing!',
-            debug = properties('webServiceDebug', False))
+            debug = config('webServiceDebug', False))
 
         self.authBearer = OAuth2PasswordBearer(tokenUrl = 'token')
 
@@ -38,7 +38,9 @@ class LeafyyWebService(
 
     def uvicornate(self):
         urun(self,
-            port = properties().get('serverPort', 38001))
+            host = config('service.host', 'localhost'), 
+            port = config('service.port', 8381)
+            )
 
     def run(self):
         'Run with Uvicorn'

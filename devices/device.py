@@ -74,7 +74,7 @@ class LeafyyDevice(LeafyyIterableComponent):
     @logWindowVisibility.setter
     def logWindowVisibility(self, value: bool):
         self.visibleInConsole = value
-        #properties().setLogWindowSources(self.name, value, 1)
+        #config().setLogWindowSources(self.name, value, 1)
 
     @property
     def decodeASCII(self):
@@ -83,7 +83,7 @@ class LeafyyDevice(LeafyyIterableComponent):
     @decodeASCII.setter
     def decodeASCII(self, value: bool):
         self.decodeASCIIMode = value
-        #properties().setLogDecodeASCII(self.address, value)
+        #config().setLogDecodeASCII(self.address, value)
 
     def start(self):
         self.logger.debug(f'Пытаюсь открыть порт {self.address}')

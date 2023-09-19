@@ -49,9 +49,9 @@ def log():
 def errors():
     return app().errors
 
-def properties(key: str = None, default: Any = None, sep: str = '.') -> dict | Any:
+def config(key: str = None, default: Any = None, sep: str = '.') -> dict | Any:
     if (key):
-        return app().properties(key, default, sep)
+        return app().config(key, default, sep)
 
     return app().properties
 

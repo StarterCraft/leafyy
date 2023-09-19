@@ -1,0 +1,34 @@
+rules:
+- id: 0
+  name: "rule-test 1"
+  description: "sample sample sample sample sample sample sample sample sample sample sample sample sample sample sample"
+  enabled: true
+  repeated: true
+  triggers:
+    - id: 0
+      parent: null
+      type: 0
+      condition: 100
+    - id: 1
+      parent: 0
+      type: 1
+      condition:
+        - "com1.0.humidity.percent"
+        - "le"
+        - 50
+    - id: 2
+      parent: 0
+      type: 2
+      condition:
+        - "time.exact"
+        - 12
+        - 0
+  actions:
+    - id: 0
+      run:
+        - "delay"
+        - 32
+    - id: 1
+      run:
+        - "com1.0.water"
+        - 800

@@ -8,7 +8,7 @@ from database.elephant import LeafyyPostgresDatabase
 from inspection        import LeafyyLogging
 from inspection.logger import LeafyyLogger
 from inspection.errors import LeafyyErrors
-from options           import LeafyyProperties
+from config            import LeafyyConfig
 from console           import LeafyyConsole
 from devices           import LeafyyDevices
 from web               import LeafyyWebService
@@ -31,7 +31,7 @@ class Leafyy(QtWidgets.QApplication):
         print(f'Starting Leafyy v.{self.version}, uncopyrighted')
         print(f'Запуск "Листочка" версии {self.version}, авторские права не защищены')
 
-        self.properties = LeafyyProperties()
+        self.config = LeafyyConfig()
         self.postgres = LeafyyPostgresDatabase()
 
         self.log = LeafyyLogging()
@@ -42,7 +42,7 @@ class Leafyy(QtWidgets.QApplication):
         self.logger.info(
             'Инициализирована подсистема журналирования '
             f'(установлен уровень {self.log.globalLevel.name})')
-        self.log.setGlobalLogLevel(self.properties('logLevel', 'DEBUG'))
+        self.log.setGlobalLogLevel(self.config('logLevel', 'DEBUG'))
 
         self.cli = LeafyyConsole()
         self.logger.info('Инициализирована подсистема консоли')

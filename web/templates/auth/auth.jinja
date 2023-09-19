@@ -17,6 +17,13 @@
         <header class="block stretcher">
             <img src="/resources/banner.jpg" height="32">
         </header class="block stretcher">
+        <span style="display: none;" id="redirectAfter">
+        {% if redirectAfter %}
+        {{redirectAfter}}
+        {% else %}
+        /
+        {% endif %}
+        </span>
         <div class="block stretcher">
             <div class="bold grand">
                 Авторизация
@@ -49,6 +56,8 @@
             </div>
         </footer>
         <script src="/libraries/jquery.js"></script>
+        <script src="/libraries/js-cookie.js"></script>
         <script src="/leafyy.js"></script>
+        <script src="/auth.js"></script>
     </body>
 </html>

@@ -32,8 +32,8 @@ from .exceptions          import *
 
 
 ALGORITHM = 'HS384'
-ACCESS_TOKEN_EXPIRE_MINUTES = 30
-REFRESH_TOKEN_EXPIRE_DAYS = 30
+ACCESS_TOKEN_EXPIRATION_MINUTES = 30
+REFRESH_TOKEN_EXPIRATION_DAYS = 30
 SALT_MULTIPLIER = 381
 HMAC_ITERATIONS = 880738
 
@@ -278,9 +278,9 @@ class LeafyyWebInterface(LeafyyComponent):
         async def accessToken(form_data: Annotated[OAuth2PasswordRequestForm, Depends()]):
             try:
                 user = authenticateUser(form_data.username, form_data.password)
-                accessTokenExpires = timedelta(minutes = ACCESS_TOKEN_EXPIRE_MINUTES)
+                accessTokenExpires = timedelta(minutes = ACCESS_TOKEN_EXPIRATION_MINUTES)
                 accessToken = createAccessToken({"sub": user.username}, accessTokenExpires)
-                refreshTokenExpires = timedelta(days = REFRESH_TOKEN_EXPIRE_DAYS)
+                refreshTokenExpires = timedelta(days = REFRESH_TOKEN_EXPIRATION_DAYS)
                 refreshToken = createRefreshToken({"sub": user.username}, refreshTokenExpires)
                 return {'access_token': accessToken, 'refresh_token': refreshToken, 'token_type': 'bearer'}
             except Exception as e:
@@ -299,9 +299,9 @@ class LeafyyWebInterface(LeafyyComponent):
                 username: str = payload['sub']
                 tkd = TokenData(username = username)
                 selectUser(tkd.username)
-                accessTokenExpires = timedelta(minutes = ACCESS_TOKEN_EXPIRE_MINUTES)
+                accessTokenExpires = timedelta(minutes = ACCESS_TOKEN_EXPIRATION_MINUTES)
                 accessToken = createAccessToken({"sub": username}, accessTokenExpires)
-                refreshTokenExpires = timedelta(days = REFRESH_TOKEN_EXPIRE_DAYS)
+                refreshTokenExpires = timedelta(days = REFRESH_TOKEN_EXPIRATION_DAYS)
                 refreshToken = createRefreshToken({"sub": username}, refreshTokenExpires)
                 return {'access_token': accessToken, 'refresh_token': refreshToken, 'token_type': 'bearer'}
             except (UsernameNotFoundException, UserDisabledException, JWTError) as e:
