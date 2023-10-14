@@ -25,6 +25,10 @@ class LeafyyWebService(
 
         @self.exception_handler(HTTPException)
         def error(request: Request, exc: HTTPException) -> RedirectResponse | _TemplateResponse:
+            if (exc.status_code == 422):
+                print(422)
+                print(request.form())
+            
             #if (exc.status_code == 401):
             #    return RedirectResponse(
             #        '/auth',

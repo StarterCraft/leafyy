@@ -99,7 +99,7 @@ class LeafyyWebInterface(LeafyyComponent):
             '''
             Метод получает версию библиотеки из API и парсит её с помощью модуля versioning.
             '''
-            fetched = get(f'https://api.cdnjs.com/libraries/{libraryId}?fields=version').json()
+            fetched = get(f'https://api.cdnjs.com/libraries/{libraryId}?fields=version', timeout = 1).json()
             _version = fetched['version']
             return versioning.parse(_version)
 
@@ -122,7 +122,7 @@ class LeafyyWebInterface(LeafyyComponent):
             '''
             Метод получает новую версию библиотеки из API, сохраняет её в файл и возвращает её в виде строки.
             '''
-            fetched = get(f'https://api.cdnjs.com/libraries/{libraryId}?fields=latest,version', timeout = 3).json()
+            fetched = get(f'https://api.cdnjs.com/libraries/{libraryId}?fields=latest,version', timeout = 1).json()
             code = get(fetched['latest']).text
             version = fetched['version']
 
@@ -217,8 +217,9 @@ class LeafyyWebInterface(LeafyyComponent):
                 ) from e
 
         @self.api.post("/token", response_model = TokenPair)
-        async def accessToken(form_data: Annotated[OAuth2PasswordRequestForm, Depends()]):
+        def accessToken(form_data: Annotated[OAuth2PasswordRequestForm, Depends()]):
             try:
+                print(form_data.username, form_data.password)
                 return self.auth.getAccessToken(form_data)
             except Exception as e:
                 self.logger.error('При входе пользователя произошла следующая ошибка:',
@@ -251,6 +252,32 @@ class LeafyyWebInterface(LeafyyComponent):
                     detail = 'Недопустимый токен обновления',
                     headers = {"WWW-Authenticate": "Bearer"}
                 ) from e
+            
+        @self.api.post('/login', response_class = HTMLResponse,
+            name = 'Вход',
+            description = 'Служебный метод для входа в систему')
+        async def getLoginResult(request: Request, to: str, form_data: Annotated[OAuth2PasswordRequestForm, Depends()]) -> _TemplateResponse:
+            status = ''
+            try:
+                td = accessToken(form_data)
+                return self['login'].render(
+                    request,
+                    accessToken = td['access_token'],
+                    refreshToken = td['refresh_token'],
+                    redirectAfter = to
+                )
+            except UsernameNotFoundException as e:
+                status = f'Учётной записи пользователя <b>{e.username}</b> не нашлось.'
+            except UserDisabledException as e:
+                status = f'Учётная запись пользователя <b>{e.username}</b> отключена.'
+            except (UserPasswordException, KeyError, JWTError) as e:
+                status = f'Неверные данные учётной записи: имя пользователя или пароль.'
+            finally:
+                return self['auth'].render(
+                    request,
+                    statusMessage = status,
+                    version = str(version())
+                    )
 
         @self.api.get('/auth', response_class = HTMLResponse,
             name = 'Авторизация',

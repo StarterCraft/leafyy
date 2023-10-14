@@ -45,9 +45,9 @@
                 <a class="action" href="#" onclick="hideStatusBar()">скрыть</a>
             </div>
         </div>
-        <form class="block vertical" id="loginForm" action="/token">
-            <input type="text" id="username" class="forminp code bold grand" placeholder="имя пользователя...">
-            <input type="password" id="password" class="forminp code bold grand" placeholder="пароль...">
+        <form class="block vertical" id="loginForm" action="/login?to={% if redirectAfter %}{{redirectAfter}}{% else %}/{% endif %}" method="post">
+            <input type="text" name="username" id="username" class="forminp code bold grand" placeholder="имя пользователя...">
+            <input type="password" name="password" id="password" class="forminp code bold grand" placeholder="пароль...">
             <input type="submit" id="confirm" class="action code bold grand" value="Вход">
         </form>
         <footer class="block stretcher fixed-bottom">
