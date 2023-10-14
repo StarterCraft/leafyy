@@ -5,11 +5,10 @@ import os
 import inspect
 
 from webutils import formatExc
-from pydantic import PositiveFloat
 from colorama import Fore, Style
 from datetime import datetime
 
-from leafyy   import log, errors, properties
+from leafyy   import log, errors, config
 
 from .models  import Logger
 from .generic import LeafyyLogLevel

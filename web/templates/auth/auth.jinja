@@ -14,10 +14,14 @@
         <link rel="stylesheet" type="text/css" href="/leafyy.css">
     </head>
     <body>
+        <script src="/libraries/jquery.js"></script>
+        <script src="/libraries/js-cookie.js"></script>
+        <script src="/leafyy.js"></script>
+        <script src="/auth.js"></script>
         <header class="block stretcher">
             <img src="/resources/banner.jpg" height="32">
         </header class="block stretcher">
-        <span style="display: none;" id="redirectAfter">
+        <span class="hidden" id="redirectAfter">
         {% if redirectAfter %}
         {{redirectAfter}}
         {% else %}
@@ -41,8 +45,8 @@
                 <a class="action" href="#" onclick="hideStatusBar()">скрыть</a>
             </div>
         </div>
-        <form class="block vertical" id="loginForm">
-            <input type="text" id="login" class="forminp code bold grand" placeholder="имя пользователя...">
+        <form class="block vertical" id="loginForm" action="/token">
+            <input type="text" id="username" class="forminp code bold grand" placeholder="имя пользователя...">
             <input type="password" id="password" class="forminp code bold grand" placeholder="пароль...">
             <input type="submit" id="confirm" class="action code bold grand" value="Вход">
         </form>
@@ -55,9 +59,5 @@
             {{version}}
             </div>
         </footer>
-        <script src="/libraries/jquery.js"></script>
-        <script src="/libraries/js-cookie.js"></script>
-        <script src="/leafyy.js"></script>
-        <script src="/auth.js"></script>
     </body>
 </html>

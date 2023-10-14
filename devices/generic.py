@@ -2,7 +2,7 @@
 from PySide6 import QtCore
 from enum    import Enum
 
-from leafyy  import app, properties
+from leafyy  import config
 
 
 class LeafyyStatus(Enum):

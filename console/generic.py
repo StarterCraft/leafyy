@@ -32,6 +32,7 @@ class LeafyyConsoleCommands(
 
     def command(self,
         key: str,
+        arguments: list[str] = None,
         displayName: str = None,
         description: str = None
         ) -> Callable[[list[str]], None]:
@@ -45,7 +46,7 @@ class LeafyyConsoleCommands(
                         fn()
                 except Exception as e:
                     self.logger.error(f'Произошла ошибка при выполнении команды {key}: {formatExc(e)}')
-            c = Command(key = key, call = decorated, displayName = displayName, description = description)
+            c = Command(key = key, call = decorated, arguments = arguments, displayName = displayName, description = description)
             self.append(c)
 
             return decorated

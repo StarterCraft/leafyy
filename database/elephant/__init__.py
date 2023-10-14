@@ -11,7 +11,7 @@ from psycopg2.extras   import NamedTupleConnection, NamedTupleCursor
 
 from autils            import fread
 
-from leafyy            import properties
+from leafyy            import config
 
 
 class LeafyyPostgresDatabase(

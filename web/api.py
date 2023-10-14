@@ -26,22 +26,18 @@ from leafyy               import web, version
 from leafyy.generic       import LeafyyComponent
 from webutils             import JsResponse, CssResponse, formatExc
 
+from .auth                import LeafyyAuthentificator
 from .template            import Template
-from .models              import User, AccessibleUser, TokenPair, TokenData
+from .models              import User, AccessibleUser, TokenPair
 from .exceptions          import *
-
-
-ALGORITHM = 'HS384'
-ACCESS_TOKEN_EXPIRATION_MINUTES = 30
-REFRESH_TOKEN_EXPIRATION_DAYS = 30
-SALT_MULTIPLIER = 381
-HMAC_ITERATIONS = 880738
 
 
 class LeafyyWebInterface(LeafyyComponent):
     api = APIRouter(
         tags = ['ui']
     )
+
+    auth = LeafyyAuthentificator()
 
     def __init__(self) -> None:
         super().__init__('WebUi')
@@ -99,7 +95,7 @@ class LeafyyWebInterface(LeafyyComponent):
         async def getResource(resourceId: str) -> FileResponse:
             return f'web/resources/{resourceId}'
 
-        async def getWebLibraryVersion(libraryId: str) -> versioning.Version:
+        def getWebLibraryVersion(libraryId: str) -> versioning.Version:
             '''
             Метод получает версию библиотеки из API и парсит её с помощью модуля versioning.
             '''
@@ -107,7 +103,7 @@ class LeafyyWebInterface(LeafyyComponent):
             _version = fetched['version']
             return versioning.parse(_version)
 
-        async def getCachedLibraryVersion(libraryId: str) -> versioning.Version:
+        def getCachedLibraryVersion(libraryId: str) -> versioning.Version:
             '''
             Метод получает версию локальной копии библиотеки из файла, парсит её и возвращает.
             '''
@@ -122,11 +118,11 @@ class LeafyyWebInterface(LeafyyComponent):
 
         @self.api.get('/libraries/web/{libraryId}.js', response_class = JsResponse, tags = ['uiUtil'],
             name = 'Получить актуальную JS-библиотеку')
-        async def getWebLibrary(libraryId: str, request: Request) -> str:
+        def getWebLibrary(libraryId: str, request: Request) -> str:
             '''
             Метод получает новую версию библиотеки из API, сохраняет её в файл и возвращает её в виде строки.
             '''
-            fetched = get(f'https://api.cdnjs.com/libraries/{libraryId}?fields=latest,version').json()
+            fetched = get(f'https://api.cdnjs.com/libraries/{libraryId}?fields=latest,version', timeout = 3).json()
             code = get(fetched['latest']).text
             version = fetched['version']
 
@@ -143,7 +139,7 @@ class LeafyyWebInterface(LeafyyComponent):
 
         @self.api.get('/libraries/cache/{libraryId}.js', response_class = JsResponse, tags = ['uiUtil'],
             name = 'Получить кэшированную JS-библиотеку')
-        async def getCachedLibrary(libraryId: str, request: Request) -> str:
+        def getCachedLibrary(libraryId: str, request: Request) -> str:
             code = fread(f'web/libraries/{libraryId}.js')
             version = getCachedLibraryVersion(libraryId)
 
@@ -156,7 +152,7 @@ class LeafyyWebInterface(LeafyyComponent):
 
         @self.api.get('/libraries/{libraryId}.js', response_class = JsResponse, tags = ['uiUtil'],
             name = 'Получить JS-библиотеку')
-        async def getLibrary(libraryId: str, request: Request) -> str:
+        def getLibrary(libraryId: str, request: Request) -> str:
             '''
             Метод получает библиотеку для клиента из API или из локальной копии
             в зависимости от того, какая версия библиотеки актуальна. Если
@@ -191,58 +187,24 @@ class LeafyyWebInterface(LeafyyComponent):
         async def getFavicon() -> FileResponse:
             return f'web/resources/favicon.svg'
 
-        def getSalt() -> str:
-            return fread('web/upsalt.token').lower()
-
-        def checkPassword(username: str, plain: str, encoded: str) -> bool:
-            try:
-                h = pbkdf2_hmac(
-                    'sha384',
-                    plain.encode('utf-8'),
-                    getSalt().encode('utf-8') * SALT_MULTIPLIER,
-                    HMAC_ITERATIONS
-                    ).hex()
-                return h == encoded
-            except Exception as e:
-                self.logger.error('При входе пользователя, расшифровке пароля произошла следующая ошибка:',
-                    exc = e)
-                raise UserPasswordException(username) from e
-
-        def selectUser(username: str) -> AccessibleUser:
-            thisUser = postgres().fetchone('web.selectUser', username)
-
-            if (not thisUser):
-                raise UsernameNotFoundException(username)
-            elif (not thisUser.enabled):
-                raise UserDisabledException(username)
-            else:
-                return AccessibleUser(**thisUser._asdict())
-
-        def authenticateUser(username: str, password: str) -> AccessibleUser:
-            user = selectUser(username)
-            checkPassword(username, password, user.password)
-            return user
-
         async def getUser(token: Annotated[str, Depends(web().authBearer)]) -> AccessibleUser:
             try:
-                payload = jdec(token, getSalt(), algorithms = [ALGORITHM])
-                username: str = payload['sub']
-                tkd = TokenData(username = username)
-                return selectUser(tkd.username)
+                self.auth.resolveUser(token)
             except UsernameNotFoundException as e:
-                self.logger.error('При входе пользователя произошла следующая ошибка:',
+                self.logger.error(f'При входе пользователя {e.username} произошла следующая ошибка:',
                     exc = e)
                 raise HTTPException(
                     status_code = 401,
-                    detail = f'Пользователь с именем {username} не существует',
+                    detail = f'Пользователь с именем {e.username} не существует',
                     headers = {"WWW-Authenticate": "Bearer"}
                 ) from e
             except UserDisabledException as e:
-                self.logger.error('При входе пользователя произошла следующая ошибка:',
+                self.logger.error(f'При входе пользователя {e.username} произошла следующая ошибка:',
                     exc = e)
                 raise HTTPException(
                     status_code = 400,
-                    detail = 'Невозможно войти с этим именем пользователя',
+                    detail = f'Невозможно войти с именем пользователя {e.username},'
+                             'учётная запись недоступна',
                     headers = {"WWW-Authenticate": "Bearer"}
                 ) from e
             except (UserPasswordException, KeyError, JWTError) as e:
@@ -254,35 +216,10 @@ class LeafyyWebInterface(LeafyyComponent):
                     headers = {"WWW-Authenticate": "Bearer"}
                 ) from e
 
-        def createAccessToken(data: dict, expires: timedelta | None = None):
-            toEncode = data.copy()
-            if expires:
-                expire = datetime.utcnow() + expires
-            else:
-                expire = datetime.utcnow() + timedelta(minute = 5)
-            toEncode.update({"exp": expire})
-            encodedJwt = jenc(toEncode, getSalt(), algorith = ALGORITHM)
-            return encodedJwt
-
-        def createRefreshToken(data: dict, expires: timedelta | None = None):
-            toEncode = data.copy()
-            if expires:
-                expire = datetime.utcnow() + expires
-            else:
-                expire = datetime.utcnow() + timedelta(day = 0)
-            toEncode.update({"exp": expire})
-            encodedJwt = jenc(toEncode, getSalt(), algorith = ALGORITHM)
-            return encodedJwt
-
         @self.api.post("/token", response_model = TokenPair)
         async def accessToken(form_data: Annotated[OAuth2PasswordRequestForm, Depends()]):
             try:
-                user = authenticateUser(form_data.username, form_data.password)
-                accessTokenExpires = timedelta(minutes = ACCESS_TOKEN_EXPIRATION_MINUTES)
-                accessToken = createAccessToken({"sub": user.username}, accessTokenExpires)
-                refreshTokenExpires = timedelta(days = REFRESH_TOKEN_EXPIRATION_DAYS)
-                refreshToken = createRefreshToken({"sub": user.username}, refreshTokenExpires)
-                return {'access_token': accessToken, 'refresh_token': refreshToken, 'token_type': 'bearer'}
+                return self.auth.getAccessToken(form_data)
             except Exception as e:
                 self.logger.error('При входе пользователя произошла следующая ошибка:',
                     exc = e)
@@ -291,19 +228,21 @@ class LeafyyWebInterface(LeafyyComponent):
                     detail = 'Недопустимые учетные данные',
                     headers = {"WWW-Authenticate": "Bearer"}
                 ) from e
+            
+        @self.api.get('/token/verify')
+        async def verifyToken(token: str):
+            try:
+                self.auth.resolveUser(token, verifyOnly = True)
+                return {'verified': True}
+            except Exception as e:
+                self.logger.error('При проверке токена пользователя произошла следующая ошибка:',
+                    exc = e)
+                return {'verified': False}
 
-        @self.api.post("/token/refresh", response_model = TokenPair)
+        @self.api.post('/token/refresh', response_model = TokenPair)
         async def refreshToken(refresh_token: str):
             try:
-                payload = jdec(refresh_token, getSalt(), algorithms = [ALGORITHM])
-                username: str = payload['sub']
-                tkd = TokenData(username = username)
-                selectUser(tkd.username)
-                accessTokenExpires = timedelta(minutes = ACCESS_TOKEN_EXPIRATION_MINUTES)
-                accessToken = createAccessToken({"sub": username}, accessTokenExpires)
-                refreshTokenExpires = timedelta(days = REFRESH_TOKEN_EXPIRATION_DAYS)
-                refreshToken = createRefreshToken({"sub": username}, refreshTokenExpires)
-                return {'access_token': accessToken, 'refresh_token': refreshToken, 'token_type': 'bearer'}
+                return self.auth.getRefreshToken(refresh_token)
             except (UsernameNotFoundException, UserDisabledException, JWTError) as e:
                 self.logger.error('При обновлении токена произошла следующая ошибка:',
                     exc = e)
@@ -321,17 +260,31 @@ class LeafyyWebInterface(LeafyyComponent):
                 request,
                 version = str(version())
                 )
+        
+        @self.api.get('/account', response_class = HTMLResponse,
+            name = 'Аккаунт',
+            description = 'Отрисовывает страницу конкретного аккаунта.')
+        async def getSelfAccountPage(request: Request, user: Annotated[User, Depends(getUser)]) -> _TemplateResponse:
+            try:
+                return self['account'].render(
+                    request,
+                    user = user,
+                    version = str(version())
+                    )
+            except Exception as e:
+                print(e)
+                raise e
 
         @self.api.get('/account/{username}', response_class = HTMLResponse,
-            name = 'Авторизация',
-            description = 'Отрисовывает страницу авторизации.')
+            name = 'Аккаунт',
+            description = 'Отрисовывает страницу конкретного аккаунта.')
         async def getAccountPage(request: Request, user: Annotated[User, Depends(getUser)]) -> _TemplateResponse:
             return self['account'].render(
                 request,
                 user = user,
                 version = str(version())
                 )
-
+                
         @self.api.get('/', response_class = HTMLResponse,
             name = 'Главная страница',
             description = 'Отрисовывает главную страницу с информацией о грядках.')

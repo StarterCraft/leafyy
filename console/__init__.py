@@ -27,7 +27,7 @@ class LeafyyConsole(
 
     def mount(self, superKey: str, commands: LeafyyConsoleCommands):
         for key, cmd in commands:
-            self.append(cmd.copy({'key': f'{superKey}-{key}'}))
+            self.append(cmd.model_copy({'key': f'{superKey}-{key}'}))
 
     def assignClis(self):
         self.assignCli()

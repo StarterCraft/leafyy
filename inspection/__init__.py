@@ -24,6 +24,8 @@ class LeafyyLogging(
     def __init__(self) -> None:
         super().__init__()
 
+        self.lastMessageId = 0
+
         self.fileName = f'logs/Leafyy_{strftime("%d.%m.%Y_%H%M%S", localtime(app().startup))}.log'
 
         #Очищаем таблицу в базе данных для текущего журнала
@@ -74,7 +76,8 @@ class LeafyyLogging(
                 continue
 
     def record(self, time: datetime, logger: str, level: str, message: str) -> None:
-        postgres().insert('inspection.insertLog', (time, logger, level, message))
+        self.lastMessageId += 1
+        postgres().insert('inspection.insertLog', (self.lastMessageId, time, logger, level, message))
 
     def getLogRecords(self, begin: PositiveFloat = 1) -> list[tuple]:
         t = datetime.fromtimestamp(begin / 1000 if osname == 'nt' else begin)

@@ -3,14 +3,8 @@ from typing import overload
 from typing import Iterable, Any, Hashable, SupportsInt
 from cmd import Cmd
 from itertools import product
-from collections import Counter
-from random import randint, sample
-from time import time_ns as timer
-from datetime import timedelta
 from string import printable, ascii_uppercase
 from os import system
-
-cmd = Cmd()
 
 
 def cls() -> None:
@@ -67,8 +61,11 @@ def printl(arg: Iterable): ...
 @overload
 def printl(*arg: Any): ...
 def printl(*arg):
+    cmd = Cmd()
+
     if (len(arg) == 1):
         cmd.columnize([str(item) for item in arg[0]])
+        return
 
     cmd.columnize([str(item) for item in arg])
 
