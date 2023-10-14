@@ -28,11 +28,11 @@ class LeafyyWebService(
             if (exc.status_code == 422):
                 print(422)
                 print(request.form())
-            
+
             #if (exc.status_code == 401):
             #    return RedirectResponse(
             #        '/auth',
-            #        status_code = 307, 
+            #        status_code = 307,
             #        headers = {"WWW-Authenticate": "Bearer"})
 
             return app().ui['error'].render(

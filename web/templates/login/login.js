@@ -1,4 +1,4 @@
-function finishLogin() 
+function finishLogin()
 {
     var ACCESS = $("#X00").text();
     var REFRESH = $("#X01").text();

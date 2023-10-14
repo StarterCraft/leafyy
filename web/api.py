@@ -229,7 +229,7 @@ class LeafyyWebInterface(LeafyyComponent):
                     detail = 'Недопустимые учетные данные',
                     headers = {"WWW-Authenticate": "Bearer"}
                 ) from e
-            
+
         @self.api.get('/token/verify')
         async def verifyToken(token: str):
             try:
@@ -252,7 +252,7 @@ class LeafyyWebInterface(LeafyyComponent):
                     detail = 'Недопустимый токен обновления',
                     headers = {"WWW-Authenticate": "Bearer"}
                 ) from e
-            
+
         @self.api.post('/login', response_class = HTMLResponse,
             name = 'Вход',
             description = 'Служебный метод для входа в систему')
@@ -287,7 +287,7 @@ class LeafyyWebInterface(LeafyyComponent):
                 request,
                 version = str(version())
                 )
-        
+
         @self.api.get('/account', response_class = HTMLResponse,
             name = 'Аккаунт',
             description = 'Отрисовывает страницу конкретного аккаунта.')
@@ -311,7 +311,7 @@ class LeafyyWebInterface(LeafyyComponent):
                 user = user,
                 version = str(version())
                 )
-                
+
         @self.api.get('/', response_class = HTMLResponse,
             name = 'Главная страница',
             description = 'Отрисовывает главную страницу с информацией о грядках.')
