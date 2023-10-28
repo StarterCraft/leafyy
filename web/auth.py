@@ -79,25 +79,25 @@ class LeafyyAuthentificator:
 
     def resolveUser(self, token: str, verifyOnly: bool = False) -> AccessibleUser | None:
         payload = jwtdec(token, self.getSalt(), algorithms = [ALGORITHM])
-        if (datetime.now().timestamp() > payload['expires']):
+        if (datetime.utcnow().timestamp() > payload['expires']):
+            print(payload)
+            print(datetime.utcnow().timestamp() > payload['expires'], datetime.utcnow().timestamp(), payload['expires'])
+
             raise TokenExpirationException
         username: str = payload['user']
         return self.selectUser(username, verifyOnly = verifyOnly)
 
-    def createAccessToken(self, data: dict, expires: timedelta | None = None) -> str:
+    def createAccessToken(self, data: dict) -> str:
         toEncode = data.copy()
-        if expires:
-            expire = datetime.utcnow() + expires
-        else:
-            expire = datetime.utcnow() + timedelta(minutes = ACCESS_TOKEN_EXPIRATION_MINUTES)
+        expire = datetime.utcnow() + timedelta(minutes = ACCESS_TOKEN_EXPIRATION_MINUTES)
         toEncode.update({"expires": expire.timestamp()})
         encodedJwt = jwtenc(toEncode, self.getSalt(), algorithm = ALGORITHM)
         return encodedJwt
 
     def createRefreshToken(self, data: dict) -> str:
         toEncode = data.copy()
-        expire = datetime.utcnow() + timedelta(REFRESH_TOKEN_EXPIRATION_DAYS)
-        toEncode.update({"expires": expire.timestamp()})
+        expire = datetime.utcnow() + timedelta(days = REFRESH_TOKEN_EXPIRATION_DAYS)
+        toEncode.update({"refresh": True, "expires": expire.timestamp()})
         encodedJwt = jwtenc(toEncode, self.getSalt(), algorithm = ALGORITHM)
         return encodedJwt
 
@@ -109,8 +109,9 @@ class LeafyyAuthentificator:
 
     def getRefreshToken(self, refreshToken: str) -> TokenPair:
         payload = jwtdec(refreshToken, self.getSalt(), algorithms = [ALGORITHM])
-        if (datetime.now().timestamp() > payload['expires']):
-            raise TokenExpirationException
+        if (datetime.utcnow().timestamp() > payload['expires']):
+            print(datetime.utcnow().timestamp() > payload['expires'], datetime.utcnow().timestamp(), payload['expires'])
+            raise TokenExpirationException()
         username: str = payload['user']
         self.selectUser(username, verifyOnly = True)
         accessToken = self.createAccessToken({"sub": username})

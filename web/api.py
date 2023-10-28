@@ -6,7 +6,6 @@ from autils               import fread, fwrite
 from requests             import get
 from packaging            import version as versioning
 from re                   import findall
-from datetime             import datetime, timedelta
 
 from fastapi              import APIRouter, Request, Depends
 from fastapi.templating   import Jinja2Templates
@@ -15,16 +14,14 @@ from starlette.exceptions import HTTPException
 from fastapi.responses    import Response, HTMLResponse, FileResponse
 
 from fastapi.security     import OAuth2PasswordRequestForm
-from hashlib              import pbkdf2_hmac
 from jose                 import JWTError
-from jose.jwt             import encode as jenc, decode as jdec
 
 from leafyy               import devices as _devices
 from leafyy               import log as logging
-from leafyy               import errors, postgres
+from leafyy               import errors
 from leafyy               import web, version
 from leafyy.generic       import LeafyyComponent
-from webutils             import JsResponse, CssResponse, formatExc
+from webutils             import JsResponse, CssResponse
 
 from .auth                import LeafyyAuthentificator
 from .template            import Template
@@ -99,9 +96,15 @@ class LeafyyWebInterface(LeafyyComponent):
             '''
             Метод получает версию библиотеки из API и парсит её с помощью модуля versioning.
             '''
-            fetched = get(f'https://api.cdnjs.com/libraries/{libraryId}?fields=version', timeout = 1).json()
-            _version = fetched['version']
-            return versioning.parse(_version)
+            version = '0.0.1dev1'
+            
+            try:
+                fetched = get(f'https://api.cdnjs.com/libraries/{libraryId}?fields=version', timeout = 1).json()
+                version = fetched['version']
+            except KeyError:
+                pass
+
+            return versioning.parse(version)
 
         def getCachedLibraryVersion(libraryId: str) -> versioning.Version:
             '''
@@ -109,7 +112,7 @@ class LeafyyWebInterface(LeafyyComponent):
             '''
             code = fread(f'web/libraries/{libraryId}.js')
             regexMatch = findall(r'(v([0-9A-Za-z][.]{0,1})+)|$', code)[0]
-            version = 'undefined'
+            version = '0.0.1dev1'
 
             if (regexMatch[0]):
                 version = regexMatch[0][1:]
@@ -230,9 +233,10 @@ class LeafyyWebInterface(LeafyyComponent):
                     headers = {"WWW-Authenticate": "Bearer"}
                 ) from e
 
-        @self.api.get('/token/verify')
+        @self.api.post('/token/verify')
         async def verifyToken(token: str):
             try:
+                self.logger.info('received ' + token)
                 self.auth.resolveUser(token, verifyOnly = True)
                 return {'verified': True}
             except Exception as e:
@@ -253,38 +257,67 @@ class LeafyyWebInterface(LeafyyComponent):
                     headers = {"WWW-Authenticate": "Bearer"}
                 ) from e
 
-        @self.api.post('/login', response_class = HTMLResponse,
+        @self.api.get('/auth', response_class = HTMLResponse,
+            name = 'Авторизация',
+            description = 'Пытается авторизовать пользователя по токену.')
+        async def getAuthentication(request: Request, to: str) -> _TemplateResponse:
+            return self['auth'].render(
+                request,
+                redirectAfter = to,
+                version = str(version())
+                )
+        
+        @self.api.post('/auth/finish', response_class = HTMLResponse,
             name = 'Вход',
-            description = 'Служебный метод для входа в систему')
+            description = 'Позволяет веб-интерфейсу записать токен в куки.')
         async def getLoginResult(request: Request, to: str, form_data: Annotated[OAuth2PasswordRequestForm, Depends()]) -> _TemplateResponse:
             status = ''
             try:
                 td = accessToken(form_data)
-                return self['login'].render(
+                return self['authFinish'].render(
                     request,
                     accessToken = td['access_token'],
                     refreshToken = td['refresh_token'],
                     redirectAfter = to
                 )
+            
             except UsernameNotFoundException as e:
                 status = f'Учётной записи пользователя <b>{e.username}</b> не нашлось.'
-            except UserDisabledException as e:
-                status = f'Учётная запись пользователя <b>{e.username}</b> отключена.'
-            except (UserPasswordException, KeyError, JWTError) as e:
-                status = f'Неверные данные учётной записи: имя пользователя или пароль.'
-            finally:
-                return self['auth'].render(
+                
+                return self['authLogin'].render(
                     request,
                     statusMessage = status,
+                    redirectAfter = to,
                     version = str(version())
                     )
+            
+            except UserDisabledException as e:
+                status = f'Учётная запись пользователя <b>{e.username}</b> отключена.'
 
-        @self.api.get('/auth', response_class = HTMLResponse,
+                return self['authLogin'].render(
+                    request,
+                    statusMessage = status,
+                    redirectAfter = to,
+                    version = str(version())
+                    )
+            
+            except (UserPasswordException, KeyError, JWTError) as e:
+                status = f'Неверные данные учётной записи: имя пользователя или пароль.'
+                
+                return self['authLogin'].render(
+                    request,
+                    statusMessage = status,
+                    redirectAfter = to,
+                    version = str(version())
+                    )
+            
+        @self.api.get('/auth/login', response_class = HTMLResponse,
             name = 'Авторизация',
             description = 'Отрисовывает страницу авторизации.')
-        async def getAuthPage(request: Request) -> _TemplateResponse:
-            return self['auth'].render(
+        async def getAuthPage(request: Request, to: str) -> _TemplateResponse:
+            return self['authLogin'].render(
                 request,
+                redirectAfter = to,
                 version = str(version())
                 )
 
@@ -292,15 +325,11 @@ class LeafyyWebInterface(LeafyyComponent):
             name = 'Аккаунт',
             description = 'Отрисовывает страницу конкретного аккаунта.')
         async def getSelfAccountPage(request: Request, user: Annotated[User, Depends(getUser)]) -> _TemplateResponse:
-            try:
-                return self['account'].render(
-                    request,
-                    user = user,
-                    version = str(version())
-                    )
-            except Exception as e:
-                print(e)
-                raise e
+            return self['account'].render(
+                request,
+                user = user,
+                version = str(version())
+                )
 
         @self.api.get('/account/{username}', response_class = HTMLResponse,
             name = 'Аккаунт',
@@ -316,10 +345,17 @@ class LeafyyWebInterface(LeafyyComponent):
             name = 'Главная страница',
             description = 'Отрисовывает главную страницу с информацией о грядках.')
         async def getIndexPage(request: Request, user: Annotated[User, Depends(getUser)]) -> _TemplateResponse:
+            if (not request.headers.get('WWW-Authenticate')):
+                return self['authLogin'].render(
+                    request,
+                    redirectAfter = '/',
+                    version = str(version())
+                    )
+            
             return self['index'].render(
                 request,
                 version = str(version()),
-                user = user,
+                user = User(username='None', warden=True, ruler=True, enabled=True),
                 devices = _devices().model(),
                 errors = errors().format()
             )
@@ -392,3 +428,4 @@ class LeafyyWebInterface(LeafyyComponent):
                 )
 
         web().include_router(self.api)
+        

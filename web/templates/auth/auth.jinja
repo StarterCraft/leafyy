@@ -2,7 +2,7 @@
 <html>
     <head>
         <title>
-            Листочек: авторизация
+            Листочек: авторизация...
         </title>
         <link rel="apple-touch-icon" sizes="180x180" href="/resources/apple-touch-icon.png">
         <link rel="icon" type="image/svg+xml" href="/resources/favicon.svg">
@@ -14,50 +14,10 @@
         <link rel="stylesheet" type="text/css" href="/leafyy.css">
     </head>
     <body>
+        <span class="hidden" id="redirectAfter">{{redirectAfter}}</span>
         <script src="/libraries/jquery.js"></script>
         <script src="/libraries/js-cookie.js"></script>
-        <script src="/leafyy.js"></script>
+        <script src="/libraries/leafyy-get-cookie.js"></script>
         <script src="/auth.js"></script>
-        <header class="block stretcher">
-            <img src="/resources/banner.jpg" height="32">
-        </header class="block stretcher">
-        <span class="hidden" id="redirectAfter">
-        {% if redirectAfter %}
-        {{redirectAfter}}
-        {% else %}
-        /
-        {% endif %}
-        </span>
-        <div class="block stretcher">
-            <div class="bold grand">
-                Авторизация
-            </div>
-        </div>
-        <div class="block stretcher status-bar" style="display: none;">
-            <div id="status">
-                {% if statusMessage %}
-                {{statusMessage}}
-                {% else %}
-                Выполни вход, чтобы начать взаимодействовать с Листочком.
-                {% endif %}
-            </div>
-            <div>
-                <a class="action" href="#" onclick="hideStatusBar()">скрыть</a>
-            </div>
-        </div>
-        <form class="block vertical" id="loginForm" action="/login?to={% if redirectAfter %}{{redirectAfter}}{% else %}/{% endif %}" method="post">
-            <input type="text" name="username" id="username" class="forminp code bold grand" placeholder="имя пользователя...">
-            <input type="password" name="password" id="password" class="forminp code bold grand" placeholder="пароль...">
-            <input type="submit" id="confirm" class="action code bold grand" value="Вход">
-        </form>
-        <footer class="block stretcher fixed-bottom">
-            <div>
-            Листочек, система автоматического контроля растений.
-            2023 год. Никакие права не защищены.
-            </div>
-            <div>
-            {{version}}
-            </div>
-        </footer>
     </body>
 </html>
