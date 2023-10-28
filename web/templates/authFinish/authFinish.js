@@ -1,5 +1,5 @@
 function finishAuth()
-{    
+{
     var ACCESS = $("#X00").text();
     var REFRESH = $("#X01").text();
 
