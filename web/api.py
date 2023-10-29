@@ -97,7 +97,7 @@ class LeafyyWebInterface(LeafyyComponent):
             Метод получает версию библиотеки из API и парсит её с помощью модуля versioning.
             '''
             version = '0.0.1dev1'
-            
+
             try:
                 fetched = get(f'https://api.cdnjs.com/libraries/{libraryId}?fields=version', timeout = 1).json()
                 version = fetched['version']
@@ -266,7 +266,7 @@ class LeafyyWebInterface(LeafyyComponent):
                 redirectAfter = to,
                 version = str(version())
                 )
-        
+
         @self.api.post('/auth/finish', response_class = HTMLResponse,
             name = 'Вход',
             description = 'Позволяет веб-интерфейсу записать токен в куки.')
@@ -280,17 +280,17 @@ class LeafyyWebInterface(LeafyyComponent):
                     refreshToken = td['refresh_token'],
                     redirectAfter = to
                 )
-            
+
             except UsernameNotFoundException as e:
                 status = f'Учётной записи пользователя <b>{e.username}</b> не нашлось.'
-                
+
                 return self['authLogin'].render(
                     request,
                     statusMessage = status,
                     redirectAfter = to,
                     version = str(version())
                     )
-            
+
             except UserDisabledException as e:
                 status = f'Учётная запись пользователя <b>{e.username}</b> отключена.'
 
@@ -300,17 +300,17 @@ class LeafyyWebInterface(LeafyyComponent):
                     redirectAfter = to,
                     version = str(version())
                     )
-            
+
             except (UserPasswordException, KeyError, JWTError) as e:
                 status = f'Неверные данные учётной записи: имя пользователя или пароль.'
-                
+
                 return self['authLogin'].render(
                     request,
                     statusMessage = status,
                     redirectAfter = to,
                     version = str(version())
                     )
-            
+
         @self.api.get('/auth/login', response_class = HTMLResponse,
             name = 'Авторизация',
             description = 'Отрисовывает страницу авторизации.')
@@ -422,4 +422,4 @@ class LeafyyWebInterface(LeafyyComponent):
                 )
 
         web().include_router(self.api)
-        
+
