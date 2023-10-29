@@ -10,8 +10,8 @@ class Command(BaseModel):
     displayName: Optional[str]
     description: Optional[str]
 
-    def __call__(self, a: list[str]) -> None:
-        self.call(a)
+    def __call__(self, *args: str) -> None:
+        self.call(args)
 
 class Order(BaseModel):
     target: str

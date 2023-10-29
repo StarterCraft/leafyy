@@ -24,12 +24,12 @@
                 <a class="action" href="/doc">справка</a>
                 <a class="action" href="/account" id="account">👤 {{user.username}}</a>
             </nav>
-        </header class="block stretcher">
+        </header>
         <div class="block stretcher">
             <div class="bold grand">
                 {{user.username}}
                 <span class="italic">
-                {% if user.ruler %}
+                {% if user.master %}
                 (господин системы)
                 {% elif user.warden %}
                 (смотритель)
@@ -49,7 +49,7 @@
                 <input class="forminp code" type="password" id="passwordField0" placeholder="Повторите пароль...">
                 <button class="code formi" id="changePasswordConfirm" onclick="onChangePasswordConfirm()">Применить</button>
             </div>
-            {% if user.warden or user.ruler %}
+            {% if user.warden or user.master %}
             <div class="block vertical" id="accounts">
                 <span class="bold">
                     Учётные записи
@@ -57,7 +57,7 @@
                 <div class="view vertical">
                     {% for account in accounts %}
                     {% if account.username != user.username %}
-                    {% if account.warden and user.ruler %}
+                    {% if account.warden and user.master %}
                     <div class="stretcher">
                         <span>
                             {{account.username}}
@@ -74,7 +74,7 @@
                                 onclick="deleteAccount('{{account.username}}')">удалить</a>
                         </div>
                     </div>
-                    {% elif not account.warden and user.ruler %}
+                    {% elif not account.warden and user.master %}
                     <div class="stretcher">
                         <span>
                             {{account.username}}

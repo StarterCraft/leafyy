@@ -12,7 +12,7 @@ class LeafyyConsoleCommands(
     commands: dict[str, Command] = {}
 
     def __getitem__(self, key: str) -> Command:
-            return self.commands[key]
+        return self.commands[key]
 
     def __iter__(self) -> Iterator[tuple[str, Command]]:
         return iter(self.commands.items())
@@ -22,9 +22,9 @@ class LeafyyConsoleCommands(
 
     def model(self) -> list[tuple[str, Command]]:
         output = []
-        output.append(('help', self['help']))
-        output.extend(sorted([c for c in self.commands.items() if len(c[0].split()) == 1 and c[0] != 'help'], key = lambda c: c[0]))
-        output.extend(sorted([c for c in self.commands.items() if len(c[0].split()) > 1 and c[0] != 'help'], key = lambda c: c[0]))
+        output.append(('Help', self['Help']))
+        output.extend(sorted([c for c in self.commands.items() if len(c[0].split()) == 1 and c[0] != 'Help'], key = lambda c: c[0]))
+        output.extend(sorted([c for c in self.commands.items() if len(c[0].split()) > 1 and c[0] != 'Help'], key = lambda c: c[0]))
         return output
 
     def append(self, command: Command):

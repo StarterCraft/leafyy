@@ -10,6 +10,9 @@ function prepareIt() {
     if ($(document).height() > $(window).height()) {
         $("footer").removeClass("fixed-bottom");
     }
+
+    $(document).prop("title", $("span.hidden#title").text());
+    $("span.hidden#title").remove();
 }
 
 $(document).ready(prepareIt);

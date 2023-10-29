@@ -35,10 +35,11 @@ class LeafyyConsole(
     def format(self) -> list[str]:
         desc = ['Доступные команды:']
 
-        for command in self.model():
+        for name, command in self.model():
+            print(name, ':', command.description, command.arguments, command.call)
             desc.append('{:<10}| {}'.format(
-                f'{command[0]} ' +
-                " ".join(command[1].arguments) if command[1].arguments else "",
-                command[1].description))
+                f'{name} ' +
+                " ".join(command.arguments) if command.arguments else "",
+                command.description))
 
         return desc

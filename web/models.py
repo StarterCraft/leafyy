@@ -6,7 +6,7 @@ class User(BaseModel):
     username: str
     enabled:  bool
     warden:   bool
-    ruler:    bool
+    master:    bool
 
 class AccessibleUser(User):
     password: str
@@ -17,6 +17,9 @@ class AccessibleUser(User):
         to_upper = True,
         pattern = r'\b[A-Fa-f0-9]{96}\b'
         )
+    
+class TokenString(BaseModel):
+    token: constr(strip_whitespace = True)
 
 class TokenPair(BaseModel):
     access_token:  str

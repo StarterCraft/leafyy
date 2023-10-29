@@ -1,3 +1,10 @@
+function injectContent(response) {
+    var redir = $("#redirectAfter").text();
+
+    $("body").html(response);
+    window.history.pushState({}, "Листочек", redir);
+}
+
 let refreshingRst = false;
 
 function finishVerificationFinale(data) {
@@ -35,7 +42,13 @@ function finishVerification(data) {
         }
     }
     else {
-        window.location.replace($("#redirectAfter").text() + "?token=" + getCookie("X00"))
+        $("#loading").text("Загрузка...");
+        $.ajax({
+            type: "GET",
+            url: $("#redirectAfter").text(),
+            headers: {"Authorization": "Bearer " + getCookie("X00", null)},
+            success: injectContent
+        });
     }
 }
 
@@ -44,9 +57,10 @@ function verifyToken() {
     if (token)
         $.ajax({
             //убрать это уродство! использовать здесь тело запроса!
-            url: "/token/verify?token=" + token,
+            url: "/token/verify",
             method: "POST",
-            //data: {token: token},
+            contentType: "application/json",
+            data: JSON.stringify({"token": token}),
             success: finishVerification,
             error: function(error) {
                 console.error('Error:', error);
@@ -57,4 +71,4 @@ function verifyToken() {
     }
 }
 
-$(document).ready(verifyToken());
+$(document).ready(verifyToken);

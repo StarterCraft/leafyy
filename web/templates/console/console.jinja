@@ -1,208 +1,192 @@
-<!DOCTYPE html>
-<html>
-    <head>
-        <title>
-            Листочек: журнал и консоль
-        </title>
-        <link rel="apple-touch-icon" sizes="180x180" href="/resources/apple-touch-icon.png">
-        <link rel="icon" type="image/svg+xml" href="/resources/favicon.svg">
-        <link rel="icon" type="image/png" href="/resources/favicon.png">
-        <link rel="manifest" href="/site.webmanifest">
-        <link rel="mask-icon" href="/resources/safari-pinned-tab.svg" color="#5bbad5">
-        <meta charset="utf-8">
-        <meta name="msapplication-TileColor" content="#fff3b4">
-        <meta name="theme-color" content="#fff3b4">
-        <link rel="stylesheet" type="text/css" href="/leafyy.css">
-    </head>
-    <body>
-        <header class="block stretcher">
-            <img src="/resources/banner.jpg" height="32">
-            <nav class="actionblock">
-                <a class="action" href="/">домой</a>
-                <a class="action" href="/rules">правила</a>
-                <a class="action" href="/devices">устройства</a>
-                <a class="action" href="/log">консоль</a>
-                <a class="action" href="/doc">справка</a>
-                <a class="action" href="/account" id="account">👤 {{user.username}}</a>
-            </nav>
-        </header class="block stretcher">
-        <div class="block stretcher">
-            <div class="bold grand">
-                Журнал и консоль
-            </div>
-            <nav class="actionblock">
-                <a class="action" href="#" onclick="onOpenSettings()">настройки</a>
-                <a class="action" href="#" onclick="onManualUpdateConsoleData()">обновить</a>
-                <a class="action" href="#" onclick="onFlushConsole()">очистить</a>
-                <a class="action" href="/log/view">к журналу</a>
-            </nav>
+<body>
+    <span class="hidden" id="title">Листочек: журнал и консоль</span>
+    <header class="block stretcher">
+        <img src="/resources/banner.jpg" height="32">
+        <nav class="actionblock">
+            <a class="action" href="/">домой</a>
+            <a class="action" href="/rules">правила</a>
+            <a class="action" href="/devices">устройства</a>
+            <a class="action" href="/log">консоль</a>
+            <a class="action" href="/doc">справка</a>
+            <a class="action" href="/account" id="account">👤 {{user.username}}</a>
+        </nav>
+    </header>
+    <div class="block stretcher">
+        <div class="bold grand">
+            Журнал и консоль
         </div>
-        <!--#region modals-->
-        <div class="modal-field vertical">
-            <!--#region log-settings-->
-            <div class="modal vertical" id="log-settings">
-                <div class="block stretcher">
-                    <div class="bold grand">
-                        Настройки консоли
-                    </div>
-                    <nav class="actionblock">
-                        <a class="action" href="#" onclick="onSaveSettings()">применить</a> <!-- автообновление! -->
-                        <a class="action" href="#" onclick="toggleModal('log-settings')">отмена</a>
-                    </nav>
+        <nav class="actionblock">
+            <a class="action" href="#" onclick="onOpenSettings()">настройки</a>
+            <a class="action" href="#" onclick="onManualUpdateConsoleData()">обновить</a>
+            <a class="action" href="#" onclick="onFlushConsole()">очистить</a>
+            <a class="action" href="/log/view">к журналу</a>
+        </nav>
+    </div>
+    <!--#region modals-->
+    <div class="modal-field vertical">
+        <!--#region log-settings-->
+        <div class="modal vertical" id="log-settings">
+            <div class="block stretcher">
+                <div class="bold grand">
+                    Настройки консоли
                 </div>
-                <div class="block vertical restricted">
-                    <div class="stretcher">
-                        <span class="bold grand">Уровень журнала</span>
-                        <select class="formi code grand log-level" id="global" onchange="onLogLevelSelectChange('global')">
-                            <option value="DEBUG" style="color: gray;">DEBUG</option>
-                            <option value="INFO" style="color: blue;">INFO</option>
-                            <option value="WARNING" style="color: orange;">WARNING</option>
-                            <option value="ERROR" style="color: red;">ERROR</option>
-                            <option value="EXCEPTION" style="color: darkred;">EXCEPTION</option>
-                        </select>
-                    </div>
-                    <div class="stretcher" onclick="toggleCheckbox('consoleAutoScroll');">
-                        <div class="bold grand">Автопрокрутка</div>
-                        <input id="consoleAutoScroll" type="checkbox">
+                <nav class="actionblock">
+                    <a class="action" href="#" onclick="onSaveSettings()">применить</a> <!-- автообновление! -->
+                    <a class="action" href="#" onclick="toggleModal('log-settings')">отмена</a>
+                </nav>
+            </div>
+            <div class="block vertical restricted">
+                <div class="stretcher">
+                    <span class="bold grand">Уровень журнала</span>
+                    <select class="formi code grand log-level" id="global" onchange="onLogLevelSelectChange('global')">
+                        <option value="DEBUG" style="color: gray;">DEBUG</option>
+                        <option value="INFO" style="color: blue;">INFO</option>
+                        <option value="WARNING" style="color: orange;">WARNING</option>
+                        <option value="ERROR" style="color: red;">ERROR</option>
+                        <option value="EXCEPTION" style="color: darkred;">EXCEPTION</option>
+                    </select>
+                </div>
+                <div class="stretcher" onclick="toggleCheckbox('consoleAutoScroll');">
+                    <div class="bold grand">Автопрокрутка</div>
+                    <input id="consoleAutoScroll" type="checkbox">
+                </div>
+            </div>
+            <div class="block vertical">
+                <div class="stretcher" onclick="toggleCheckbox('consoleShouldUpdate');">
+                    <div class="bold grand">Автообновление консоли</div>
+                    <input id="consoleShouldUpdate" type="checkbox">
+                </div>
+                <div class="stretcher">
+                    <span>Минимальная частота:</span>
+                    <div>
+                        <input class="formi" id="minConsoleUpdatePeriod" type="number" min="1" max="3600">
+                        <label for="minConsoleUpdatePeriod">секунд</label>
                     </div>
                 </div>
-                <div class="block vertical">
-                    <div class="stretcher" onclick="toggleCheckbox('consoleShouldUpdate');">
-                        <div class="bold grand">Автообновление консоли</div>
-                        <input id="consoleShouldUpdate" type="checkbox">
-                    </div>
-                    <div class="stretcher">
-                        <span>Минимальная частота:</span>
-                        <div>
-                            <input class="formi" id="minConsoleUpdatePeriod" type="number" min="1" max="3600">
-                            <label for="minConsoleUpdatePeriod">секунд</label>
-                        </div>
-                    </div>
-                    <div class="stretcher">
-                        <span>Максимальная частота:</span>
-                        <div>
-                            <input class="formi" id="maxConsoleUpdatePeriod" type="number" min="1" max="3600">
-                            <label for="maxConsoleUpdatePeriod">секунд</label>
-                        </div>
+                <div class="stretcher">
+                    <span>Максимальная частота:</span>
+                    <div>
+                        <input class="formi" id="maxConsoleUpdatePeriod" type="number" min="1" max="3600">
+                        <label for="maxConsoleUpdatePeriod">секунд</label>
                     </div>
                 </div>
-                <div class="block vertical">
-                    <div class="bold grand">
-                        Настройки журнала
-                    </div>
-                    <div class="line-view evenly row-gap column-gap">
-                        <span class="bold">
-                            Каналы журналирования:
-                        </span>
-                        <span class="bold">
-                            Сообщения с устройств:
-                        </span>
-                        <div class="view vertical" id="loggersBlacklist">
-                            {% if logConfig.loggers %}
-                            {% for logger in logConfig.loggers %}
-                            <div class="stretcher">
-                                <div>
-                                    <input type="checkbox" id="{{logger.name}}" checked="{{logger.live}}">
-                                    <label for="{{logger.name}}">{{logger.name}}</label>
-                                </div>
-                                <div>
-                                <span>Уровень логгера:</span>
-                                <select class="formi code log-level" id="{{logger.name}}"
-                                    selected="{{logger.level}}" onchange="onLogLevelSelectChange('{{logger.name}}')">
-                                    <option value="DEBUG" style="color: gray;">DEBUG</option>
-                                    <option value="INFO" style="color: blue;">INFO</option>
-                                    <option value="WARNING" style="color: orange;">WARNING</option>
-                                    <option value="ERROR" style="color: red;">ERROR</option>
-                                    <option value="EXCEPTION" style="color: darkred;">EXCEPTION</option>
-                                </select>
-                                </div>
+            </div>
+            <div class="block vertical">
+                <div class="bold grand">
+                    Настройки журнала
+                </div>
+                <div class="line-view evenly row-gap column-gap">
+                    <span class="bold">
+                        Каналы журналирования:
+                    </span>
+                    <span class="bold">
+                        Сообщения с устройств:
+                    </span>
+                    <div class="view vertical" id="loggersBlacklist">
+                        {% if logConfig.loggers %}
+                        {% for logger in logConfig.loggers %}
+                        <div class="stretcher">
+                            <div>
+                                <input type="checkbox" id="{{logger.name}}" checked="{{logger.live}}">
+                                <label for="{{logger.name}}">{{logger.name}}</label>
                             </div>
-                            {% endfor %}
-                            {% else %}
-                            <div></div>
-                            <span>Нет каналов.</span>
-                            {% endif %}
-                        </div>
-                        <div class="view vertical" id="devicesBlacklist">
-                            {% if devices.devices %}
-                            {% for device in devices.devices %}
-                            <div class="stretcher">
-                                <div>
-                                    <input type="checkbox" id="{{device.address}}" checked="{{device.visibleInConsole}}">
-                                    <label for="{{device.address}}">{{device.displayName}}
-                                <span class="bold code"> @{{device.address}} </span></label>
-                                </div>
-                                <div>
-                                <span>Режим декодирования:</span>
-                                <select class="formi code decode-mode" id="{{device.address}}" selected="{{device.decodeMode}}">
-                                    <option value="ascii">ASCII</option>
-                                    <option value="bin">BIN</option>
-                                    <option value="oct">OCT</option>
-                                    <option value="dec">DEC</option>
-                                    <option value="hex">HEX</option>
-                                </select>
-                                </div>
+                            <div>
+                            <span>Уровень логгера:</span>
+                            <select class="formi code log-level" id="{{logger.name}}"
+                                selected="{{logger.level}}" onchange="onLogLevelSelectChange('{{logger.name}}')">
+                                <option value="DEBUG" style="color: gray;">DEBUG</option>
+                                <option value="INFO" style="color: blue;">INFO</option>
+                                <option value="WARNING" style="color: orange;">WARNING</option>
+                                <option value="ERROR" style="color: red;">ERROR</option>
+                                <option value="EXCEPTION" style="color: darkred;">EXCEPTION</option>
+                            </select>
                             </div>
-                            {% endfor %}
-                            {% else %}
-                            <div></div>
-                            <span>Нет устройств.</span>
-                            {% endif %}
                         </div>
+                        {% endfor %}
+                        {% else %}
+                        <div></div>
+                        <span>Нет каналов.</span>
+                        {% endif %}
+                    </div>
+                    <div class="view vertical" id="devicesBlacklist">
+                        {% if devices.devices %}
+                        {% for device in devices.devices %}
+                        <div class="stretcher">
+                            <div>
+                                <input type="checkbox" id="{{device.address}}" checked="{{device.visibleInConsole}}">
+                                <label for="{{device.address}}">{{device.displayName}}
+                            <span class="bold code"> @{{device.address}} </span></label>
+                            </div>
+                            <div>
+                            <span>Режим декодирования:</span>
+                            <select class="formi code decode-mode" id="{{device.address}}" selected="{{device.decodeMode}}">
+                                <option value="ascii">ASCII</option>
+                                <option value="bin">BIN</option>
+                                <option value="oct">OCT</option>
+                                <option value="dec">DEC</option>
+                                <option value="hex">HEX</option>
+                            </select>
+                            </div>
+                        </div>
+                        {% endfor %}
+                        {% else %}
+                        <div></div>
+                        <span>Нет устройств.</span>
+                        {% endif %}
                     </div>
                 </div>
             </div>
         </div>
+    </div>
+    </div>
+    <!-- #endregion -->
+    </div>
+    <!-- #endregion -->
+    <!-- #region primary -->
+    <div class="block maxheight">
+        <div class="code line-view vertical" id="view">
+            {% for line in console %}
+            <div class="log-lineno">
+                {{loop.index}}
+            </div>
+            <div class="log-message">
+                {{line|safe}}
+            </div>
+            {% endfor %}
         </div>
-        <!-- #endregion -->
+    </div>
+    <div class="block stretcher status-bar" style="display: none;">
+        <div id="status"></div>
+        <div>
+            <a class="action" href="#" onclick="hideStatusBar()">скрыть</a>
         </div>
-        <!-- #endregion -->
-        <!-- #region primary -->
-        <div class="block maxheight">
-            <div class="code line-view vertical" id="view">
-                {% for line in console %}
-                <div class="log-lineno">
-                    {{loop.index}}
-                </div>
-                <div class="log-message">
-                    {{line|safe}}
-                </div>
+    </div>
+    {% if user.warden or user.master %}
+    <div class="block">
+        <div id="console" style="display: contents;">
+            <select class="code formi" id="target" onchange="onConsoleTargetSelected()">
+                <option value="server">Сервер</option>
+                {% for device in devices.devices %}
+                {% if device.status == 1 %}
+                <option value="{{device.address}}">{{device.address}}</option>
+                {% endif %}
                 {% endfor %}
-            </div>
+            </select>
+            <input class="code formi maxwidth" type="text" id="data" onkeydown="onConsoleInputKeyDown(event)">
+            <select class="code formi" id="type" onchange="onConsoleInputTypeSelected()">
+                <option value="ascii">ASCII</option>
+                <option value="bin">BIN</option>
+                <option value="oct">OCT</option>
+                <option value="dec">DEC</option>
+                <option value="hex">HEX</option>
+            </select>
+            <button class="code formi" id="consoleSend" onclick="onConsoleSend()">Отправить</button>
         </div>
-        <div class="block stretcher status-bar" style="display: none;">
-            <div id="status"></div>
-            <div>
-                <a class="action" href="#" onclick="hideStatusBar()">скрыть</a>
-            </div>
-        </div>
-        {% if user.warden or user.ruler %}
-        <div class="block">
-            <div id="console" style="display: contents;">
-                <select class="code formi" id="target" onchange="onConsoleTargetSelected()">
-                    <option value="server">Сервер</option>
-                    {% for device in devices.devices %}
-                    {% if device.status == 1 %}
-                    <option value="{{device.address}}">{{device.address}}</option>
-                    {% endif %}
-                    {% endfor %}
-                </select>
-                <input class="code formi maxwidth" type="text" id="data" onkeydown="onConsoleInputKeyDown(event)">
-                <select class="code formi" id="type" onchange="onConsoleInputTypeSelected()">
-                    <option value="ascii">ASCII</option>
-                    <option value="bin">BIN</option>
-                    <option value="oct">OCT</option>
-                    <option value="dec">DEC</option>
-                    <option value="hex">HEX</option>
-                </select>
-                <button class="code formi" id="consoleSend" onclick="onConsoleSend()">Отправить</button>
-            </div>
-        </div>
-        {% endif %}
-        <!-- #endregion -->
-        <script src="/libraries/jquery.js"></script>
-        <script src="/libraries/js-cookie.js"></script>
-        <script src="/leafyy.js"></script>
-        <script src="/console.js"></script>
-    </body>
-</html>
+    </div>
+    {% endif %}
+    <!-- #endregion -->
+    <script src="/libraries/jquery.js"></script>
+    <script src="/libraries/js-cookie.js"></script>
+    <script src="/leafyy.js"></script>
+    <script src="/console.js"></script>
+</body>

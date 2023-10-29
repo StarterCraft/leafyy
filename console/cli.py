@@ -6,13 +6,13 @@ from leafyy          import app
 
 class LeafyyConsoleCli:
     def assignCli(self):
-        @self.command('help',
+        @self.command('Help',
             displayName = 'Помощь',
             description = 'Отобразить сообщение о помощи')
         def help():
             self.logger.info('\n' + '\n'.join(self.format()))
 
-        @self.command('exit',
+        @self.command('Exit',
             displayName = 'Остановить службу',
             description = 'Завершить работу службы')
         def exit():

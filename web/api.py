@@ -25,7 +25,7 @@ from webutils             import JsResponse, CssResponse
 
 from .auth                import LeafyyAuthentificator
 from .template            import Template
-from .models              import User, AccessibleUser, TokenPair
+from .models              import User, AccessibleUser, TokenString, TokenPair
 from .exceptions          import *
 
 
@@ -192,7 +192,7 @@ class LeafyyWebInterface(LeafyyComponent):
 
         async def getUser(token: Annotated[str, Depends(web().authBearer)]) -> AccessibleUser:
             try:
-                self.auth.resolveUser(token)
+                return self.auth.resolveUser(token)
             except UsernameNotFoundException as e:
                 self.logger.error(f'При входе пользователя {e.username} произошла следующая ошибка:',
                     exc = e)
@@ -234,10 +234,10 @@ class LeafyyWebInterface(LeafyyComponent):
                 ) from e
 
         @self.api.post('/token/verify')
-        async def verifyToken(token: str):
+        async def verifyToken(token: TokenString):
             try:
-                self.logger.info('received ' + token)
-                self.auth.resolveUser(token, verifyOnly = True)
+                self.logger.info('received ' + token.token)
+                self.auth.resolveUser(token.token, verifyOnly = True)
                 return {'verified': True}
             except Exception as e:
                 self.logger.error('При проверке токена пользователя произошла следующая ошибка:',
@@ -260,7 +260,7 @@ class LeafyyWebInterface(LeafyyComponent):
         @self.api.get('/auth', response_class = HTMLResponse,
             name = 'Авторизация',
             description = 'Пытается авторизовать пользователя по токену.')
-        async def getAuthentication(request: Request, to: str) -> _TemplateResponse:
+        async def getAuthentication(request: Request, to: str = '/') -> _TemplateResponse:
             return self['auth'].render(
                 request,
                 redirectAfter = to,
@@ -314,7 +314,7 @@ class LeafyyWebInterface(LeafyyComponent):
         @self.api.get('/auth/login', response_class = HTMLResponse,
             name = 'Авторизация',
             description = 'Отрисовывает страницу авторизации.')
-        async def getAuthPage(request: Request, to: str) -> _TemplateResponse:
+        async def getAuthPage(request: Request, to: str = '/') -> _TemplateResponse:
             return self['authLogin'].render(
                 request,
                 redirectAfter = to,
@@ -345,17 +345,11 @@ class LeafyyWebInterface(LeafyyComponent):
             name = 'Главная страница',
             description = 'Отрисовывает главную страницу с информацией о грядках.')
         async def getIndexPage(request: Request, user: Annotated[User, Depends(getUser)]) -> _TemplateResponse:
-            if (not request.headers.get('WWW-Authenticate')):
-                return self['authLogin'].render(
-                    request,
-                    redirectAfter = '/',
-                    version = str(version())
-                    )
-            
+            self.logger.debug(f'Logged in as {user.username} with creds {[user.warden, user.master]}')
             return self['index'].render(
                 request,
                 version = str(version()),
-                user = User(username='None', warden=True, ruler=True, enabled=True),
+                user = user,
                 devices = _devices().model(),
                 errors = errors().format()
             )
