@@ -17,7 +17,7 @@ class AccessibleUser(User):
         to_upper = True,
         pattern = r'\b[A-Fa-f0-9]{96}\b'
         )
-    
+
 class TokenString(BaseModel):
     token: constr(strip_whitespace = True)
 
