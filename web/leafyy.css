@@ -252,9 +252,9 @@
 /* Log messages */
 .log-message {
     display: block;
-    white-space: nowrap;
+    white-space: pre-line;
+    margin-top: -15px;
     padding-left: 8px;
-    /* Enable word wrap */
 }
 
 .log-lineno {

@@ -90,6 +90,7 @@ class LeafyyAuthentificator:
     def createAccessToken(self, data: dict) -> str:
         toEncode = data.copy()
         expire = datetime.utcnow() + timedelta(minutes = ACCESS_TOKEN_EXPIRATION_MINUTES)
+        print(expire)
         toEncode.update({"expires": expire.timestamp()})
         encodedJwt = jwtenc(toEncode, self.getSalt(), algorithm = ALGORITHM)
         return encodedJwt
@@ -97,6 +98,7 @@ class LeafyyAuthentificator:
     def createRefreshToken(self, data: dict) -> str:
         toEncode = data.copy()
         expire = datetime.utcnow() + timedelta(days = REFRESH_TOKEN_EXPIRATION_DAYS)
+        print(expire)
         toEncode.update({"refresh": True, "expires": expire.timestamp()})
         encodedJwt = jwtenc(toEncode, self.getSalt(), algorithm = ALGORITHM)
         return encodedJwt
