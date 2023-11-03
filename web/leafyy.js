@@ -11,8 +11,7 @@ function prepareIt() {
         $("footer").removeClass("fixed-bottom");
     }
 
-    $(document).prop("title", $("span.hidden#title").text());
-    $("span.hidden#title").remove();
+    $(document).prop("title", $("body title").text());
 }
 
 $(document).ready(prepareIt);
@@ -63,7 +62,8 @@ function toggleCheckbox(boxId) {
 
 $.ajaxSetup({
     processData: false,
-    contentType: "application/json"
+    contentType: "application/json",
+    headers: {"Authorization": "Bearer " + getCookie("X00", null)}
 })
 
 function reportStdCallback(request) {

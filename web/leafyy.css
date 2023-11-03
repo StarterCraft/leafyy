@@ -90,10 +90,12 @@
 
 .larger {
     font-size: larger;
+    padding-bottom: 3px;
 }
 
 .grand {
     font-size: x-large;
+    padding-bottom: 7px;
     /* font-family: 'Jikharev', system-ui; */
 }
 
@@ -201,7 +203,8 @@
 .card {
     flex: auto;
     display: block;
-    width: auto;
+    width: min-content;
+    height: fit-content;
     min-width: fit-content;
 }
 
@@ -280,6 +283,7 @@
     padding: 4px;
     color: black;
     background-color: white;
+    font-family: system-ui;
     text-decoration: none;
     border-radius: 0 0 4px 4px;
     border-top: none;
@@ -306,6 +310,11 @@
 
 .card:hover .actionblock {
     display: inherit;
+}
+
+button.embed {
+    background: none;
+    border: none;
 }
 
 .code {

@@ -100,7 +100,7 @@ class LeafyyLogging(
         for logger in self:
             logger.setLogLevel(lvl)
 
-    async def getLogFolderSummary(self, reversed = False) -> list[Log]:
+    def getLogFolderSummary(self, reversed = False) -> list[Log]:
         data = [
             {'name': fileName.split(psep)[-1],
              'time': getmtime(fileName),
@@ -215,7 +215,7 @@ class LeafyyLogging(
 
         return output
 
-    async def getLogFile(self, name: str, html: bool = False) -> Log:
+    def getLogFile(self, name: str, html: bool = False) -> Log:
         data = {
             'name': name,
             'time': getmtime(f'logs/{name}'),
@@ -231,4 +231,3 @@ class LeafyyLogging(
             data.update(lines = fread(f'logs/{name}', encoding = 'utf-8').splitlines())
 
         return data
-

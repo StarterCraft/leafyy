@@ -26,10 +26,12 @@ function tryRefreshToken() {
     $.ajax({
         url: "/token/refresh",
         method: "POST",
-        data: {refresh_token: refreshToken},
+        contentType: "application/json",
+        data: JSON.stringify({token: refreshToken}),
         success: finishVerificationFinale,
         error: function(error) {
             console.error('Error:', error);
+            alert(error.responseText);
         }
     })
 }

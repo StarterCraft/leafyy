@@ -1,10 +1,7 @@
-function finishAuth()
+function finishLogout()
 {
     var ACCESS = $("#X00").text();
     var REFRESH = $("#X01").text();
-
-    console.info('New ACCESS:', ACCESS);
-    console.info('New REFRESH', REFRESH)
 
     Cookies.set("X00", ACCESS);
     Cookies.set("X01", REFRESH);
@@ -15,4 +12,4 @@ function finishAuth()
     window.location.href = ($("#redirectAfter").text());
 }
 
-$(document).ready(finishAuth);
+$(document).ready(finishLogout);

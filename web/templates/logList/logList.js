@@ -1,3 +1,16 @@
+function onDownloadLog(file) {
+    var logText = '';
+
+    $.ajax({
+        type: "GET",
+        url: "/log/" + file,
+        success: r => logText = r,
+        error: e => alert(e)
+    });
+
+    saveTextAs(logText, file);
+}
+
 function onSearchQuery() {
     console.debug("onInput Raised!");
 

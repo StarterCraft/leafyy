@@ -29,6 +29,9 @@ from .models              import User, AccessibleUser, TokenString, TokenPair
 from .exceptions          import *
 
 
+JS_LIBRARY_UPDATE_TIMEOUT = 5
+
+
 class LeafyyWebInterface(LeafyyComponent):
     api = APIRouter(
         tags = ['ui']
@@ -99,7 +102,7 @@ class LeafyyWebInterface(LeafyyComponent):
             version = '0.0.1dev1'
 
             try:
-                fetched = get(f'https://api.cdnjs.com/libraries/{libraryId}?fields=version', timeout = 1).json()
+                fetched = get(f'https://api.cdnjs.com/libraries/{libraryId}?fields=version', timeout = JS_LIBRARY_UPDATE_TIMEOUT).json()
                 version = fetched['version']
             except KeyError:
                 pass
@@ -125,7 +128,7 @@ class LeafyyWebInterface(LeafyyComponent):
             '''
             Метод получает новую версию библиотеки из API, сохраняет её в файл и возвращает её в виде строки.
             '''
-            fetched = get(f'https://api.cdnjs.com/libraries/{libraryId}?fields=latest,version', timeout = 1).json()
+            fetched = get(f'https://api.cdnjs.com/libraries/{libraryId}?fields=latest,version', timeout = JS_LIBRARY_UPDATE_TIMEOUT).json()
             code = get(fetched['latest']).text
             version = fetched['version']
 
@@ -144,7 +147,9 @@ class LeafyyWebInterface(LeafyyComponent):
             name = 'Получить кэшированную JS-библиотеку')
         def getCachedLibrary(libraryId: str, request: Request) -> str:
             code = fread(f'web/libraries/{libraryId}.js')
-            version = getCachedLibraryVersion(libraryId)
+            version = 'undefined'
+            try: version = getCachedLibraryVersion(libraryId)
+            except: pass
 
             self.logger.debug(
                 f'Загружена локальная библиотека {libraryId} (версия {version})'
@@ -227,11 +232,7 @@ class LeafyyWebInterface(LeafyyComponent):
             except Exception as e:
                 self.logger.error('При входе пользователя произошла следующая ошибка:',
                     exc = e)
-                raise HTTPException(
-                    status_code = 401,
-                    detail = 'Недопустимые учетные данные',
-                    headers = {"WWW-Authenticate": "Bearer"}
-                ) from e
+                raise e
 
         @self.api.post('/token/verify')
         async def verifyToken(token: TokenString):
@@ -245,9 +246,9 @@ class LeafyyWebInterface(LeafyyComponent):
                 return {'verified': False}
 
         @self.api.post('/token/refresh', response_model = TokenPair)
-        async def refreshToken(refresh_token: str):
+        async def refreshToken(refresh_token: TokenString):
             try:
-                return self.auth.getRefreshToken(refresh_token)
+                return self.auth.getRefreshToken(refresh_token.token)
             except (UsernameNotFoundException, UserDisabledException, JWTError) as e:
                 self.logger.error('При обновлении токена произошла следующая ошибка:',
                     exc = e)
@@ -282,7 +283,7 @@ class LeafyyWebInterface(LeafyyComponent):
                 )
 
             except UsernameNotFoundException as e:
-                status = f'Учётной записи пользователя <b>{e.username}</b> не нашлось.'
+                status = f'<span class="negative">Учётной записи пользователя <b>{e.username}</b> не нашлось.</span>'
 
                 return self['authLogin'].render(
                     request,
@@ -292,7 +293,7 @@ class LeafyyWebInterface(LeafyyComponent):
                     )
 
             except UserDisabledException as e:
-                status = f'Учётная запись пользователя <b>{e.username}</b> отключена.'
+                status = f'<span class="negative">Учётная запись пользователя <b>{e.username}</b> отключена.</span>'
 
                 return self['authLogin'].render(
                     request,
@@ -302,7 +303,7 @@ class LeafyyWebInterface(LeafyyComponent):
                     )
 
             except (UserPasswordException, KeyError, JWTError) as e:
-                status = f'Неверные данные учётной записи: имя пользователя или пароль.'
+                status = f'<span class="negative">Неверные данные учётной записи: имя пользователя или пароль.</span>'
 
                 return self['authLogin'].render(
                     request,
@@ -311,6 +312,14 @@ class LeafyyWebInterface(LeafyyComponent):
                     version = str(version())
                     )
 
+        @self.api.get('/auth/logout', response_class = HTMLResponse,
+            name = 'Выход',
+            description = 'Позволяет пользователю выйти из системы.')
+        async def getAuthPage(request: Request) -> _TemplateResponse:
+            return self['authLogout'].render(
+                request
+                )
+        
         @self.api.get('/auth/login', response_class = HTMLResponse,
             name = 'Авторизация',
             description = 'Отрисовывает страницу авторизации.')
@@ -328,6 +337,7 @@ class LeafyyWebInterface(LeafyyComponent):
             return self['account'].render(
                 request,
                 user = user,
+                accounts = self.auth.getUsers(),
                 version = str(version())
                 )
 

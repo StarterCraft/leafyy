@@ -1,5 +1,5 @@
 <body>
-    <span class="hidden" id="title">Листочек: устройства</span>
+    <title>Листочек: устройства</title>
     <header class="block stretcher">
         <img src="/resources/banner.jpg" height="32">
         <nav class="actionblock">
@@ -32,14 +32,16 @@
                 <div>
                     {% if device.status == 1 %}
                     <span class="bold larger positive">
-                        {% elif device.status == -1 %}
-                        <span class="bold larger negative">
-                            {% else %}
-                            <span class="bold larger">
-                                {% endif %}
-                                {{device.displayName}}
-                            </span>
-                            <span class="bold larger code"> @{{device.address}} </span>
+                    {% elif device.status == -1 %}
+                    <span class="bold larger negative">
+                    {% else %}
+                    <span class="bold larger">
+                    {% endif %}
+                    {{device.displayName}}
+                    </span>
+                    <span class="bold larger code">
+                    @{{device.address}}
+                    </span>
                 </div>
                 {% if user.warden or user.master %}
                 <div class="actionblock">
@@ -49,8 +51,11 @@
                 {% endif %}
             </div>
             <div class="vertical">
-                <p>{{device.description}}</p>
-                <span class="bold"></span>
+                <p>
+                {{device.description}}
+                </p>
+                <span class="bold">
+                </span>
             </div>
         </div>
         {% endfor %}

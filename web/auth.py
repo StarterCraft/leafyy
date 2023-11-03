@@ -70,6 +70,11 @@ class LeafyyAuthentificator:
         else:
             if (not verifyOnly):
                 return AccessibleUser(**thisUser._asdict())
+            
+    def getUsers(self) -> list[User]:
+        ud = postgres().fetchall('web.selectUsers')
+
+        return [User(**d._asdict()) for d in ud]
 
     def authenticateUser(self, username: str, password: str) -> AccessibleUser:
         user = self.selectUser(username)
@@ -81,7 +86,6 @@ class LeafyyAuthentificator:
     def resolveUser(self, token: str, verifyOnly: bool = False) -> AccessibleUser | None:
         payload = jwtdec(token, self.getSalt(), algorithms = [ALGORITHM])
         if (datetime.utcnow().timestamp() > payload['expires']):
-            print(payload)
             print(datetime.utcnow().timestamp() > payload['expires'], datetime.utcnow().timestamp(), payload['expires'])
 
             raise TokenExpirationException

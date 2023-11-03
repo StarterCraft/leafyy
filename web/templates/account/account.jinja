@@ -1,4 +1,5 @@
 <body>
+    <title>Листочек: учётные записи</title>
     <header class="block stretcher">
         <img src="/resources/banner.jpg" height="32">
         <nav class="actionblock">
@@ -15,7 +16,7 @@
             {{user.username}}
             <span class="italic">
             {% if user.master %}
-            (хозяин)
+            (господин системы)
             {% elif user.warden %}
             (смотритель)
             {% else %}
@@ -23,70 +24,108 @@
             {% endif %}
             </span>
         </div>
-        <a class="action" href="/logout" id="logout">выйти</a>
+        <a class="action" href="/auth/logout" id="logout">выйти</a>
     </div>
-    <div class="stretcher">
-        <div class="block vertical" id="changePassword">
-            <span class="bold">
+    <div class="view horizontal">
+        <div class="block card vertical" id="changePassword">
+            <span class="bold larger">
                 Смена пароля
             </span>
-            <input class="forminp code" type="password" id="passwordField0" placeholder="Новый пароль...">
-            <input class="forminp code" type="password" id="passwordField0" placeholder="Повторите пароль...">
-            <button class="code formi" id="changePasswordConfirm" onclick="onChangePasswordConfirm()">Применить</button>
+            <div class="view vertical">
+                <input class="forminp code" type="password" id="passwordField0" placeholder="Новый пароль...">
+                <input class="forminp code" type="password" id="passwordField1" placeholder="Повторите пароль...">
+                <button class="action formi" id="changePasswordConfirm" onclick="onChangePasswordConfirm()">Применить</button>
+            </div>
         </div>
         {% if user.warden or user.master %}
-        <div class="block vertical" id="accounts">
-            <span class="bold">
+        <div class="block card vertical" id="accounts">
+            <span class="bold larger">
                 Учётные записи
             </span>
             <div class="view vertical">
                 {% for account in accounts %}
-                {% if account.username != user.username %}
-                {% if account.warden and user.master %}
+                {% if user.master %}
+                {% if account.master %}
                 <div class="stretcher">
                     <span>
                         {{account.username}}
                         <span class="italic">
-                            (смотритель)
+                        (это вы, господин системы)
+                        </span>
+                    </span>
+                </div>
+                {% elif account.warden %}
+                <div class="stretcher">
+                    <span>
+                        {{account.username}}
+                        <span class="italic">
+                        (смотритель)
                         </span>
                     </span>
                     <div class="actionblock">
-                        <a class="action" id="deposeWarden-{{account.username}}"
-                            onclick="deposeWarden('{{account.username}}')">низложить</a>
+                        <a class="action" id="depose-{{account.username}}"
+                            onclick="deposeUser('{{account.username}}')">низложить</a>
                         <a class="action" id="disable-{{account.username}}"
-                            onclick="disableAccount('{{account.username}}')">отключить</a>
+                            onclick="disableUser('{{account.username}}')">отключить</a>
                         <a class="action" id="delete-{{account.username}}"
-                            onclick="deleteAccount('{{account.username}}')">удалить</a>
+                            onclick="deleteUser('{{account.username}}')">изгнать</a>
                     </div>
                 </div>
-                {% elif not account.warden and user.master %}
+                {% else %}
                 <div class="stretcher">
                     <span>
                         {{account.username}}
                         <span class="italic">
-                            (простолюдин)
+                        (простолюдин)
                         </span>
                     </span>
                     <div class="actionblock">
+                        <a class="action" id="pose-{{account.username}}"
+                            onclick="poseUser('{{account.username}}')">возвести</a>
                         <a class="action" id="disable-{{account.username}}"
                             onclick="disableAccount('{{account.username}}')">отключить</a>
                         <a class="action" id="delete-{{account.username}}"
-                            onclick="deleteAccount('{{account.username}}')">удалить</a>
+                            onclick="deleteAccount('{{account.username}}')">изгнать</a>
                     </div>
                 </div>
-                {% elif not account.warden and user.warden %}
+                {% endif %}
+                {% elif user.warden %}
+                {% if account.warden %}
                 <div class="stretcher">
                     <span>
                         {{account.username}}
                         <span class="italic">
-                            (простолюдин)
+                        {% if account.username == user.username %}
+                        (это вы, смотритель)
+                        {% else %}
+                        (смотритель)
+                        {% endif %}
                         </span>
                     </span>
                     <div class="actionblock">
+                        <a class="action" id="depose-{{account.username}}"
+                            onclick="deposeUser('{{account.username}}')">низложить</a>
+                        <a class="action" id="disable-{{account.username}}"
+                            onclick="disableUser('{{account.username}}')">отключить</a>
+                        <a class="action" id="delete-{{account.username}}"
+                            onclick="deleteUser('{{account.username}}')">изгнать</a>
+                    </div>
+                </div>
+                {% else %}
+                <div class="stretcher">
+                    <span>
+                        {{account.username}}
+                        <span class="italic">
+                        (простолюдин)
+                        </span>
+                    </span>
+                    <div class="actionblock">
+                        <a class="action" id="pose-{{account.username}}"
+                            onclick="poseUser('{{account.username}}')">возвести</a>
                         <a class="action" id="disable-{{account.username}}"
                             onclick="disableAccount('{{account.username}}')">отключить</a>
                         <a class="action" id="delete-{{account.username}}"
-                            onclick="deleteAccount('{{account.username}}')">удалить</a>
+                            onclick="deleteAccount('{{account.username}}')">изгнать</a>
                     </div>
                 </div>
                 {% endif %}

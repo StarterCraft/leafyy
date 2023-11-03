@@ -1,5 +1,5 @@
 <body>
-    <span class="hidden" id="title">Листочек: журнал и консоль</span>
+    <title>Листочек: журнал и консоль</title>
     <header class="block stretcher">
         <img src="/resources/banner.jpg" height="32">
         <nav class="actionblock">
@@ -91,15 +91,15 @@
                                 <label for="{{logger.name}}">{{logger.name}}</label>
                             </div>
                             <div>
-                            <span>Уровень логгера:</span>
-                            <select class="formi code log-level" id="{{logger.name}}"
-                                selected="{{logger.level}}" onchange="onLogLevelSelectChange('{{logger.name}}')">
-                                <option value="DEBUG" style="color: gray;">DEBUG</option>
-                                <option value="INFO" style="color: blue;">INFO</option>
-                                <option value="WARNING" style="color: orange;">WARNING</option>
-                                <option value="ERROR" style="color: red;">ERROR</option>
-                                <option value="EXCEPTION" style="color: darkred;">EXCEPTION</option>
-                            </select>
+                                <span>Уровень логгера:</span>
+                                <select class="formi code log-level" id="{{logger.name}}" selected="{{logger.level}}"
+                                    onchange="onLogLevelSelectChange('{{logger.name}}')">
+                                    <option value="DEBUG" style="color: gray;">DEBUG</option>
+                                    <option value="INFO" style="color: blue;">INFO</option>
+                                    <option value="WARNING" style="color: orange;">WARNING</option>
+                                    <option value="ERROR" style="color: red;">ERROR</option>
+                                    <option value="EXCEPTION" style="color: darkred;">EXCEPTION</option>
+                                </select>
                             </div>
                         </div>
                         {% endfor %}
@@ -115,17 +115,18 @@
                             <div>
                                 <input type="checkbox" id="{{device.address}}" checked="{{device.visibleInConsole}}">
                                 <label for="{{device.address}}">{{device.displayName}}
-                            <span class="bold code"> @{{device.address}} </span></label>
+                                    <span class="bold code"> @{{device.address}} </span></label>
                             </div>
                             <div>
-                            <span>Режим декодирования:</span>
-                            <select class="formi code decode-mode" id="{{device.address}}" selected="{{device.decodeMode}}">
-                                <option value="ascii">ASCII</option>
-                                <option value="bin">BIN</option>
-                                <option value="oct">OCT</option>
-                                <option value="dec">DEC</option>
-                                <option value="hex">HEX</option>
-                            </select>
+                                <span>Режим декодирования:</span>
+                                <select class="formi code decode-mode" id="{{device.address}}"
+                                    selected="{{device.decodeMode}}">
+                                    <option value="ascii">ASCII</option>
+                                    <option value="bin">BIN</option>
+                                    <option value="oct">OCT</option>
+                                    <option value="dec">DEC</option>
+                                    <option value="hex">HEX</option>
+                                </select>
                             </div>
                         </div>
                         {% endfor %}
