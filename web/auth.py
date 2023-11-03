@@ -70,7 +70,7 @@ class LeafyyAuthentificator:
         else:
             if (not verifyOnly):
                 return AccessibleUser(**thisUser._asdict())
-            
+
     def getUsers(self) -> list[User]:
         ud = postgres().fetchall('web.selectUsers')
 
