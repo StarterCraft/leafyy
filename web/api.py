@@ -223,40 +223,40 @@ class LeafyyWebInterface(LeafyyComponent):
                     detail = 'Недопустимые учетные данные',
                     headers = {"WWW-Authenticate": "Bearer"}
                 ) from e
-            
+
         @self.api.post('/account/add')
         def postAddUser(request: Request, user: Annotated[User, Depends(getUser)], data: AccessibleUser):
             try:
                 if (not (user.warden or user.master)):
                     raise PermissionError(
                         f'Пользователь {user.username} @ {request.client.host} не имеет прав на эту операцию')
-                
+
                 return self.auth.addUser(data)
             except ValueError as e:
                 self.logger.error('При создании нового профиля пользователя произошла следующая ошибка:',
                     exc = e)
                 raise e
-            
+
         @self.api.put('/account/password')
         def putUserPassword(request: Request, user: Annotated[User, Depends(getUser)], data: UserForPasswordChange):
             try:
                 if (not (user.warden or user.master)):
                     raise PermissionError(
                         f'Пользователь {user.username} @ {request.client.host} не имеет прав на эту операцию')
-                
+
                 return self.auth.setUserPassword(data)
             except ValueError as e:
                 self.logger.error('При изменении пароля пользователя произошла следующая ошибка:',
                     exc = e)
                 raise e
-            
+
         @self.api.put('/account/position')
         def putUserPosition(request: Request, user: Annotated[User, Depends(getUser)], data: UserForPasswordChange):
             try:
                 if (not (user.warden or user.master)):
                     raise PermissionError(
                         f'Пользователь {user.username} @ {request.client.host} не имеет прав на эту операцию')
-                
+
                 return self.auth.setUserPassword(data)
             except ValueError as e:
                 self.logger.error('При изменении пароля пользователя произошла следующая ошибка:',

@@ -17,11 +17,11 @@ class AccessibleUser(User):
         to_upper = True,
         pattern = r'\b[A-Fa-f0-9]{96}\b'
         )
-    
+
 class UserForPasswordChange(BaseModel):
     username: str
     password: str
-    
+
 class UserForPasswordChange(BaseModel):
     username: str
     enabled:  str
