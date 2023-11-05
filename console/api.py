@@ -16,7 +16,7 @@ class LeafyyConsoleApi:
         @self.api.post('', tags = ['console'],
             name = 'Исполнить команду',
             description = 'Исполняет команду, находящуюся в теле запроса.')
-        async def postExecCmd(request: Request, response: Response, data: Order):
+        async def postExec(request: Request, response: Response, data: Order):
             cmdName = data.data.split()[0]
             cmdArgs = data.data.split()[1:]
 

@@ -25,7 +25,7 @@ from webutils             import JsResponse, CssResponse
 
 from .auth                import LeafyyAuthentificator
 from .template            import Template
-from .models              import User, AccessibleUser, TokenString, TokenPair
+from .models              import User, AccessibleUser, UserForPasswordChange, TokenString, TokenPair
 from .exceptions          import *
 
 
@@ -138,7 +138,7 @@ class LeafyyWebInterface(LeafyyComponent):
 
             self.logger.info(
                 f'Загружена локальная библиотека {libraryId} (версия {version})'
-                f' для клиента {request.client.host}:{request.client.port}. Локальная библиотека обновлена'
+                f' для клиента {request.client.host}. Локальная библиотека обновлена'
             )
 
             return code
@@ -153,7 +153,7 @@ class LeafyyWebInterface(LeafyyComponent):
 
             self.logger.debug(
                 f'Загружена локальная библиотека {libraryId} (версия {version})'
-                f' для клиента {request.client.host}:{request.client.port}'
+                f' для клиента {request.client.host}'
             )
 
             return code
@@ -195,11 +195,11 @@ class LeafyyWebInterface(LeafyyComponent):
         async def getFavicon() -> FileResponse:
             return f'web/resources/favicon.svg'
 
-        async def getUser(token: Annotated[str, Depends(web().authBearer)]) -> AccessibleUser:
+        async def getUser(request: Request, token: Annotated[str, Depends(web().authBearer)]) -> AccessibleUser:
             try:
                 return self.auth.resolveUser(token)
             except UsernameNotFoundException as e:
-                self.logger.error(f'При входе пользователя {e.username} произошла следующая ошибка:',
+                self.logger.error(f'При входе пользователя {e.username} @ {request.client.host} произошла следующая ошибка:',
                     exc = e)
                 raise HTTPException(
                     status_code = 401,
@@ -207,7 +207,7 @@ class LeafyyWebInterface(LeafyyComponent):
                     headers = {"WWW-Authenticate": "Bearer"}
                 ) from e
             except UserDisabledException as e:
-                self.logger.error(f'При входе пользователя {e.username} произошла следующая ошибка:',
+                self.logger.error(f'При входе пользователя {e.username} @ {request.client.host} произошла следующая ошибка:',
                     exc = e)
                 raise HTTPException(
                     status_code = 400,
@@ -216,15 +216,54 @@ class LeafyyWebInterface(LeafyyComponent):
                     headers = {"WWW-Authenticate": "Bearer"}
                 ) from e
             except (UserPasswordException, KeyError, JWTError) as e:
-                self.logger.error('При входе пользователя произошла следующая ошибка:',
+                self.logger.error(f'При входе пользователя с {request.client.host} произошла следующая ошибка:',
                     exc = e)
                 raise HTTPException(
                     status_code = 401,
                     detail = 'Недопустимые учетные данные',
                     headers = {"WWW-Authenticate": "Bearer"}
                 ) from e
+            
+        @self.api.post('/account/add')
+        def postAddUser(request: Request, user: Annotated[User, Depends(getUser)], data: AccessibleUser):
+            try:
+                if (not (user.warden or user.master)):
+                    raise PermissionError(
+                        f'Пользователь {user.username} @ {request.client.host} не имеет прав на эту операцию')
+                
+                return self.auth.addUser(data)
+            except ValueError as e:
+                self.logger.error('При создании нового профиля пользователя произошла следующая ошибка:',
+                    exc = e)
+                raise e
+            
+        @self.api.put('/account/password')
+        def putUserPassword(request: Request, user: Annotated[User, Depends(getUser)], data: UserForPasswordChange):
+            try:
+                if (not (user.warden or user.master)):
+                    raise PermissionError(
+                        f'Пользователь {user.username} @ {request.client.host} не имеет прав на эту операцию')
+                
+                return self.auth.setUserPassword(data)
+            except ValueError as e:
+                self.logger.error('При изменении пароля пользователя произошла следующая ошибка:',
+                    exc = e)
+                raise e
+            
+        @self.api.put('/account/position')
+        def putUserPosition(request: Request, user: Annotated[User, Depends(getUser)], data: UserForPasswordChange):
+            try:
+                if (not (user.warden or user.master)):
+                    raise PermissionError(
+                        f'Пользователь {user.username} @ {request.client.host} не имеет прав на эту операцию')
+                
+                return self.auth.setUserPassword(data)
+            except ValueError as e:
+                self.logger.error('При изменении пароля пользователя произошла следующая ошибка:',
+                    exc = e)
+                raise e
 
-        @self.api.post("/token", response_model = TokenPair)
+        @self.api.post('/token', response_model = TokenPair)
         def accessToken(form_data: Annotated[OAuth2PasswordRequestForm, Depends()]):
             try:
                 print(form_data.username, form_data.password)
@@ -332,11 +371,12 @@ class LeafyyWebInterface(LeafyyComponent):
 
         @self.api.get('/account', response_class = HTMLResponse,
             name = 'Аккаунт',
-            description = 'Отрисовывает страницу конкретного аккаунта.')
+            description = 'Отрисовывает страницу своего аккаунта.')
         async def getSelfAccountPage(request: Request, user: Annotated[User, Depends(getUser)]) -> _TemplateResponse:
             return self['account'].render(
                 request,
                 user = user,
+                thisAccount = user,
                 accounts = self.auth.getUsers(),
                 version = str(version())
                 )
@@ -348,6 +388,8 @@ class LeafyyWebInterface(LeafyyComponent):
             return self['account'].render(
                 request,
                 user = user,
+                thisAccount = self.auth.getUser,
+                accounts = self.auth.getUsers(),
                 version = str(version())
                 )
 

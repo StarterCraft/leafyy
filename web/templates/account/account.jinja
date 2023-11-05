@@ -13,11 +13,11 @@
     </header>
     <div class="block stretcher">
         <div class="bold grand">
-            {{user.username}}
+            {{thisAccount.username}}
             <span class="italic">
-            {% if user.master %}
+            {% if thisAccount.master %}
             (господин системы)
-            {% elif user.warden %}
+            {% elif thisAccount.warden %}
             (смотритель)
             {% else %}
             (простолюдин)
@@ -27,6 +27,7 @@
         <a class="action" href="/auth/logout" id="logout">выйти</a>
     </div>
     <div class="view horizontal">
+        {% if thisAccount.username == user.username %}
         <div class="block card vertical" id="changePassword">
             <span class="bold larger">
                 Смена пароля
@@ -34,9 +35,32 @@
             <div class="view vertical">
                 <input class="forminp code" type="password" id="passwordField0" placeholder="Новый пароль...">
                 <input class="forminp code" type="password" id="passwordField1" placeholder="Повторите пароль...">
-                <button class="action formi" id="changePasswordConfirm" onclick="onChangePasswordConfirm()">Применить</button>
+                <button class="action formi" id="changePasswordConfirm" onclick="onChangePasswordConfirm({{user.username}})">Применить</button>
             </div>
         </div>
+        {% elif user.master %}
+        <div class="block card vertical" id="changePassword">
+            <span class="bold larger">
+                Смена пароля
+            </span>
+            <div class="view vertical">
+                <input class="forminp code" type="password" id="passwordField0" placeholder="Новый пароль...">
+                <input class="forminp code" type="password" id="passwordField1" placeholder="Повторите пароль...">
+                <button class="action formi" id="changePasswordConfirm" onclick="onChangePasswordConfirm({{thisAccount.username}})">Применить</button>
+            </div>
+        </div>
+        {% elif user.warden and not thisAccount.warden %}
+        <div class="block card vertical" id="changePassword">
+            <span class="bold larger">
+                Смена пароля
+            </span>
+            <div class="view vertical">
+                <input class="forminp code" type="password" id="passwordField0" placeholder="Новый пароль...">
+                <input class="forminp code" type="password" id="passwordField1" placeholder="Повторите пароль...">
+                <button class="action formi" id="changePasswordConfirm" onclick="onChangePasswordConfirm({{thisAccount.username}})">Применить</button>
+            </div>
+        </div>
+        {% endif %}
         {% if user.warden or user.master %}
         <div class="block card vertical" id="accounts">
             <span class="bold larger">
