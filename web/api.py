@@ -250,16 +250,16 @@ class LeafyyWebInterface(LeafyyComponent):
                     exc = e)
                 raise e
             
-        @self.api.put('/account/position')
-        def putUserPosition(request: Request, user: Annotated[User, Depends(getUser)], data: UserForPasswordChange):
+        @self.api.put('/account/status')
+        def putUserStatus(request: Request, user: Annotated[User, Depends(getUser)], data: User):
             try:
                 if (not (user.warden or user.master)):
                     raise PermissionError(
                         f'Пользователь {user.username} @ {request.client.host} не имеет прав на эту операцию')
                 
-                return self.auth.setUserPassword(data)
+                return self.auth.setUserStatus(data)
             except ValueError as e:
-                self.logger.error('При изменении пароля пользователя произошла следующая ошибка:',
+                self.logger.error('При изменении статуса пользователя произошла следующая ошибка:',
                     exc = e)
                 raise e
 
