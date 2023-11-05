@@ -358,7 +358,7 @@ class LeafyyWebInterface(LeafyyComponent):
             return self['authLogout'].render(
                 request
                 )
-        
+
         @self.api.get('/auth/login', response_class = HTMLResponse,
             name = 'Авторизация',
             description = 'Отрисовывает страницу авторизации.')
