@@ -25,7 +25,7 @@ from webutils             import JsResponse, CssResponse
 
 from .auth                import LeafyyAuthentificator
 from .template            import Template
-from .models              import User, AccessibleUser, UserForPasswordChange, TokenString, TokenPair
+from .models              import *
 from .exceptions          import *
 
 
@@ -236,6 +236,19 @@ class LeafyyWebInterface(LeafyyComponent):
                 self.logger.error('При создании нового профиля пользователя произошла следующая ошибка:',
                     exc = e)
                 raise e
+            
+        @self.api.delete('/account/remove')
+        def deleteUser(request: Request, user: Annotated[User, Depends(getUser)], data: UserForStatusChange):
+            try:
+                if (not (user.warden or user.master)):
+                    raise PermissionError(
+                        f'Пользователь {user.username} @ {request.client.host} не имеет прав на эту операцию')
+
+                return self.auth.addUser(data)
+            except ValueError as e:
+                self.logger.error('При удалении профиля пользователя произошла следующая ошибка:',
+                    exc = e)
+                raise e
 
         @self.api.put('/account/password')
         def putUserPassword(request: Request, user: Annotated[User, Depends(getUser)], data: UserForPasswordChange):
@@ -249,14 +262,14 @@ class LeafyyWebInterface(LeafyyComponent):
                 self.logger.error('При изменении пароля пользователя произошла следующая ошибка:',
                     exc = e)
                 raise e
-
+            
         @self.api.put('/account/status')
         def putUserStatus(request: Request, user: Annotated[User, Depends(getUser)], data: User):
             try:
                 if (not (user.warden or user.master)):
                     raise PermissionError(
                         f'Пользователь {user.username} @ {request.client.host} не имеет прав на эту операцию')
-
+                
                 return self.auth.setUserStatus(data)
             except ValueError as e:
                 self.logger.error('При изменении статуса пользователя произошла следующая ошибка:',

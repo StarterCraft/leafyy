@@ -22,7 +22,7 @@ class UserForPasswordChange(BaseModel):
     username: str
     password: str
 
-class UserForPasswordChange(BaseModel):
+class UserForStatusChange(BaseModel):
     username: str
     enabled:  str
 
