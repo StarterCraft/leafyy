@@ -1,3 +1,1 @@
-function onChangePassword(username) {
-
-}
+$(document).ready(() => {$('div.modal#add-user').show()});

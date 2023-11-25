@@ -26,6 +26,78 @@
         </div>
         <a class="action" href="/auth/logout" id="logout">выйти</a>
     </div>
+    <!--#region modals-->
+    <div class="modal-field vertical">
+        <!--#region add-user-->
+        <div class="modal vertical" id="add-user">
+            <div class="block stretcher">
+                <div class="bold grand">
+                    Новый пользователь
+                </div>
+                <nav class="actionblock">
+                    <a class="action" href="#" onclick="onAddUser()">применить</a> <!-- автообновление! -->
+                    <a class="action" href="#" onclick="toggleModal('add-user')">отмена</a>
+                </nav>
+            </div>
+            <div class="block vertical restricted">
+                <div class="stretcher">
+                    <span>Логин</span>
+                    <input class="code formi" id="newUserName" type="text" maxlength="64">
+                </div>
+                <div class="stretcher">
+                    <span>Пароль</span>
+                    <input class="code formi" id="newPassword" type="password" maxlength="64">
+                </div>
+                <div class="stretcher" onclick="toggleCheckbox('newUserIsWarden');">
+                    <span>Назначить смотрителем</span>
+                    <input id="newUserIsWarden" type="checkbox">
+                </div>
+            </div>
+        </div>
+        <!--#endregion-->
+        <!--#region pose-user-->
+        <div class="modal vertical" id="pose-user">
+            <div class="block stretcher">
+                <div class="bold grand">
+                    Новый пользователь
+                </div>
+                <nav class="actionblock">
+                    <a class="action" href="#" onclick="onSaveSettings()">применить</a> <!-- автообновление! -->
+                    <a class="action" href="#" onclick="toggleModal('log-settings')">отмена</a>
+                </nav>
+            </div>
+            </div>
+        </div>
+        <!--#endregion-->
+        <!--#region depose-user-->
+        <div class="modal vertical" id="depose-user">
+            <div class="block stretcher">
+                <div class="bold grand">
+                    Новый пользователь
+                </div>
+                <nav class="actionblock">
+                    <a class="action" href="#" onclick="onSaveSettings()">применить</a> <!-- автообновление! -->
+                    <a class="action" href="#" onclick="toggleModal('log-settings')">отмена</a>
+                </nav>
+            </div>
+        </div>
+        <!--#endregion-->
+        <!--#region remove-user-->
+        <div class="modal vertical" id="remove-user">
+            <div class="block stretcher">
+                <div class="bold grand">
+                    Новый пользователь
+                </div>
+                <nav class="actionblock">
+                    <a class="action" href="#" onclick="onSaveSettings()">применить</a> <!-- автообновление! -->
+                    <a class="action" href="#" onclick="toggleModal('log-settings')">отмена</a>
+                </nav>
+            </div>
+        </div>
+        <!--#endregion-->
+    </div>
+    <!--#endregion-->
+    <!--#region primary-->
     <div class="view horizontal">
         {% if thisAccount.username == user.username %}
         <div class="block card vertical" id="changePassword">
@@ -174,5 +246,6 @@
             {{version}}
         </div>
     </footer>
+    <!--#endregion-->
     <script src="/leafyy.js"></script>
 </body>
